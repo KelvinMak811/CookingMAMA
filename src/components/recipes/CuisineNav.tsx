@@ -1,0 +1,52 @@
+"use client";
+
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import Nav from "react-bootstrap/Nav";
+import { CUISINE_NAV_ITEMS, isValidCuisine } from "@/lib/cuisineNav";
+import type { CuisineFilter } from "@/lib/cuisineNav";
+import { getRecipeById } from "@/data/recipes";
+
+function resolveActiveCuisine(pathname: string): CuisineFilter {
+  const cuisineMatch = pathname.match(/^\/recipes\/cuisine\/([^/]+)/);
+  if (cuisineMatch && isValidCuisine(cuisineMatch[1])) return cuisineMatch[1];
+  const detailMatch = pathname.match(/^\/recipes\/([^/]+)$/);
+  if (detailMatch && detailMatch[1] !== "cuisine") {
+    const recipe = getRecipeById(detailMatch[1]);
+    if (recipe) return recipe.cuisine;
+  }
+  return "all";
+}
+
+export function CuisineNav() {
+  const pathname = usePathname();
+  const active = resolveActiveCuisine(pathname);
+
+  if (!pathname.startsWith("/recipes")) return null;
+
+  return (
+    <nav className="cuisine-nav-sticky border-bottom py-2 mb-0" aria-label="菜式類別">
+      <div className="date-nav-scroll">
+        <Nav variant="pills" className="flex-nowrap gap-2">
+          {CUISINE_NAV_ITEMS.map((item) => {
+            const isActive = active === item.value;
+            return (
+              <Nav.Item key={item.value}>
+                <Link
+                  href={item.href}
+                  className={`nav-link rounded-3 d-flex align-items-center gap-1 px-3 ${isActive ? "active" : ""}`}
+                >
+                  <span>{item.icon}</span>
+                  <span>{item.label}</span>
+                  <span className={`badge rounded-pill ${isActive ? "bg-light text-primary" : "bg-secondary-subtle text-secondary"}`}>
+                    {item.count}
+                  </span>
+                </Link>
+              </Nav.Item>
+            );
+          })}
+        </Nav>
+      </div>
+    </nav>
+  );
+}

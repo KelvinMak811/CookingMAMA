@@ -1,0 +1,118 @@
+:root {
+  --bs-primary: #f97316;
+  --bs-primary-rgb: 249, 115, 22;
+  --bs-link-color: #ea580c;
+  --bs-link-hover-color: #c2410c;
+  --bs-body-font-family: var(--font-noto-sans-tc), "PingFang TC", "Microsoft JhengHei",
+    sans-serif;
+  --smartcook-bg: #fffbf5;
+}
+
+body {
+  background-color: var(--smartcook-bg);
+  min-height: 100vh;
+}
+
+.btn-primary {
+  --bs-btn-bg: #f97316;
+  --bs-btn-border-color: #f97316;
+  --bs-btn-hover-bg: #ea580c;
+  --bs-btn-hover-border-color: #ea580c;
+  --bs-btn-active-bg: #c2410c;
+  --bs-btn-active-border-color: #c2410c;
+}
+
+.btn-outline-primary {
+  --bs-btn-color: #f97316;
+  --bs-btn-border-color: #f97316;
+  --bs-btn-hover-bg: #f97316;
+  --bs-btn-hover-border-color: #f97316;
+}
+
+.text-primary {
+  color: #f97316 !important;
+}
+
+.bg-primary-subtle {
+  background-color: #fff7ed !important;
+}
+
+.nav-pills .nav-link.active {
+  background-color: #f97316;
+}
+
+.form-check-input:checked {
+  background-color: #f97316;
+  border-color: #f97316;
+}
+
+.app-main {
+  max-width: 48rem;
+  padding-bottom: 5.5rem;
+}
+
+@media (min-width: 768px) {
+  .app-main {
+    padding-bottom: 2rem;
+  }
+}
+
+.safe-area-bottom {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+.date-nav-scroll {
+  overflow-x: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.date-nav-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+.cuisine-nav-sticky {
+  position: sticky;
+  top: 56px;
+  z-index: 1020;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(8px);
+}
+
+.shopping-fab {
+  position: fixed;
+  right: 1rem;
+  bottom: 5.5rem;
+  z-index: 1040;
+  width: 3.5rem;
+  height: 3.5rem;
+  border-radius: 50%;
+}
+
+@media (min-width: 768px) {
+  .shopping-fab {
+    bottom: 1.5rem;
+  }
+}
+
+.recipe-card-img {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  width: 100%;
+}
+
+.star-rating button {
+  border: none;
+  background: none;
+  font-size: 1.5rem;
+  padding: 0 0.15rem;
+  line-height: 1;
+}
+
+.star-rating button.active {
+  color: #fbbf24;
+}
+
+.star-rating button:not(.active) {
+  color: #d1d5db;
+}
