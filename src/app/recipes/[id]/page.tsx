@@ -6,11 +6,15 @@ import { DifficultyStars } from "@/components/recipes/DifficultyStars";
 import { StepList } from "@/components/recipes/StepList";
 import { CompleteCookingButton } from "@/components/recipes/CompleteCookingButton";
 import { RecipeDetailClient } from "@/components/recipes/RecipeDetailClient";
-import { getRecipeById } from "@/data/recipes";
+import { getRecipeById, recipes } from "@/data/recipes";
 import { CUISINE_LABELS } from "@/types";
 
 interface RecipeDetailPageProps {
   params: Promise<{ id: string }>;
+}
+
+export function generateStaticParams() {
+  return recipes.map((recipe) => ({ id: recipe.id }));
 }
 
 export default async function RecipeDetailPage({ params }: RecipeDetailPageProps) {
