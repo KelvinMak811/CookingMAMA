@@ -5,7 +5,8 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build && node scripts/postbuild-github-pages.mjs",
-    "export-recipes": "tsx scripts/export-recipes-json.ts",
+    "build:pages": "npm run export-recipes && node scripts/build-github-pages-static.mjs",
+    "export-recipes": "npx tsx scripts/export-recipes-json.ts",
     "start": "next start",
     "lint": "eslint"
   },

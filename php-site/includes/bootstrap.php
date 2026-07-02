@@ -16,13 +16,65 @@ const CUISINE_HINTS = [
     'italian' => '意粉同燉菜，易潔鑊就煮到意式風味。',
 ];
 
-const CUISINE_NAV = [
-    ['value' => 'all', 'label' => '全部', 'icon' => '🍽️', 'href' => 'recipes.php'],
-    ['value' => 'chinese', 'label' => '中餐', 'icon' => '🥢', 'href' => 'recipes-cuisine.php?cuisine=chinese'],
-    ['value' => 'western', 'label' => '西餐', 'icon' => '🍝', 'href' => 'recipes-cuisine.php?cuisine=western'],
-    ['value' => 'japanese', 'label' => '日式', 'icon' => '🍱', 'href' => 'recipes-cuisine.php?cuisine=japanese'],
-    ['value' => 'italian', 'label' => '意式', 'icon' => '🍕', 'href' => 'recipes-cuisine.php?cuisine=italian'],
-];
+function is_static_export(): bool
+{
+    return getenv('SMARTCOOK_STATIC') === '1';
+}
+
+function base_path(): string
+{
+    return rtrim(getenv('SMARTCOOK_BASE_PATH') ?: '', '/');
+}
+
+function asset_url(string $path): string
+{
+    $base = base_path();
+    $normalized = ltrim($path, '/');
+    return $base !== '' ? "{$base}/{$normalized}" : $normalized;
+}
+
+function page_url(string $path): string
+{
+    $base = base_path();
+    if (is_static_export()) {
+        $map = [
+            'recipes.php' => 'recipes/',
+            'shopping-list.php' => 'shopping-list/',
+            'history.php' => 'history/',
+            'expenses.php' => 'expenses/',
+        ];
+        $path = $map[$path] ?? $path;
+    }
+    $normalized = ltrim($path, '/');
+    return $base !== '' ? "{$base}/{$normalized}" : $normalized;
+}
+
+function cuisine_url(string $cuisine): string
+{
+    if (is_static_export()) {
+        return asset_url("recipes/cuisine/{$cuisine}/");
+    }
+    return page_url('recipes-cuisine.php?cuisine=' . rawurlencode($cuisine));
+}
+
+function recipe_url(string $recipeId): string
+{
+    if (is_static_export()) {
+        return asset_url('recipes/' . rawurlencode($recipeId) . '/');
+    }
+    return page_url('recipe.php?id=' . rawurlencode($recipeId));
+}
+
+function cuisine_nav_items(): array
+{
+    return [
+        ['value' => 'all', 'label' => '全部', 'icon' => '🍽️', 'href' => page_url('recipes.php')],
+        ['value' => 'chinese', 'label' => '中餐', 'icon' => '🥢', 'href' => cuisine_url('chinese')],
+        ['value' => 'western', 'label' => '西餐', 'icon' => '🍝', 'href' => cuisine_url('western')],
+        ['value' => 'japanese', 'label' => '日式', 'icon' => '🍱', 'href' => cuisine_url('japanese')],
+        ['value' => 'italian', 'label' => '意式', 'icon' => '🍕', 'href' => cuisine_url('italian')],
+    ];
+}
 
 function h(string $value): string
 {

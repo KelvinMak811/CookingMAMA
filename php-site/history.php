@@ -1,7 +1,7 @@
 <?php
 require_once __DIR__ . '/includes/bootstrap.php';
 $pageTitle = '煮食日曆 — SmartCook';
-$pageScripts = ['assets/js/history.js?v=20260702'];
+$pageScripts = [asset_url('assets/js/history.js?v=20260702')];
 ?>
 <!DOCTYPE html>
 <html lang="zh-HK">

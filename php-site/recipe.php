@@ -14,12 +14,12 @@ if ($recipe === null) {
 <?php
 $showBack = true;
 $headerTitle = '搵唔到菜式';
-$backHref = 'recipes.php';
+$backHref = page_url('recipes.php');
 include __DIR__ . '/header.html';
 ?>
 <main class="container app-main flex-grow-1 px-3 py-5 text-center">
   <p class="text-secondary mb-4">呢個菜式可能已移除，請返回菜式庫重試。</p>
-  <a href="recipes.php" class="btn btn-primary">返回菜式庫</a>
+  <a href="<?php echo h(page_url('recipes.php')); ?>" class="btn btn-primary">返回菜式庫</a>
 </main>
 <?php include __DIR__ . '/footer.html'; ?>
 </body>
@@ -31,7 +31,7 @@ include __DIR__ . '/header.html';
 $cuisine = (string) $recipe['cuisine'];
 $activeCuisine = $cuisine;
 $pageTitle = $recipe['name'] . ' — SmartCook';
-$pageScripts = ['assets/js/recipe-detail.js?v=20260702'];
+$pageScripts = [asset_url('assets/js/recipe-detail.js?v=20260702')];
 $recipeJson = json_encode($recipe, JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP);
 ?>
 <!DOCTYPE html>
@@ -41,7 +41,7 @@ $recipeJson = json_encode($recipe, JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_
 <?php
 $showBack = true;
 $headerTitle = (string) $recipe['name'];
-$backHref = 'recipes-cuisine.php?cuisine=' . urlencode($cuisine);
+$backHref = cuisine_url($cuisine);
 include __DIR__ . '/header.html';
 ?>
 <div class="container app-main px-3">

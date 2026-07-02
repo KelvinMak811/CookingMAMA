@@ -122,7 +122,13 @@ function updateShoppingBubble() {
   }
 }
 
-function speakText(text) {
+function recipePageUrl(recipeId) {
+  const base = window.SMARTCOOK_BASE || "";
+  if (window.SMARTCOOK_STATIC) {
+    return `${base}/recipes/${encodeURIComponent(recipeId)}/`;
+  }
+  return `${base}/recipe.php?id=${encodeURIComponent(recipeId)}`;
+}
   if (!("speechSynthesis" in window)) {
     alert("你嘅瀏覽器唔支援語音播放");
     return;

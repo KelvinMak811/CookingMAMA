@@ -4,7 +4,7 @@
 <nav class="cuisine-nav-sticky border-bottom py-1 mb-0" aria-label="菜式類別">
   <div class="date-nav-scroll">
     <ul class="nav nav-pills flex-nowrap gap-2 mb-0">
-      <?php foreach (CUISINE_NAV as $item): ?>
+      <?php foreach (cuisine_nav_items() as $item): ?>
         <?php $isActive = ($activeCuisine ?? 'all') === $item['value']; ?>
         <li class="nav-item">
           <a

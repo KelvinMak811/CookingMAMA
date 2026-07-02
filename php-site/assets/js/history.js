@@ -100,7 +100,7 @@ document.addEventListener("DOMContentLoaded", () => {
             <span class="badge bg-info mb-1">預定</span>
             <div class="fw-semibold">${plan.recipeName}</div>
             <small class="text-secondary">${plan.servings} 人 × ${plan.mealBatches} 餐</small>
-            <div><a href="recipe.php?id=${encodeURIComponent(plan.recipeId)}" class="btn btn-sm btn-outline-primary mt-2">睇菜式</a></div>
+            <div><a href="${recipePageUrl(plan.recipeId)}" class="btn btn-sm btn-outline-primary mt-2">睇菜式</a></div>
           </div>
           <button type="button" class="btn btn-link text-secondary p-0" data-remove-plan="${plan.id}">✕</button>
         </div>

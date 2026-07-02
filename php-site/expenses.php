@@ -1,7 +1,7 @@
 <?php
 require_once __DIR__ . '/includes/bootstrap.php';
 $pageTitle = '開支紀錄 — SmartCook';
-$pageScripts = ['assets/js/expenses.js?v=20260702'];
+$pageScripts = [asset_url('assets/js/expenses.js?v=20260702')];
 ?>
 <!DOCTYPE html>
 <html lang="zh-HK">

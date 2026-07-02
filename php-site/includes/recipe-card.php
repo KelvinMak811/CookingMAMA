@@ -2,7 +2,7 @@
 /** @var array $recipe */
 ?>
 <div class="col">
-  <a href="recipe.php?id=<?php echo urlencode((string) $recipe['id']); ?>" class="text-decoration-none text-dark h-100 d-block">
+  <a href="<?php echo h(recipe_url((string) $recipe['id'])); ?>" class="text-decoration-none text-dark h-100 d-block">
     <div class="card h-100 border-0 shadow-sm overflow-hidden">
       <div class="recipe-card-img">
         <img

@@ -1,8 +1,9 @@
 <?php
 $showBack = $showBack ?? false;
 $headerTitle = $headerTitle ?? '';
-$backHref = $backHref ?? 'recipes.php';
+$backHref = $backHref ?? page_url('recipes.php');
 $current = current_page();
+$recipesActive = in_array($current, ['recipes.php', 'recipes-cuisine.php', 'recipe.php'], true);
 ?>
 <header class="navbar navbar-light bg-white border-bottom sticky-top shadow-sm app-navbar">
   <div class="container app-main px-3 py-0">
@@ -13,7 +14,7 @@ $current = current_page();
           <span class="mb-0 fw-bold text-truncate flex-grow-1 min-w-0"><?php echo h($headerTitle); ?></span>
         <?php endif; ?>
       <?php else: ?>
-        <a href="recipes.php" class="d-flex align-items-center gap-2 text-decoration-none min-w-0 flex-grow-1">
+        <a href="<?php echo h(page_url('recipes.php')); ?>" class="d-flex align-items-center gap-2 text-decoration-none min-w-0 flex-grow-1">
           <span class="app-navbar-icon">🍳</span>
           <?php if ($headerTitle !== ''): ?>
             <span class="fw-bold text-dark text-truncate"><?php echo h($headerTitle); ?></span>
@@ -24,10 +25,10 @@ $current = current_page();
       <?php endif; ?>
 
       <nav class="d-none d-md-flex ms-auto gap-1">
-        <a href="recipes.php" class="nav-link rounded-3 px-3 py-2 <?php echo $current === 'recipes.php' || $current === 'recipes-cuisine.php' || $current === 'recipe.php' ? 'bg-primary-subtle text-primary fw-semibold' : 'text-secondary'; ?>">菜式庫</a>
-        <a href="shopping-list.php" class="nav-link rounded-3 px-3 py-2 <?php echo $current === 'shopping-list.php' ? 'bg-primary-subtle text-primary fw-semibold' : 'text-secondary'; ?>">買餸清單</a>
-        <a href="history.php" class="nav-link rounded-3 px-3 py-2 <?php echo $current === 'history.php' ? 'bg-primary-subtle text-primary fw-semibold' : 'text-secondary'; ?>">煮食日曆</a>
-        <a href="expenses.php" class="nav-link rounded-3 px-3 py-2 <?php echo $current === 'expenses.php' ? 'bg-primary-subtle text-primary fw-semibold' : 'text-secondary'; ?>">開支紀錄</a>
+        <a href="<?php echo h(page_url('recipes.php')); ?>" class="nav-link rounded-3 px-3 py-2 <?php echo $recipesActive ? 'bg-primary-subtle text-primary fw-semibold' : 'text-secondary'; ?>">菜式庫</a>
+        <a href="<?php echo h(page_url('shopping-list.php')); ?>" class="nav-link rounded-3 px-3 py-2 <?php echo $current === 'shopping-list.php' ? 'bg-primary-subtle text-primary fw-semibold' : 'text-secondary'; ?>">買餸清單</a>
+        <a href="<?php echo h(page_url('history.php')); ?>" class="nav-link rounded-3 px-3 py-2 <?php echo $current === 'history.php' ? 'bg-primary-subtle text-primary fw-semibold' : 'text-secondary'; ?>">煮食日曆</a>
+        <a href="<?php echo h(page_url('expenses.php')); ?>" class="nav-link rounded-3 px-3 py-2 <?php echo $current === 'expenses.php' ? 'bg-primary-subtle text-primary fw-semibold' : 'text-secondary'; ?>">開支紀錄</a>
       </nav>
     </div>
   </div>
@@ -35,22 +36,22 @@ $current = current_page();
 
 <nav class="fixed-bottom bg-white border-top d-md-none bottom-nav safe-area-bottom" aria-label="主要導航">
   <div class="d-flex justify-content-around">
-    <a href="recipes.php" class="bottom-nav-link <?php echo in_array($current, ['recipes.php', 'recipes-cuisine.php', 'recipe.php'], true) ? 'active' : ''; ?>">
+    <a href="<?php echo h(page_url('recipes.php')); ?>" class="bottom-nav-link <?php echo $recipesActive ? 'active' : ''; ?>">
       <span class="fs-5">📖</span><small>菜式</small>
     </a>
-    <a href="shopping-list.php" class="bottom-nav-link <?php echo $current === 'shopping-list.php' ? 'active' : ''; ?>">
+    <a href="<?php echo h(page_url('shopping-list.php')); ?>" class="bottom-nav-link <?php echo $current === 'shopping-list.php' ? 'active' : ''; ?>">
       <span class="fs-5">🛒</span><small>買餸</small>
     </a>
-    <a href="history.php" class="bottom-nav-link <?php echo $current === 'history.php' ? 'active' : ''; ?>">
+    <a href="<?php echo h(page_url('history.php')); ?>" class="bottom-nav-link <?php echo $current === 'history.php' ? 'active' : ''; ?>">
       <span class="fs-5">📅</span><small>日曆</small>
     </a>
-    <a href="expenses.php" class="bottom-nav-link <?php echo $current === 'expenses.php' ? 'active' : ''; ?>">
+    <a href="<?php echo h(page_url('expenses.php')); ?>" class="bottom-nav-link <?php echo $current === 'expenses.php' ? 'active' : ''; ?>">
       <span class="fs-5">💰</span><small>開支</small>
     </a>
   </div>
 </nav>
 
-<a href="shopping-list.php" id="shopping-bubble" class="shopping-bubble d-none" aria-label="買餸清單">
+<a href="<?php echo h(page_url('shopping-list.php')); ?>" id="shopping-bubble" class="shopping-bubble d-none" aria-label="買餸清單">
   <span>🛒</span>
   <span id="shopping-bubble-count" class="shopping-bubble-count">0</span>
 </a>

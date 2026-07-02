@@ -1,5 +1,6 @@
+<script>window.SMARTCOOK_BASE=<?php echo json_encode(base_path(), JSON_UNESCAPED_SLASHES); ?>;window.SMARTCOOK_STATIC=<?php echo is_static_export() ? 'true' : 'false'; ?>;</script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-<script src="assets/js/smartcook.js?v=20260702"></script>
+<script src="<?php echo h(asset_url('assets/js/smartcook.js?v=20260702')); ?>"></script>
 <?php if (!empty($pageScripts) && is_array($pageScripts)): ?>
   <?php foreach ($pageScripts as $script): ?>
 <script src="<?php echo h($script); ?>"></script>
