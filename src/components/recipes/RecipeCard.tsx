@@ -1,7 +1,7 @@
 import Badge from "react-bootstrap/Badge";
 import type { Recipe } from "@/types";
 import { CUISINE_LABELS } from "@/types";
-import { appPath } from "@/lib/paths";
+import { recipeDetailPath } from "@/lib/paths";
 import { DifficultyStars } from "./DifficultyStars";
 
 interface RecipeCardProps {
@@ -9,11 +9,10 @@ interface RecipeCardProps {
 }
 
 export function RecipeCard({ recipe }: RecipeCardProps) {
+  const href = recipeDetailPath(recipe.id);
+
   return (
-    <a
-      href={appPath(`/recipes/${recipe.id}`)}
-      className="text-decoration-none text-dark h-100 d-block"
-    >
+    <a href={href} className="text-decoration-none text-dark h-100 d-block">
       <div className="card h-100 border-0 shadow-sm overflow-hidden">
         <div className="position-relative recipe-card-img">
           <img

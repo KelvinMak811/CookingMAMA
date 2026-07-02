@@ -3,8 +3,15 @@ export const BASE_PATH = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
 
 /** 產生帶 basePath 嘅站內路徑（預設補 trailing slash） */
 export function appPath(path: string, trailingSlash = true): string {
-  const normalized = path.startsWith("/") ? path : `/${path}`;
-  const suffix =
+  const [pathname, query] = path.split("?");
+  const normalized = pathname.startsWith("/") ? pathname : `/${pathname}`;
+  const withSlash =
     trailingSlash && !normalized.endsWith("/") ? `${normalized}/` : normalized;
-  return `${BASE_PATH}${suffix}`;
+  const suffix = query ? `?${query}` : "";
+  return `${BASE_PATH}${withSlash}${suffix}`;
+}
+
+/** 菜式詳情頁（GitHub Pages 相容） */
+export function recipeDetailPath(recipeId: string): string {
+  return appPath(`/recipes/detail?id=${encodeURIComponent(recipeId)}`);
 }

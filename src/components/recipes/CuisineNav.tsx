@@ -1,17 +1,26 @@
 "use client";
 
 import { AppLink } from "@/components/layout/AppLink";
-import { usePathname } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 import Nav from "react-bootstrap/Nav";
 import { CUISINE_NAV_ITEMS, isValidCuisine } from "@/lib/cuisineNav";
 import type { CuisineFilter } from "@/lib/cuisineNav";
 import { getRecipeById } from "@/data/recipes";
 
-function resolveActiveCuisine(pathname: string): CuisineFilter {
+function resolveActiveCuisine(
+  pathname: string,
+  recipeId: string | null
+): CuisineFilter {
+  if (recipeId) {
+    const recipe = getRecipeById(recipeId);
+    if (recipe) return recipe.cuisine;
+  }
+
   const cuisineMatch = pathname.match(/^\/recipes\/cuisine\/([^/]+)/);
   if (cuisineMatch && isValidCuisine(cuisineMatch[1])) return cuisineMatch[1];
+
   const detailMatch = pathname.match(/^\/recipes\/([^/]+)$/);
-  if (detailMatch && detailMatch[1] !== "cuisine") {
+  if (detailMatch && detailMatch[1] !== "cuisine" && detailMatch[1] !== "detail") {
     const recipe = getRecipeById(detailMatch[1]);
     if (recipe) return recipe.cuisine;
   }
@@ -20,7 +29,10 @@ function resolveActiveCuisine(pathname: string): CuisineFilter {
 
 export function CuisineNav() {
   const pathname = usePathname();
-  const active = resolveActiveCuisine(pathname);
+  const searchParams = useSearchParams();
+  const recipeId =
+    pathname.includes("/recipes/detail") ? searchParams.get("id") : null;
+  const active = resolveActiveCuisine(pathname, recipeId);
 
   if (!pathname.startsWith("/recipes")) return null;
 

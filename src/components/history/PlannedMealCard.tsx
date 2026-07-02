@@ -1,6 +1,6 @@
 "use client";
 
-import { appPath } from "@/lib/paths";
+import { recipeDetailPath } from "@/lib/paths";
 import Card from "react-bootstrap/Card";
 import Button from "react-bootstrap/Button";
 import Badge from "react-bootstrap/Badge";
@@ -36,7 +36,7 @@ export function PlannedMealCard({ plan, onRemove, showDate }: PlannedMealCardPro
           <p className="mb-2 small text-secondary">
             {plan.servings} 人份量 × {plan.mealBatches} 餐
           </p>
-          <a href={appPath(`/recipes/${plan.recipeId}`)} className="btn btn-sm btn-outline-primary">
+          <a href={recipeDetailPath(plan.recipeId)} className="btn btn-sm btn-outline-primary">
             睇菜式
           </a>
         </div>
