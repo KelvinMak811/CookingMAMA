@@ -1,5 +1,10 @@
-import { redirect } from "next/navigation";
+import { AppShell } from "@/components/layout/AppShell";
+import { RecipeCatalog } from "@/components/recipes/RecipeCatalog";
 
 export default function Home() {
-  redirect("/recipes");
+  return (
+    <AppShell title="菜式庫">
+      <RecipeCatalog cuisine="all" />
+    </AppShell>
+  );
 }

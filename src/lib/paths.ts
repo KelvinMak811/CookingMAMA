@@ -11,7 +11,7 @@ export function appPath(path: string, trailingSlash = true): string {
   return `${BASE_PATH}${withSlash}${suffix}`;
 }
 
-/** 菜式詳情頁（GitHub Pages 相容） */
+/** 菜式詳情頁（靜態匯出：每道菜預先產生獨立 HTML） */
 export function recipeDetailPath(recipeId: string): string {
-  return appPath(`/recipes/detail?id=${encodeURIComponent(recipeId)}`);
+  return appPath(`/recipes/${recipeId}`);
 }

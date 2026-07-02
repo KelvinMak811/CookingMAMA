@@ -1,7 +1,7 @@
 import { recipes } from "@/data/recipes";
-import { RecipeLegacyRedirect } from "./RecipeLegacyRedirect";
+import { RecipeDetailView } from "@/components/recipes/RecipeDetailView";
 
-interface LegacyRecipePageProps {
+interface RecipePageProps {
   params: Promise<{ id: string }>;
 }
 
@@ -9,7 +9,7 @@ export function generateStaticParams() {
   return recipes.map((recipe) => ({ id: recipe.id }));
 }
 
-export default async function LegacyRecipePage({ params }: LegacyRecipePageProps) {
+export default async function RecipePage({ params }: RecipePageProps) {
   const { id } = await params;
-  return <RecipeLegacyRedirect recipeId={id} />;
+  return <RecipeDetailView recipeId={id} />;
 }
