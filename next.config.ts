@@ -2,7 +2,8 @@ import type { NextConfig } from "next";
 
 /** GitHub Pages project site: kelvinmak811.github.io/CookingMAMA */
 const isGithubPages = process.env.GITHUB_PAGES === "true";
-const basePath = isGithubPages ? "/CookingMAMA" : "";
+const basePath =
+  process.env.NEXT_PUBLIC_BASE_PATH ?? (isGithubPages ? "/CookingMAMA" : "");
 
 const nextConfig: NextConfig = {
   output: "export",

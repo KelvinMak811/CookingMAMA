@@ -78,9 +78,15 @@ export const useShoppingStore = create<ShoppingState>()(
 
       toggleBought: (id) =>
         set((state) => ({
-          items: state.items.map((item) =>
-            item.id === id ? { ...item, isBought: !item.isBought } : item
-          ),
+          items: state.items.map((item) => {
+            if (item.id !== id) return item;
+            const nextBought = !item.isBought;
+            return {
+              ...item,
+              isBought: nextBought,
+              boughtAt: nextBought ? new Date().toISOString() : undefined,
+            };
+          }),
         })),
 
       updatePrice: (id, price) =>

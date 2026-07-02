@@ -6,7 +6,7 @@ import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
 import Alert from "react-bootstrap/Alert";
 import Badge from "react-bootstrap/Badge";
-import Link from "next/link";
+import { AppLink } from "@/components/layout/AppLink";
 import type { Recipe } from "@/types";
 import { useMealPlanStore } from "@/stores/mealPlanStore";
 import { toDateInputValue, formatDayLabel } from "@/lib/dateNav";
@@ -105,9 +105,9 @@ export function ScheduleCookingCard({
                 </div>
               ))}
             </div>
-            <Link href="/history" className="btn btn-sm btn-outline-primary w-100 mt-2">
+            <AppLink href="/history" className="btn btn-sm btn-outline-primary w-100 mt-2">
               去日曆睇 →
-            </Link>
+            </AppLink>
           </div>
         )}
       </Card.Body>

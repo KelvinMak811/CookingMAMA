@@ -30,14 +30,15 @@ export function ShoppingListItem({ item }: ShoppingListItemProps) {
       />
       <ShoppingItemDetails item={item} strikethrough={item.isBought} />
       <InputGroup size="sm" style={{ width: "5.5rem" }} className="flex-shrink-0">
-        <InputGroup.Text className="px-1">$</InputGroup.Text>
+        <InputGroup.Text className="px-1" title="材料價錢">$</InputGroup.Text>
         <Form.Control
           type="number"
           min="0"
           step="0.1"
           value={item.price || ""}
           onChange={(e) => updatePrice(item.id, parseFloat(e.target.value) || 0)}
-          placeholder="0"
+          placeholder="價錢"
+          aria-label={`${item.ingredientName} 價錢`}
         />
       </InputGroup>
       <Button variant="link" className="text-secondary p-0 flex-shrink-0" onClick={() => removeItem(item.id)}>

@@ -1,13 +1,14 @@
 "use client";
 
-import Link from "next/link";
+import { AppLink } from "@/components/layout/AppLink";
 import { usePathname } from "next/navigation";
 import Nav from "react-bootstrap/Nav";
 
 const navItems = [
-  { href: "/recipes", label: "菜式庫", icon: "📖" },
-  { href: "/shopping-list", label: "買餸清單", icon: "🛒" },
-  { href: "/history", label: "煮食紀錄", icon: "📅" },
+  { href: "/recipes", label: "菜式", icon: "📖" },
+  { href: "/shopping-list", label: "買餸", icon: "🛒" },
+  { href: "/history", label: "日曆", icon: "📅" },
+  { href: "/expenses", label: "開支", icon: "💰" },
 ];
 
 export function BottomNav() {
@@ -24,13 +25,13 @@ export function BottomNav() {
           pathname === item.href || pathname.startsWith(item.href + "/");
         return (
           <Nav.Item key={item.href} className="flex-fill text-center">
-            <Link
+            <AppLink
               href={item.href}
               className={`d-flex flex-column align-items-center py-2 text-decoration-none ${isActive ? "text-primary fw-semibold" : "text-secondary"}`}
             >
               <span className="fs-5">{item.icon}</span>
-              <small>{item.label}</small>
-            </Link>
+              <small style={{ fontSize: "0.7rem" }}>{item.label}</small>
+            </AppLink>
           </Nav.Item>
         );
       })}

@@ -38,6 +38,8 @@ export interface ShoppingItem {
   isBought: boolean;
   price: number;
   addedAt: string;
+  /** 標記已購買嘅日期（用於開支紀錄） */
+  boughtAt?: string;
 }
 
 // 煮食紀錄模型（已完成）

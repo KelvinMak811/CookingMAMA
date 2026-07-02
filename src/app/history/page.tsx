@@ -19,9 +19,9 @@ export default function HistoryPage() {
   const plans = useMealPlanStore((s) => s.plans);
 
   return (
-    <AppShell title="煮食紀錄">
+    <AppShell title="煮食日曆">
       <p className="text-secondary small mb-3">
-        藍點係預定煮食，綠點係已完成。撳日子快速查看。
+        撳日子查看預定煮食（藍點）同已完成（綠點）。可切換日曆或時間軸檢視。
       </p>
 
       <DateQuickNav

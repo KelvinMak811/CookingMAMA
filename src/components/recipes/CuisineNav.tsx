@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import { AppLink } from "@/components/layout/AppLink";
 import { usePathname } from "next/navigation";
 import Nav from "react-bootstrap/Nav";
 import { CUISINE_NAV_ITEMS, isValidCuisine } from "@/lib/cuisineNav";
@@ -32,7 +32,7 @@ export function CuisineNav() {
             const isActive = active === item.value;
             return (
               <Nav.Item key={item.value}>
-                <Link
+                <AppLink
                   href={item.href}
                   className={`nav-link rounded-3 d-flex align-items-center gap-1 px-3 ${isActive ? "active" : ""}`}
                 >
@@ -41,7 +41,7 @@ export function CuisineNav() {
                   <span className={`badge rounded-pill ${isActive ? "bg-light text-primary" : "bg-secondary-subtle text-secondary"}`}>
                     {item.count}
                   </span>
-                </Link>
+                </AppLink>
               </Nav.Item>
             );
           })}

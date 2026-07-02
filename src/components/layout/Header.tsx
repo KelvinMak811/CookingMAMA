@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import { AppLink } from "@/components/layout/AppLink";
 import { usePathname } from "next/navigation";
 import Container from "react-bootstrap/Container";
 import Navbar from "react-bootstrap/Navbar";
@@ -9,7 +9,8 @@ import Nav from "react-bootstrap/Nav";
 const navItems = [
   { href: "/recipes", label: "菜式庫" },
   { href: "/shopping-list", label: "買餸清單" },
-  { href: "/history", label: "煮食紀錄" },
+  { href: "/history", label: "煮食日曆" },
+  { href: "/expenses", label: "開支紀錄" },
 ];
 
 interface HeaderProps {
@@ -32,15 +33,15 @@ export function Header({ title, showBack, backHref = "/recipes" }: HeaderProps) 
         <div className="d-flex align-items-center w-100 gap-2 app-navbar-inner">
           {showBack ? (
             <>
-              <Link href={backHref} className="btn btn-light btn-sm rounded-3 flex-shrink-0" aria-label="返回">
+              <AppLink href={backHref} className="btn btn-light btn-sm rounded-3 flex-shrink-0" aria-label="返回">
                 ←
-              </Link>
+              </AppLink>
               {title && (
                 <span className="mb-0 fw-bold text-truncate flex-grow-1 min-w-0">{title}</span>
               )}
             </>
           ) : (
-            <Link
+            <AppLink
               href="/recipes"
               className="d-flex align-items-center gap-2 text-decoration-none min-w-0 flex-grow-1"
             >
@@ -50,7 +51,7 @@ export function Header({ title, showBack, backHref = "/recipes" }: HeaderProps) 
               ) : (
                 <span className="fw-bold text-primary">SmartCook</span>
               )}
-            </Link>
+            </AppLink>
           )}
           {!title && !showBack && (
             <Nav className="ms-auto d-none d-md-flex gap-1">
@@ -58,13 +59,13 @@ export function Header({ title, showBack, backHref = "/recipes" }: HeaderProps) 
                 const isActive =
                   pathname === item.href || pathname.startsWith(item.href + "/");
                 return (
-                  <Link
+                  <AppLink
                     key={item.href}
                     href={item.href}
                     className={`nav-link rounded-3 px-3 py-2 ${isActive ? "bg-primary-subtle text-primary fw-semibold" : "text-secondary"}`}
                   >
                     {item.label}
-                  </Link>
+                  </AppLink>
                 );
               })}
             </Nav>

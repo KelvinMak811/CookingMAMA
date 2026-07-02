@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import Link from "next/link";
+import { AppLink } from "@/components/layout/AppLink";
 import { usePathname } from "next/navigation";
 import Button from "react-bootstrap/Button";
 import Offcanvas from "react-bootstrap/Offcanvas";
@@ -85,9 +85,9 @@ export function ShoppingBubble() {
             </p>
           )}
           <AddShoppingItemForm />
-          <Link href="/shopping-list" className="btn btn-primary w-100" onClick={() => setShow(false)}>
+          <AppLink href="/shopping-list" className="btn btn-primary w-100" onClick={() => setShow(false)}>
             打開完整買餸清單 →
-          </Link>
+          </AppLink>
         </Offcanvas.Body>
       </Offcanvas>
     </>
