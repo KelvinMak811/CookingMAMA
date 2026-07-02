@@ -277,3 +277,17 @@ body {
   font-weight: 700;
   color: #212529;
 }
+
+.maintain-page .nav-pills .nav-link {
+  color: #adb5bd;
+  background: transparent;
+}
+
+.maintain-page .nav-pills .nav-link.active {
+  background: #f97316;
+  color: #fff;
+}
+
+.maintain-page .table code {
+  color: #ffc078;
+}

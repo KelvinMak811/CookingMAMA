@@ -159,6 +159,14 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
+    if (typeof trackEvent === "function") {
+      trackEvent(editingRecipe ? "dish_edit_custom" : "dish_add_custom", {
+        dish_id: recipe.id,
+        dish_name: recipe.name,
+        metadata: { cuisine: recipe.cuisine },
+      });
+    }
+
     alert(editingRecipe ? "菜式已更新" : "菜式已加入");
     location.replace(recipePageUrl(recipe.id));
   });

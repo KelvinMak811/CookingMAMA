@@ -130,4 +130,7 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   initRecipeDetail(recipe);
+  if (typeof trackDishView === "function") {
+    trackDishView(recipe);
+  }
 });

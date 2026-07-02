@@ -86,6 +86,13 @@ function initRecipeDetail(recipe) {
       }
     });
     setShoppingItems(items);
+    if (typeof trackEvent === "function") {
+      trackEvent("shopping_add", {
+        dish_id: recipe.id,
+        dish_name: recipe.name,
+        metadata: { items_added: added },
+      });
+    }
     alert(added > 0 ? `已加入 ${added} 項材料到買餸清單` : "材料已經喺清單入面");
   });
 
@@ -111,6 +118,9 @@ function initRecipeDetail(recipe) {
       createdAt: new Date().toISOString(),
     });
     setMealPlans(plans);
+    if (typeof trackEvent === "function") {
+      trackEvent("meal_plan_add", { dish_id: recipe.id, dish_name: recipe.name, metadata: { date: dateVal } });
+    }
     alert("已加入煮食日程");
   });
 
@@ -139,10 +149,16 @@ function initRecipeDetail(recipe) {
       rating: rating || undefined,
     });
     setCookingRecords(records);
+    if (typeof trackEvent === "function") {
+      trackEvent("cooking_complete", { dish_id: recipe.id, dish_name: recipe.name, metadata: { rating: rating || null } });
+    }
     alert("打卡成功！");
   });
 
   renderIngredients();
+  if (typeof trackDishView === "function") {
+    trackDishView(recipe);
+  }
 }
 
 document.addEventListener("DOMContentLoaded", () => {
