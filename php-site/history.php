@@ -1,7 +1,7 @@
 <?php
 require_once __DIR__ . '/includes/bootstrap.php';
 $pageTitle = '煮食日曆 — SmartCook';
-$pageScripts = [asset_url('assets/js/history.js?v=20260702')];
+$pageScripts = [asset_url('assets/js/history.js?v=20260703')];
 ?>
 <!DOCTYPE html>
 <html lang="zh-HK">
@@ -12,6 +12,7 @@ $headerTitle = '煮食日曆';
 include __DIR__ . '/header.html';
 ?>
 <main class="container app-main flex-grow-1 px-3 py-2">
+  <div id="user-toggle" class="mb-3"></div>
   <p class="text-secondary small mb-3">撳日子查看預定煮食（藍點）同已完成（綠點）。可切換日曆或時間軸檢視。</p>
 
   <div id="date-quick-nav" class="mb-3"></div>

@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-<link href="/CookingMAMA/assets/css/style.css?v=20260702" rel="stylesheet">
+<link href="/CookingMAMA/assets/css/style.css?v=20260703" rel="stylesheet">
 </head>
 <body class="d-flex flex-column min-vh-100">
 <header class="navbar navbar-light bg-white border-bottom sticky-top shadow-sm app-navbar">
@@ -16,12 +16,25 @@
     <div class="d-flex align-items-center w-100 gap-2 app-navbar-inner">
       <a href="/CookingMAMA/recipes/cuisine/italian/" class="btn btn-light btn-sm rounded-3 flex-shrink-0" aria-label="返回">←</a>
            <span class="mb-0 fw-bold text-truncate flex-grow-1 min-w-0">奶油培根意粉</span>
-      <nav class="d-none d-md-flex ms-auto gap-1">
+      <div class="d-flex align-items-center ms-auto gap-2 flex-shrink-0">
+        <div class="dropdown" id="account-menu">
+          <button class="btn btn-outline-primary btn-sm dropdown-toggle account-menu-btn" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="帳戶選單">
+            <span id="account-display-name">帳戶</span>
+          </button>
+          <ul class="dropdown-menu dropdown-menu-end shadow-sm">
+            <li><a class="dropdown-item" href="/CookingMAMA/history/">📅 煮食日曆</a></li>
+            <li><a class="dropdown-item" href="/CookingMAMA/shopping-list/">🛒 買餸清單</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="/CookingMAMA/account/">🔄 切換帳戶</a></li>
+          </ul>
+        </div>
+        <nav class="d-none d-md-flex gap-1">
         <a href="/CookingMAMA/recipes/" class="nav-link rounded-3 px-3 py-2 bg-primary-subtle text-primary fw-semibold">菜式庫</a>
         <a href="/CookingMAMA/shopping-list/" class="nav-link rounded-3 px-3 py-2 text-secondary">買餸清單</a>
         <a href="/CookingMAMA/history/" class="nav-link rounded-3 px-3 py-2 text-secondary">煮食日曆</a>
         <a href="/CookingMAMA/expenses/" class="nav-link rounded-3 px-3 py-2 text-secondary">開支紀錄</a>
-      </nav>
+        </nav>
+      </div>
     </div>
   </div>
 </header>
@@ -50,5 +63,5 @@
 <script id="recipe-data" type="application/json">{"id":"it-8","name":"奶油培根意粉","cuisine":"italian","baseServings":2,"description":"浓郁奶油培根面，易洁锅一锅完成。","difficulty":1,"prepTime":20,"imageUrl":"https://www.themealdb.com/images/media/meals/0jv5gx1661040802.jpg","ingredients":[{"id":"it8-1","name":"意粉","amount":"200g"},{"id":"it8-2","name":"培根","amount":"120g"},{"id":"it8-3","name":"淡奶油","amount":"150ml"},{"id":"it8-4","name":"帕玛森芝士","amount":"30g"},{"id":"it8-5","name":"黑胡椒","amount":"少许"}],"steps":["培根切約半厘米闊條；帕瑪森芝士刨碎備用。","意粉煮至彈牙，瀝乾留半杯麵水。","易潔鑊中火煎培根條約3至4分鐘至酥脆出油、邊緣金黃。","倒入淡奶油，轉中小火煮滾約2分鐘，汁變稠、顏色奶白。","拌入意粉同少許麵水兜勻，撒芝士碎翻拌至溶化。","加黑胡椒試味，立即起鑊食，避免奶油醬放涼變稠。"]}</script>
 <script>window.SMARTCOOK_BASE="/CookingMAMA";window.SMARTCOOK_STATIC=true;</script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-<script src="/CookingMAMA/assets/js/smartcook.js?v=20260702"></script>
-<script src="/CookingMAMA/assets/js/recipe-detail.js?v=20260702"></script></body></html>
+<script src="/CookingMAMA/assets/js/smartcook.js?v=20260703"></script>
+<script src="/CookingMAMA/assets/js/recipe-detail.js?v=20260703"></script></body></html>

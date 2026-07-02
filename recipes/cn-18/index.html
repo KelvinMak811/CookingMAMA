@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-<link href="/CookingMAMA/assets/css/style.css?v=20260702" rel="stylesheet">
+<link href="/CookingMAMA/assets/css/style.css?v=20260703" rel="stylesheet">
 </head>
 <body class="d-flex flex-column min-vh-100">
 <header class="navbar navbar-light bg-white border-bottom sticky-top shadow-sm app-navbar">
@@ -16,12 +16,25 @@
     <div class="d-flex align-items-center w-100 gap-2 app-navbar-inner">
       <a href="/CookingMAMA/recipes/cuisine/chinese/" class="btn btn-light btn-sm rounded-3 flex-shrink-0" aria-label="返回">←</a>
            <span class="mb-0 fw-bold text-truncate flex-grow-1 min-w-0">干炒牛河</span>
-      <nav class="d-none d-md-flex ms-auto gap-1">
+      <div class="d-flex align-items-center ms-auto gap-2 flex-shrink-0">
+        <div class="dropdown" id="account-menu">
+          <button class="btn btn-outline-primary btn-sm dropdown-toggle account-menu-btn" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="帳戶選單">
+            <span id="account-display-name">帳戶</span>
+          </button>
+          <ul class="dropdown-menu dropdown-menu-end shadow-sm">
+            <li><a class="dropdown-item" href="/CookingMAMA/history/">📅 煮食日曆</a></li>
+            <li><a class="dropdown-item" href="/CookingMAMA/shopping-list/">🛒 買餸清單</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="/CookingMAMA/account/">🔄 切換帳戶</a></li>
+          </ul>
+        </div>
+        <nav class="d-none d-md-flex gap-1">
         <a href="/CookingMAMA/recipes/" class="nav-link rounded-3 px-3 py-2 bg-primary-subtle text-primary fw-semibold">菜式庫</a>
         <a href="/CookingMAMA/shopping-list/" class="nav-link rounded-3 px-3 py-2 text-secondary">買餸清單</a>
         <a href="/CookingMAMA/history/" class="nav-link rounded-3 px-3 py-2 text-secondary">煮食日曆</a>
         <a href="/CookingMAMA/expenses/" class="nav-link rounded-3 px-3 py-2 text-secondary">開支紀錄</a>
-      </nav>
+        </nav>
+      </div>
     </div>
   </div>
 </header>
@@ -50,5 +63,5 @@
 <script id="recipe-data" type="application/json">{"id":"cn-18","name":"干炒牛河","cuisine":"chinese","baseServings":2,"description":"茶餐廳招牌干炒牛河，鑊氣夠、河粉不碎、牛肉嫩滑。","difficulty":3,"prepTime":25,"imageUrl":"https://upload.wikimedia.org/wikipedia/commons/thumb/e/e3/Gon_caau_ngau_ho_%2820150222171214%29.JPG/960px-Gon_caau_ngau_ho_%2820150222171214%29.JPG","ingredients":[{"id":"cn18-1","name":"河粉","amount":"400g"},{"id":"cn18-2","name":"牛肉","amount":"200g"},{"id":"cn18-3","name":"芽菜","amount":"100g"},{"id":"cn18-4","name":"蔥","amount":"2條"},{"id":"cn18-5","name":"生抽","amount":"2湯匙"},{"id":"cn18-6","name":"老抽","amount":"1茶匙"}],"steps":["牛肉切薄片，生抽、油、生粉醃15分鐘；河粉輕輕分開。","蔥切段，芽菜洗淨瀝乾。","易潔鑊大火燒到夠熱，下油炒牛肉至八成熟盛起。","再加少許油，下河粉輕輕推炒，加生抽老抽上色。","下芽菜同牛肉，大火快速兜炒，河粉微焦邊最香。","撒蔥段再炒幾下即起鑊，要熱食。"]}</script>
 <script>window.SMARTCOOK_BASE="/CookingMAMA";window.SMARTCOOK_STATIC=true;</script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-<script src="/CookingMAMA/assets/js/smartcook.js?v=20260702"></script>
-<script src="/CookingMAMA/assets/js/recipe-detail.js?v=20260702"></script></body></html>
+<script src="/CookingMAMA/assets/js/smartcook.js?v=20260703"></script>
+<script src="/CookingMAMA/assets/js/recipe-detail.js?v=20260703"></script></body></html>

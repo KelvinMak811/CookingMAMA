@@ -1,11 +1,100 @@
 /**
  * SmartCook — 共用儲存層（相容 Next.js Zustand persist 格式）
  */
+const ACCOUNTS = {
+  kelvin: { id: "kelvin", name: "Kelvin" },
+  yuetsum: { id: "yuetsum", name: "YuetSum" },
+};
+
+const STORAGE_KEY_CURRENT_USER = "smartcook_current_user";
+
 const STORAGE_KEYS = {
   SHOPPING: "smartcook_shopping",
   COOKING_LOG: "smartcook_cooking_log",
   MEAL_PLAN: "smartcook_meal_plan",
 };
+
+const LEGACY_KEYS = { ...STORAGE_KEYS };
+
+function userStorageKey(baseKey, userId) {
+  return `${baseKey}_${userId}`;
+}
+
+function getCurrentUserId() {
+  const id = localStorage.getItem(STORAGE_KEY_CURRENT_USER);
+  return id && ACCOUNTS[id] ? id : null;
+}
+
+function getCurrentUser() {
+  const id = getCurrentUserId();
+  return id ? ACCOUNTS[id] : null;
+}
+
+function getAccountName(userId) {
+  return ACCOUNTS[userId]?.name || userId;
+}
+
+function getOtherUserId(userId) {
+  return Object.keys(ACCOUNTS).find((id) => id !== userId) || null;
+}
+
+function setCurrentUser(userId) {
+  if (!ACCOUNTS[userId]) return;
+  localStorage.setItem(STORAGE_KEY_CURRENT_USER, userId);
+  migrateLegacyData(userId);
+  updateShoppingBubble();
+  updateAccountMenu();
+}
+
+function canEditUser(userId) {
+  return userId === getCurrentUserId();
+}
+
+function accountPageUrl() {
+  const base = window.SMARTCOOK_BASE || "";
+  if (window.SMARTCOOK_STATIC) {
+    return `${base}/account/`;
+  }
+  return `${base}/account.php`;
+}
+
+function historyPageUrl() {
+  const base = window.SMARTCOOK_BASE || "";
+  if (window.SMARTCOOK_STATIC) {
+    return `${base}/history/`;
+  }
+  return `${base}/history.php`;
+}
+
+function shoppingPageUrl() {
+  const base = window.SMARTCOOK_BASE || "";
+  if (window.SMARTCOOK_STATIC) {
+    return `${base}/shopping-list/`;
+  }
+  return `${base}/shopping-list.php`;
+}
+
+function requireCurrentUser() {
+  if (getCurrentUserId()) return;
+  location.replace(accountPageUrl());
+}
+
+function migrateLegacyData(targetUserId) {
+  if (!targetUserId) return;
+  const pairs = [
+    [LEGACY_KEYS.SHOPPING, STORAGE_KEYS.SHOPPING, { items: [] }],
+    [LEGACY_KEYS.COOKING_LOG, STORAGE_KEYS.COOKING_LOG, { records: [] }],
+    [LEGACY_KEYS.MEAL_PLAN, STORAGE_KEYS.MEAL_PLAN, { plans: [] }],
+  ];
+  pairs.forEach(([legacyKey, baseKey, fallback]) => {
+    const userKey = userStorageKey(baseKey, targetUserId);
+    if (localStorage.getItem(userKey)) return;
+    const legacyRaw = localStorage.getItem(legacyKey);
+    if (!legacyRaw) return;
+    localStorage.setItem(userKey, legacyRaw);
+    localStorage.removeItem(legacyKey);
+  });
+}
 
 function loadZustandState(key, fallbackState) {
   try {
@@ -84,29 +173,51 @@ function scaleIngredients(ingredients, baseServings, servings, mealBatches) {
   }));
 }
 
-function getShoppingItems() {
-  return loadZustandState(STORAGE_KEYS.SHOPPING, { items: [] }).items || [];
+function resolveUserId(userId) {
+  return userId || getCurrentUserId();
 }
 
-function setShoppingItems(items) {
-  saveZustandState(STORAGE_KEYS.SHOPPING, { items });
+function getShoppingItems(userId) {
+  const id = resolveUserId(userId);
+  if (!id) return [];
+  migrateLegacyData(id);
+  const key = userStorageKey(STORAGE_KEYS.SHOPPING, id);
+  return loadZustandState(key, { items: [] }).items || [];
+}
+
+function setShoppingItems(items, userId) {
+  const id = resolveUserId(userId);
+  if (!id || !canEditUser(id)) return;
+  saveZustandState(userStorageKey(STORAGE_KEYS.SHOPPING, id), { items });
   updateShoppingBubble();
 }
 
-function getCookingRecords() {
-  return loadZustandState(STORAGE_KEYS.COOKING_LOG, { records: [] }).records || [];
+function getCookingRecords(userId) {
+  const id = resolveUserId(userId);
+  if (!id) return [];
+  migrateLegacyData(id);
+  const key = userStorageKey(STORAGE_KEYS.COOKING_LOG, id);
+  return loadZustandState(key, { records: [] }).records || [];
 }
 
-function setCookingRecords(records) {
-  saveZustandState(STORAGE_KEYS.COOKING_LOG, { records });
+function setCookingRecords(records, userId) {
+  const id = resolveUserId(userId);
+  if (!id || !canEditUser(id)) return;
+  saveZustandState(userStorageKey(STORAGE_KEYS.COOKING_LOG, id), { records });
 }
 
-function getMealPlans() {
-  return loadZustandState(STORAGE_KEYS.MEAL_PLAN, { plans: [] }).plans || [];
+function getMealPlans(userId) {
+  const id = resolveUserId(userId);
+  if (!id) return [];
+  migrateLegacyData(id);
+  const key = userStorageKey(STORAGE_KEYS.MEAL_PLAN, id);
+  return loadZustandState(key, { plans: [] }).plans || [];
 }
 
-function setMealPlans(plans) {
-  saveZustandState(STORAGE_KEYS.MEAL_PLAN, { plans });
+function setMealPlans(plans, userId) {
+  const id = resolveUserId(userId);
+  if (!id || !canEditUser(id)) return;
+  saveZustandState(userStorageKey(STORAGE_KEYS.MEAL_PLAN, id), { plans });
 }
 
 function updateShoppingBubble() {
@@ -129,6 +240,8 @@ function recipePageUrl(recipeId) {
   }
   return `${base}/recipe.php?id=${encodeURIComponent(recipeId)}`;
 }
+
+function speakText(text) {
   if (!("speechSynthesis" in window)) {
     alert("你嘅瀏覽器唔支援語音播放");
     return;
@@ -139,4 +252,51 @@ function recipePageUrl(recipeId) {
   window.speechSynthesis.speak(utter);
 }
 
-document.addEventListener("DOMContentLoaded", updateShoppingBubble);
+function updateAccountMenu() {
+  const nameEl = document.getElementById("account-display-name");
+  const menu = document.getElementById("account-menu");
+  const user = getCurrentUser();
+  if (nameEl) {
+    nameEl.textContent = user ? user.name : "帳戶";
+  }
+  if (menu) {
+    menu.classList.toggle("d-none", !user);
+  }
+}
+
+function renderUserToggle(containerEl, viewingUserId, onChange) {
+  if (!containerEl) return;
+  const currentId = getCurrentUserId();
+  containerEl.innerHTML = `
+    <div class="btn-group w-100 user-toggle" role="group" aria-label="揀選要睇邊個帳戶嘅紀錄">
+      ${Object.values(ACCOUNTS)
+        .map((acc) => {
+          const active = viewingUserId === acc.id;
+          const suffix = acc.id === currentId ? "（我）" : "";
+          return `<button type="button" class="btn btn-sm ${active ? "btn-primary" : "btn-outline-primary"}" data-view-user="${acc.id}">${acc.name}${suffix}</button>`;
+        })
+        .join("")}
+    </div>
+    ${
+      viewingUserId !== currentId
+        ? `<div class="alert alert-info py-2 small mb-0 mt-2">只限閱讀 <strong>${getAccountName(viewingUserId)}</strong> 嘅紀錄，唔可以修改</div>`
+        : ""
+    }`;
+  containerEl.querySelectorAll("[data-view-user]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      onChange(btn.dataset.viewUser);
+    });
+  });
+}
+
+function initAppShell() {
+  updateAccountMenu();
+  updateShoppingBubble();
+  const path = location.pathname;
+  const isAccountPage = path.includes("/account") || path.endsWith("account.php");
+  if (!isAccountPage) {
+    requireCurrentUser();
+  }
+}
+
+document.addEventListener("DOMContentLoaded", initAppShell);

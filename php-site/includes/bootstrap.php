@@ -42,6 +42,7 @@ function page_url(string $path): string
             'shopping-list.php' => 'shopping-list/',
             'history.php' => 'history/',
             'expenses.php' => 'expenses/',
+            'account.php' => 'account/',
         ];
         $path = $map[$path] ?? $path;
     }

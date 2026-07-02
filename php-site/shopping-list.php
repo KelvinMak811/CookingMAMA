@@ -1,7 +1,7 @@
 <?php
 require_once __DIR__ . '/includes/bootstrap.php';
 $pageTitle = '買餸清單 — SmartCook';
-$pageScripts = [asset_url('assets/js/shopping.js?v=20260702')];
+$pageScripts = [asset_url('assets/js/shopping.js?v=20260703')];
 ?>
 <!DOCTYPE html>
 <html lang="zh-HK">
@@ -12,6 +12,7 @@ $headerTitle = '買餸清單';
 include __DIR__ . '/header.html';
 ?>
 <main class="container app-main flex-grow-1 px-3 py-2">
+  <div id="user-toggle" class="mb-3"></div>
   <div class="d-flex flex-column gap-4">
     <form id="add-shopping-form" class="card border-0 shadow-sm">
       <div class="card-body">

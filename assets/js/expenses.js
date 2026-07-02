@@ -2,6 +2,16 @@ document.addEventListener("DOMContentLoaded", () => {
   const today = new Date();
   let year = today.getFullYear();
   let month = today.getMonth();
+  let viewingUserId = getCurrentUserId();
+  const toggleEl = document.getElementById("user-toggle");
+
+  function renderToggle() {
+    renderUserToggle(toggleEl, viewingUserId, (userId) => {
+      viewingUserId = userId;
+      renderToggle();
+      render();
+    });
+  }
 
   function renderBarChart(containerId, data, emptyText) {
     const el = document.getElementById(containerId);
@@ -23,8 +33,8 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function render() {
-    const items = getShoppingItems();
-    const records = getCookingRecords();
+    const items = getShoppingItems(viewingUserId);
+    const records = getCookingRecords(viewingUserId);
 
     const monthItems = items.filter((i) => {
       if (!i.isBought || !i.boughtAt) return false;
@@ -109,5 +119,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
+  renderToggle();
   render();
 });

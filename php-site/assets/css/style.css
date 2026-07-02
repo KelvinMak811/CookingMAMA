@@ -213,3 +213,67 @@ body {
   text-align: right;
   font-size: 0.8rem;
 }
+
+.account-menu-btn {
+  max-width: 7.5rem;
+}
+
+#account-display-name {
+  display: inline-block;
+  max-width: 5.5rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  vertical-align: bottom;
+}
+
+.user-toggle .btn {
+  flex: 1;
+}
+
+.account-page-icon {
+  font-size: 2.5rem;
+  line-height: 1;
+}
+
+.account-pick-grid {
+  max-width: 20rem;
+  margin: 0 auto;
+}
+
+.account-pick-btn {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 1.25rem;
+  border: 2px solid #fed7aa;
+  background: #fff;
+  border-radius: 1rem;
+  text-align: left;
+  transition: border-color 0.15s, box-shadow 0.15s, transform 0.15s;
+}
+
+.account-pick-btn:hover,
+.account-pick-btn:focus {
+  border-color: #f97316;
+  box-shadow: 0 4px 16px rgba(249, 115, 22, 0.15);
+  transform: translateY(-1px);
+}
+
+.account-pick-avatar {
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: 50%;
+  background: #fff7ed;
+  color: #f97316;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.account-pick-name {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: #212529;
+}

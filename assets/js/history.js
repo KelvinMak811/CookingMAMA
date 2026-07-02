@@ -1,13 +1,29 @@
 document.addEventListener("DOMContentLoaded", () => {
   let selectedDate = new Date();
   let view = "calendar";
+  let viewingUserId = getCurrentUserId();
 
   const calendarView = document.getElementById("calendar-view");
   const timelineView = document.getElementById("timeline-view");
   const quickNav = document.getElementById("date-quick-nav");
+  const toggleEl = document.getElementById("user-toggle");
+
+  function isReadOnly() {
+    return viewingUserId !== getCurrentUserId();
+  }
+
+  function renderToggle() {
+    renderUserToggle(toggleEl, viewingUserId, (userId) => {
+      viewingUserId = userId;
+      renderToggle();
+      render();
+    });
+  }
 
   function renderQuickNav() {
     const offsets = [-2, -1, 0, 1, 2];
+    const records = getCookingRecords(viewingUserId);
+    const plans = getMealPlans(viewingUserId);
     quickNav.innerHTML = `
       <div class="date-nav-scroll d-flex gap-2">
         ${offsets
@@ -15,8 +31,6 @@ document.addEventListener("DOMContentLoaded", () => {
             const d = new Date(selectedDate);
             d.setDate(d.getDate() + offset);
             const active = isSameDay(d, selectedDate);
-            const records = getCookingRecords();
-            const plans = getMealPlans();
             const hasPlan = plans.some((p) => isSameDay(p.plannedDate, d));
             const hasDone = records.some((r) => isSameDay(r.cookedDate, d));
             return `<button type="button" class="btn btn-sm ${active ? "btn-primary" : "btn-light"}" data-offset="${offset}">
@@ -43,8 +57,8 @@ document.addEventListener("DOMContentLoaded", () => {
     const first = new Date(year, month, 1);
     const startDay = first.getDay();
     const daysInMonth = new Date(year, month + 1, 0).getDate();
-    const records = getCookingRecords();
-    const plans = getMealPlans();
+    const records = getCookingRecords(viewingUserId);
+    const plans = getMealPlans(viewingUserId);
 
     let html = `<div class="d-flex justify-content-between align-items-center mb-3">
       <button type="button" class="btn btn-light btn-sm" id="cal-prev">←</button>
@@ -86,8 +100,9 @@ document.addEventListener("DOMContentLoaded", () => {
   function renderDayPanel() {
     const panel = document.getElementById("day-panel");
     if (!panel) return;
-    const records = getCookingRecords().filter((r) => isSameDay(r.cookedDate, selectedDate));
-    const plans = getMealPlans().filter((p) => isSameDay(p.plannedDate, selectedDate));
+    const records = getCookingRecords(viewingUserId).filter((r) => isSameDay(r.cookedDate, selectedDate));
+    const plans = getMealPlans(viewingUserId).filter((p) => isSameDay(p.plannedDate, selectedDate));
+    const readOnly = isReadOnly();
 
     let html = `<h6 class="fw-bold mb-3">${formatDateHK(selectedDate)}</h6>`;
     if (plans.length === 0 && records.length === 0) {
@@ -102,7 +117,7 @@ document.addEventListener("DOMContentLoaded", () => {
             <small class="text-secondary">${plan.servings} 人 × ${plan.mealBatches} 餐</small>
             <div><a href="${recipePageUrl(plan.recipeId)}" class="btn btn-sm btn-outline-primary mt-2">睇菜式</a></div>
           </div>
-          <button type="button" class="btn btn-link text-secondary p-0" data-remove-plan="${plan.id}">✕</button>
+          ${readOnly ? "" : `<button type="button" class="btn btn-link text-secondary p-0" data-remove-plan="${plan.id}">✕</button>`}
         </div>
       </div>`;
     });
@@ -117,19 +132,23 @@ document.addEventListener("DOMContentLoaded", () => {
       </div>`;
     });
     panel.innerHTML = html;
+    if (readOnly) return;
     panel.querySelectorAll("[data-remove-plan]").forEach((btn) => {
       btn.addEventListener("click", () => {
-        setMealPlans(getMealPlans().filter((p) => p.id !== btn.dataset.removePlan));
+        setMealPlans(
+          getMealPlans(viewingUserId).filter((p) => p.id !== btn.dataset.removePlan),
+          viewingUserId
+        );
         render();
       });
     });
   }
 
   function renderTimeline() {
-    const records = [...getCookingRecords()].sort(
+    const records = [...getCookingRecords(viewingUserId)].sort(
       (a, b) => new Date(b.cookedDate) - new Date(a.cookedDate)
     );
-    const plans = [...getMealPlans()].sort(
+    const plans = [...getMealPlans(viewingUserId)].sort(
       (a, b) => new Date(a.plannedDate) - new Date(b.plannedDate)
     );
     const events = [
@@ -185,5 +204,6 @@ document.addEventListener("DOMContentLoaded", () => {
     render();
   });
 
+  renderToggle();
   render();
 });

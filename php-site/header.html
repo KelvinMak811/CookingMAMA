@@ -24,12 +24,26 @@ $recipesActive = in_array($current, ['recipes.php', 'recipes-cuisine.php', 'reci
         </a>
       <?php endif; ?>
 
-      <nav class="d-none d-md-flex ms-auto gap-1">
+      <div class="d-flex align-items-center ms-auto gap-2 flex-shrink-0">
+        <div class="dropdown" id="account-menu">
+          <button class="btn btn-outline-primary btn-sm dropdown-toggle account-menu-btn" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="帳戶選單">
+            <span id="account-display-name">帳戶</span>
+          </button>
+          <ul class="dropdown-menu dropdown-menu-end shadow-sm">
+            <li><a class="dropdown-item" href="<?php echo h(page_url('history.php')); ?>">📅 煮食日曆</a></li>
+            <li><a class="dropdown-item" href="<?php echo h(page_url('shopping-list.php')); ?>">🛒 買餸清單</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="<?php echo h(page_url('account.php')); ?>">🔄 切換帳戶</a></li>
+          </ul>
+        </div>
+
+        <nav class="d-none d-md-flex gap-1">
         <a href="<?php echo h(page_url('recipes.php')); ?>" class="nav-link rounded-3 px-3 py-2 <?php echo $recipesActive ? 'bg-primary-subtle text-primary fw-semibold' : 'text-secondary'; ?>">菜式庫</a>
         <a href="<?php echo h(page_url('shopping-list.php')); ?>" class="nav-link rounded-3 px-3 py-2 <?php echo $current === 'shopping-list.php' ? 'bg-primary-subtle text-primary fw-semibold' : 'text-secondary'; ?>">買餸清單</a>
         <a href="<?php echo h(page_url('history.php')); ?>" class="nav-link rounded-3 px-3 py-2 <?php echo $current === 'history.php' ? 'bg-primary-subtle text-primary fw-semibold' : 'text-secondary'; ?>">煮食日曆</a>
         <a href="<?php echo h(page_url('expenses.php')); ?>" class="nav-link rounded-3 px-3 py-2 <?php echo $current === 'expenses.php' ? 'bg-primary-subtle text-primary fw-semibold' : 'text-secondary'; ?>">開支紀錄</a>
-      </nav>
+        </nav>
+      </div>
     </div>
   </div>
 </header>
