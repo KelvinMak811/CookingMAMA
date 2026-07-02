@@ -51,10 +51,17 @@ function getOtherUserId(userId) {
 
 function setCurrentUser(userId) {
   if (!ACCOUNTS[userId]) return;
+  const previous = getCurrentUserId();
   localStorage.setItem(STORAGE_KEY_CURRENT_USER, userId);
   migrateLegacyData(userId);
   updateShoppingBubble();
   updateAccountMenu();
+  if (typeof trackEvent === "function") {
+    trackEvent(previous && previous !== userId ? "account_switch" : "account_login", {
+      account_id: userId,
+      metadata: { previous_account: previous || null, name: getAccountName(userId) },
+    });
+  }
 }
 
 function canEditUser(userId) {
@@ -419,7 +426,8 @@ function initAppShell() {
   updateShoppingBubble();
   const path = location.pathname;
   const isAccountPage = path.includes("/account") || path.endsWith("account.php");
-  if (!isAccountPage) {
+  const isMaintainPage = path.includes("/maintain") || path.endsWith("maintain.php");
+  if (!isAccountPage && !isMaintainPage) {
     requireCurrentUser();
   }
 }

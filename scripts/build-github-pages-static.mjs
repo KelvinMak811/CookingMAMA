@@ -114,9 +114,11 @@ function header({ showBack = false, title = "", backHref = page("recipes/"), rec
 }
 
 function footer(extraScripts = []) {
-  return `<script>window.SMARTCOOK_BASE=${JSON.stringify(BASE)};window.SMARTCOOK_STATIC=true;</script>
+  const apiBase = process.env.SMARTCOOK_API_URL || "";
+  return `<script>window.SMARTCOOK_BASE=${JSON.stringify(BASE)};window.SMARTCOOK_STATIC=true;window.SMARTCOOK_API_BASE=${JSON.stringify(apiBase)};</script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-<script src="${asset("assets/js/smartcook.js?v=20260704")}"></script>
+<script src="${asset("assets/js/smartcook.js?v=20260705")}"></script>
+<script src="${asset("assets/js/analytics.js?v=20260705")}"></script>
 ${extraScripts.map((s) => `<script src="${h(s)}"></script>`).join("\n")}`;
 }
 

@@ -59,6 +59,37 @@ npm run export-recipes
 
 買餸清單、煮食紀錄、預定煮食仍用瀏覽器 **localStorage**，格式相容之前 Next.js 版（`smartcook_shopping` 等 key），換 PHP 版後原有資料會保留。
 
+## Backend 活動紀錄（SQLite）
+
+PHP 版會將用戶行為寫入 `php-site/storage/smartcook.db`：
+
+- 帳戶登入次數、切換帳戶
+- 瀏覽頁面、停留時間
+- 睇邊道菜、自訂菜式、買餸、煮食日曆、打卡等
+
+API：`POST /api/track.php`（前端 `analytics.js` 自動送出）
+
+GitHub Pages 靜態站要設定 API 網址後先會記錄：
+
+```bash
+set SMARTCOOK_API_URL=https://your-php-host.example.com
+npm run build:pages
+```
+
+並喺 `config.local.php` 的 `allowed_origins` 加入 `https://kelvinmak811.github.io`。
+
+## Maintain 管理頁（隱藏）
+
+無入口掣，直接開：
+
+- 本機：http://127.0.0.1:8888/maintain.php
+- 預設密碼：`maintain2026`（請複製 `config.example.php` → `config.local.php` 並改密碼）
+
+功能：
+
+- 睇活動 logs、登入統計
+- 新增／編輯／刪除 **system** 菜式（寫入 `dish/` folder）
+
 ## 與 GitHub Pages 分別
 
 | | Next.js (舊) | PHP (新) |
