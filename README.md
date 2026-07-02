@@ -1,36 +1,49 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# SmartCook（CookingMAMA）
 
-## Getting Started
+香港家常煮食 App — 50 道易潔鑊菜式、買餸清單、煮食日曆、開支紀錄。
 
-First, run the development server:
+**網站：** [https://kelvinmak811.github.io/CookingMAMA/](https://kelvinmak811.github.io/CookingMAMA/)
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+## 功能
+
+- 菜式瀏覽（中餐、西餐、日式、意式）
+- 食譜詳情（材料、步驟、難度、份量調整）
+- 買餸清單（localStorage 同步）
+- 煮食日曆與開支紀錄
+
+## 本機開發
+
+### PHP 版（建議）
+
+```bat
+cd php-site
+start.bat
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+瀏覽器開啟 http://127.0.0.1:8888/recipes.php
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### 建置 GitHub Pages 靜態站
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+npm run build:pages
+```
 
-## Learn More
+輸出至 `out/`。推送到 `main` 後，GitHub Actions 會自動部署靜態檔到倉庫根目錄及 `gh-pages` 分支。
 
-To learn more about Next.js, take a look at the following resources:
+## 專案結構
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+| 路徑 | 說明 |
+|------|------|
+| `php-site/` | PHP 版網站（本機測試用） |
+| `scripts/build-github-pages-static.mjs` | 靜態 HTML 產生器 |
+| `src/` | 舊版 Next.js 原始碼 |
+| `recipes/`, `assets/` 等（根目錄） | 已建置的 GitHub Pages 靜態檔 |
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## GitHub Pages 設定
 
-## Deploy on Vercel
+若首頁仍顯示本 README 而非 App，請到 **Settings → Pages**：
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- **Source:** Deploy from a branch
+- **Branch:** `main` → `/ (root)`（推送後會自動更新靜態檔）
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+或使用 `gh-pages` 分支作為來源亦可。
