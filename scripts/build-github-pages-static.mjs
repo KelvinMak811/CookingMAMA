@@ -7,6 +7,7 @@ import {
   writeFileSync,
 } from "node:fs";
 import { join } from "node:path";
+import { tmpdir } from "node:os";
 
 const ROOT = process.cwd();
 const PHP_SITE = join(ROOT, "php-site");
@@ -17,29 +18,44 @@ function renderPhp(scriptName, params, outRelativePath) {
   const outFile = join(OUT, outRelativePath);
   mkdirSync(join(outFile, ".."), { recursive: true });
 
+  const wrapperPath = join(tmpdir(), `smartcook-render-${Date.now()}-${Math.random().toString(36).slice(2)}.php`);
   const getLines = Object.entries(params)
-    .map(([key, value]) => `$_GET[${JSON.stringify(key)}]=${JSON.stringify(value)};`)
-    .join("");
+    .map(([key, value]) => `$_GET[${JSON.stringify(key)}] = ${JSON.stringify(String(value))};`)
+    .join("\n");
 
-  const phpCode = [
-    `chdir(${JSON.stringify(PHP_SITE.replace(/\\/g, "/"))});`,
-    getLines,
-    `$_SERVER['PHP_SELF']=${JSON.stringify(scriptName)};`,
-    `include ${JSON.stringify(scriptName)};`,
-  ].join("");
+  const wrapper = `<?php
+chdir(${JSON.stringify(PHP_SITE)});
+${getLines}
+$_SERVER['PHP_SELF'] = ${JSON.stringify(scriptName)};
+include ${JSON.stringify(scriptName)};
+`;
 
-  const html = execSync(`php -r "${phpCode.replace(/"/g, '\\"')}"`, {
-    env: {
-      ...process.env,
-      SMARTCOOK_BASE_PATH: BASE,
-      SMARTCOOK_STATIC: "1",
-    },
-    encoding: "utf8",
-    stdio: ["ignore", "pipe", "pipe"],
-  });
+  writeFileSync(wrapperPath, wrapper, "utf8");
 
-  writeFileSync(outFile, html, "utf8");
-  console.log(`  ${outRelativePath}`);
+  try {
+    const html = execSync(`php "${wrapperPath}"`, {
+      env: {
+        ...process.env,
+        SMARTCOOK_BASE_PATH: BASE,
+        SMARTCOOK_STATIC: "1",
+      },
+      encoding: "utf8",
+      stdio: ["ignore", "pipe", "pipe"],
+    });
+
+    if (!html.includes("<!DOCTYPE html>")) {
+      throw new Error(`Invalid HTML output for ${scriptName}`);
+    }
+
+    writeFileSync(outFile, html, "utf8");
+    console.log(`  ${outRelativePath}`);
+  } finally {
+    try {
+      rmSync(wrapperPath, { force: true });
+    } catch {
+      // ignore cleanup errors
+    }
+  }
 }
 
 console.log("Building static site for GitHub Pages...");
