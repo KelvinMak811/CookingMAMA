@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build && node scripts/postbuild-github-pages.mjs",
+    "export-recipes": "tsx scripts/export-recipes-json.ts",
     "start": "next start",
     "lint": "eslint"
   },
