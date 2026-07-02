@@ -13,7 +13,7 @@
           >
             <span><?php echo $item['icon']; ?></span>
             <span><?php echo h($item['label']); ?></span>
-            <span class="badge rounded-pill <?php echo $isActive ? 'bg-light text-primary' : 'bg-secondary-subtle text-secondary'; ?>">
+            <span class="badge rounded-pill <?php echo $isActive ? 'bg-light text-primary' : 'bg-secondary-subtle text-secondary'; ?>" data-cuisine-count="<?php echo h($item['value']); ?>" data-base-count="<?php echo cuisine_count($item['value']); ?>">
               <?php echo cuisine_count($item['value']); ?>
             </span>
           </a>

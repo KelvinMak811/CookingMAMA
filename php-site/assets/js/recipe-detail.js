@@ -1,9 +1,5 @@
-document.addEventListener("DOMContentLoaded", () => {
-  const dataEl = document.getElementById("recipe-data");
-  if (!dataEl) return;
-
-  const recipe = JSON.parse(dataEl.textContent);
-  let servings = recipe.baseServings;
+function initRecipeDetail(recipe) {
+  let servings = recipe.baseServings || 2;
   let mealBatches = 1;
   let rating = 0;
 
@@ -21,20 +17,23 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function renderIngredients() {
     const scaled = scaleIngredients(
-      recipe.ingredients,
-      recipe.baseServings,
+      recipe.ingredients || [],
+      recipe.baseServings || 2,
       servings,
       mealBatches
     );
-    const factor = (servings / recipe.baseServings) * mealBatches;
-    factorBadge.textContent = `材料 × ${Number.isInteger(factor) ? factor : factor.toFixed(1)}`;
-    servingsLabel.textContent = `${servings} 人`;
-    batchesLabel.textContent = `${mealBatches} 餐`;
-    ingredientsHeading.textContent = `(${servings}人 × ${mealBatches}餐)`;
+    const factor = (servings / (recipe.baseServings || 2)) * mealBatches;
+    if (factorBadge) {
+      factorBadge.textContent = `材料 × ${Number.isInteger(factor) ? factor : factor.toFixed(1)}`;
+    }
+    if (servingsLabel) servingsLabel.textContent = `${servings} 人`;
+    if (batchesLabel) batchesLabel.textContent = `${mealBatches} 餐`;
+    if (ingredientsHeading) ingredientsHeading.textContent = `(${servings}人 × ${mealBatches}餐)`;
+    if (!ingredientsList) return;
     ingredientsList.innerHTML = scaled
       .map(
         (ing) =>
-          `<li class="list-group-item px-0 d-flex justify-content-between"><span>${ing.name}</span><span class="text-secondary">${ing.amount}</span></li>`
+          `<li class="list-group-item px-0 d-flex justify-content-between"><span>${escapeHtml(ing.name)}</span><span class="text-secondary">${escapeHtml(ing.amount || "")}</span></li>`
       )
       .join("");
   }
@@ -57,8 +56,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
   document.getElementById("add-to-shopping-btn")?.addEventListener("click", () => {
     const scaled = scaleIngredients(
-      recipe.ingredients,
-      recipe.baseServings,
+      recipe.ingredients || [],
+      recipe.baseServings || 2,
       servings,
       mealBatches
     );
@@ -76,7 +75,7 @@ document.addEventListener("DOMContentLoaded", () => {
         items.unshift({
           id: generateId(),
           ingredientName: ing.name,
-          amount: ing.amount,
+          amount: ing.amount || undefined,
           recipeId: recipe.id,
           recipeName: recipe.name,
           isBought: false,
@@ -144,4 +143,10 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   renderIngredients();
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  const dataEl = document.getElementById("recipe-data");
+  if (!dataEl) return;
+  initRecipeDetail(JSON.parse(dataEl.textContent));
 });

@@ -9,11 +9,12 @@ $hint = CUISINE_HINTS['all'];
 
 $pageTitle = '菜式庫 — SmartCook';
 $pageDescription = '香港風味煮食菜式庫，易潔鑊家常菜';
+$pageScripts = [asset_url('assets/js/recipes-catalog.js?v=20260704')];
 ?>
 <!DOCTYPE html>
 <html lang="zh-HK">
 <?php include __DIR__ . '/head.html'; ?>
-<body class="d-flex flex-column min-vh-100">
+<body class="d-flex flex-column min-vh-100" data-cuisine="all">
 <?php
 $headerTitle = '菜式庫';
 include __DIR__ . '/header.html';
@@ -22,17 +23,21 @@ include __DIR__ . '/header.html';
   <?php include __DIR__ . '/includes/cuisine-nav.php'; ?>
 </div>
 <main class="container app-main flex-grow-1 px-3 py-2">
-  <h2 class="h4 fw-bold mb-1"><?php echo h($title); ?></h2>
-  <p class="text-secondary small mb-4"><?php echo h($hint); ?> 共 <?php echo count($recipes); ?> 款。</p>
-  <?php if (count($recipes) === 0): ?>
-    <div class="text-center py-5 text-secondary">呢個分類暫時冇菜式</div>
-  <?php else: ?>
-    <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 g-3">
-      <?php foreach ($recipes as $recipe): ?>
-        <?php include __DIR__ . '/includes/recipe-card.php'; ?>
-      <?php endforeach; ?>
+  <div class="d-flex justify-content-between align-items-start gap-2 mb-3">
+    <div>
+      <h2 class="h4 fw-bold mb-1"><?php echo h($title); ?></h2>
+      <p class="text-secondary small mb-0"><?php echo h($hint); ?> 共 <span id="recipe-catalog-count"><?php echo count($recipes); ?></span> 款。</p>
     </div>
+    <a href="<?php echo h(page_url('add-recipe.php')); ?>" class="btn btn-primary btn-sm flex-shrink-0">➕ 加入菜式</a>
+  </div>
+  <?php if (count($recipes) === 0): ?>
+    <div class="text-center py-5 text-secondary" id="recipe-catalog-empty">呢個分類暫時冇預設菜式</div>
   <?php endif; ?>
+  <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 g-3" id="recipe-catalog-grid" data-builtin-count="<?php echo count($recipes); ?>">
+    <?php foreach ($recipes as $recipe): ?>
+      <?php include __DIR__ . '/includes/recipe-card.php'; ?>
+    <?php endforeach; ?>
+  </div>
 </main>
 <?php include __DIR__ . '/footer.html'; ?>
 </body>

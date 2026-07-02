@@ -65,7 +65,7 @@ function head(title, description) {
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-<link href="${asset("assets/css/style.css?v=20260703")}" rel="stylesheet">
+<link href="${asset("assets/css/style.css?v=20260704")}" rel="stylesheet">
 </head>`;
 }
 
@@ -116,7 +116,7 @@ function header({ showBack = false, title = "", backHref = page("recipes/"), rec
 function footer(extraScripts = []) {
   return `<script>window.SMARTCOOK_BASE=${JSON.stringify(BASE)};window.SMARTCOOK_STATIC=true;</script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-<script src="${asset("assets/js/smartcook.js?v=20260703")}"></script>
+<script src="${asset("assets/js/smartcook.js?v=20260704")}"></script>
 ${extraScripts.map((s) => `<script src="${h(s)}"></script>`).join("\n")}`;
 }
 
@@ -132,7 +132,7 @@ function cuisineNav(active) {
 ${items.map(([value, label, icon, href]) => {
   const count = value === "all" ? recipes.length : recipes.filter((r) => r.cuisine === value).length;
   const isActive = active === value;
-  return `<li class="nav-item"><a href="${href}" class="nav-link rounded-3 d-flex align-items-center gap-1 px-3 ${isActive ? "active" : ""}"><span>${icon}</span><span>${label}</span><span class="badge rounded-pill ${isActive ? "bg-light text-primary" : "bg-secondary-subtle text-secondary"}">${count}</span></a></li>`;
+  return `<li class="nav-item"><a href="${href}" class="nav-link rounded-3 d-flex align-items-center gap-1 px-3 ${isActive ? "active" : ""}"><span>${icon}</span><span>${label}</span><span class="badge rounded-pill ${isActive ? "bg-light text-primary" : "bg-secondary-subtle text-secondary"}" data-cuisine-count="${value}" data-base-count="${count}">${count}</span></a></li>`;
 }).join("")}
 </ul></div></nav>`;
 }
@@ -146,14 +146,13 @@ function recipesPage(cuisine = "all") {
   const title = cuisine === "all" ? "全部菜式" : `${CUISINE_LABELS[cuisine]}菜式`;
   const hint = CUISINE_HINTS[cuisine];
   return `<!DOCTYPE html><html lang="zh-HK">${head(`${title} — SmartCook`, hint)}
-<body class="d-flex flex-column min-vh-100">
+<body class="d-flex flex-column min-vh-100" data-cuisine="${cuisine}">
 ${header({ title: "菜式庫", recipesActive: true })}
 <div class="container app-main px-3">${cuisineNav(cuisine)}</div>
 <main class="container app-main flex-grow-1 px-3 py-2">
-<h2 class="h4 fw-bold mb-1">${h(title)}</h2>
-<p class="text-secondary small mb-4">${h(hint)} 共 ${filtered.length} 款。</p>
-<div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 g-3">${filtered.map(recipeCard).join("")}</div>
-</main>${footer()}</body></html>`;
+<div class="d-flex justify-content-between align-items-start gap-2 mb-3"><div><h2 class="h4 fw-bold mb-1">${h(title)}</h2><p class="text-secondary small mb-0">${h(hint)} 共 <span id="recipe-catalog-count">${filtered.length}</span> 款。</p></div><a href="${page("add-recipe/")}" class="btn btn-primary btn-sm flex-shrink-0">➕ 加入菜式</a></div>
+<div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 g-3" id="recipe-catalog-grid" data-builtin-count="${filtered.length}">${filtered.map(recipeCard).join("")}</div>
+</main>${footer([asset("assets/js/recipes-catalog.js?v=20260704")])}</body></html>`;
 }
 
 function recipePage(recipe) {
@@ -173,7 +172,7 @@ ${header({ showBack: true, title: recipe.name, backHref: cuisineUrl(recipe.cuisi
 <section class="card border-0 shadow-sm"><div class="card-body"><label class="form-label small text-secondary">幾時煮？可以補登之前煮過嘅餸</label><input type="date" class="form-control mb-3" id="cooked-date"><p class="small text-secondary mb-2">幫自己評個分</p><div class="mb-3" id="rating-stars">${[1,2,3,4,5].map((i)=>`<button type="button" class="btn btn-link p-0 rating-star" data-rating="${i}">☆</button>`).join("")}</div><button type="button" class="btn btn-success w-100" id="complete-cooking-btn">✅ 完成煮食 · 打卡</button></div></section>
 </article></main>
 <script id="recipe-data" type="application/json">${JSON.stringify(recipe)}</script>
-${footer([asset("assets/js/recipe-detail.js?v=20260703")])}</body></html>`;
+${footer([asset("assets/js/recipe-detail.js?v=20260704")])}</body></html>`;
 }
 
 function shellPage(title, current, mainHtml, script) {
@@ -224,7 +223,37 @@ ${header({ title: "SmartCook" })}
 </div>
 <p class="text-secondary small text-center mt-4 mb-0">兩個帳戶可以互相睇對方嘅日曆同買餸清單，但唔可以修改</p>
 </main>
-${footer([asset("assets/js/account.js?v=20260703")])}</body></html>`);
+${footer([asset("assets/js/account.js?v=20260704")])}</body></html>`);
+
+const addRecipeFormHtml = `<h1 class="h4 fw-bold mb-1" id="add-recipe-page-title">加入菜式</h1><p class="text-secondary small mb-4">填寫你嘅菜式資料。除菜式名稱同材料外，其他欄位可留空。</p>
+<form id="add-recipe-form" class="d-flex flex-column gap-4">
+<div class="card border-0 shadow-sm"><div class="card-body"><h6 class="fw-bold mb-3">基本資料</h6>
+<div class="mb-3"><label class="form-label">菜式名稱 <span class="text-danger">*</span></label><input type="text" class="form-control" name="name" placeholder="例如：媽咪秘製咖喱" required></div>
+<div class="row g-3">
+<div class="col-6"><label class="form-label">菜系</label><select class="form-select" name="cuisine"><option value="chinese">中餐</option><option value="western">西餐</option><option value="japanese">日式</option><option value="italian">意式</option></select></div>
+<div class="col-6"><label class="form-label">預設人數</label><input type="number" class="form-control" name="baseServings" min="1" max="12" value="2"></div>
+<div class="col-6"><label class="form-label">難度（1-5）</label><select class="form-select" name="difficulty"><option value="1">★☆☆☆☆</option><option value="2">★★☆☆☆</option><option value="3">★★★☆☆</option><option value="4">★★★★☆</option><option value="5">★★★★★</option></select></div>
+<div class="col-6"><label class="form-label">準備時間（分鐘）</label><input type="number" class="form-control" name="prepTime" min="0" placeholder="可留空"></div>
+</div>
+<div class="mt-3"><label class="form-label">簡介</label><textarea class="form-control" name="description" rows="2" placeholder="描述呢道菜…（可留空）"></textarea></div>
+<div class="mt-3"><label class="form-label">圖片網址</label><input type="url" class="form-control" name="imageUrl" placeholder="https://…（可留空）"></div>
+</div></div>
+<div class="card border-0 shadow-sm"><div class="card-body"><div class="d-flex justify-content-between align-items-center mb-3"><h6 class="fw-bold mb-0">材料 <span class="text-danger">*</span></h6><button type="button" class="btn btn-sm btn-outline-primary" id="add-ingredient-btn">＋ 加材料</button></div><div id="ingredients-list-form"></div></div></div>
+<div class="card border-0 shadow-sm"><div class="card-body"><div class="d-flex justify-content-between align-items-center mb-3"><h6 class="fw-bold mb-0">煮食步驟</h6><button type="button" class="btn btn-sm btn-outline-primary" id="add-step-btn">＋ 加步驟</button></div><div id="steps-list-form"></div><p class="small text-secondary mb-0 mt-2">步驟可留空，之後再補充</p></div></div>
+<div class="d-grid gap-2"><button type="submit" class="btn btn-primary btn-lg" id="submit-recipe-btn">加入菜式</button><button type="button" class="btn btn-outline-danger d-none" id="delete-recipe-btn">🗑 刪除此菜式</button></div>
+</form>`;
+
+writeOut("add-recipe/index.html", `<!DOCTYPE html><html lang="zh-HK">${head("加入菜式 — SmartCook")}
+<body class="d-flex flex-column min-vh-100">
+${header({ showBack: true, title: "加入菜式", backHref: page("recipes/"), recipesActive: true })}
+<main class="container app-main flex-grow-1 px-3 py-2">${addRecipeFormHtml}</main>
+${footer([asset("assets/js/add-recipe.js?v=20260704")])}</body></html>`);
+
+writeOut("recipes/custom/index.html", `<!DOCTYPE html><html lang="zh-HK">${head("自訂菜式 — SmartCook")}
+<body class="d-flex flex-column min-vh-100" data-cuisine="all">
+${header({ showBack: true, title: "自訂菜式", backHref: page("recipes/"), recipesActive: true })}
+<main class="container app-main flex-grow-1 px-3 py-2"><div id="recipe-custom-app"></div></main>
+${footer([asset("assets/js/recipe-detail.js?v=20260704"), asset("assets/js/recipe-custom-view.js?v=20260704")])}</body></html>`);
 
 writeOut("index.html", `<!DOCTYPE html><html lang="zh-HK"><head><meta charset="utf-8"><title>SmartCook</title><script>(function(){var base=${JSON.stringify(BASE)};var user=localStorage.getItem("smartcook_current_user");location.replace(user?base+"/recipes/":base+"/account/");})();</script></head><body></body></html>`);
 cpSync(join(OUT, "recipes/index.html"), join(OUT, "404.html"));

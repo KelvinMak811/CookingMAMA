@@ -43,6 +43,8 @@ function page_url(string $path): string
             'history.php' => 'history/',
             'expenses.php' => 'expenses/',
             'account.php' => 'account/',
+            'add-recipe.php' => 'add-recipe/',
+            'recipe-custom.php' => 'recipes/custom/',
         ];
         $path = $map[$path] ?? $path;
     }

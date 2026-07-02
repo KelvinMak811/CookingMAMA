@@ -12,7 +12,18 @@ const STORAGE_KEYS = {
   SHOPPING: "smartcook_shopping",
   COOKING_LOG: "smartcook_cooking_log",
   MEAL_PLAN: "smartcook_meal_plan",
+  CUSTOM_RECIPES: "smartcook_custom_recipes",
 };
+
+const CUISINE_LABELS = {
+  chinese: "中餐",
+  western: "西餐",
+  japanese: "日式",
+  italian: "意式",
+};
+
+const DEFAULT_RECIPE_IMAGE =
+  "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7f/Cooking_pot_stew_%28Unsplash%29.jpg/640px-Cooking_pot_stew_%28Unsplash%29.jpg";
 
 const LEGACY_KEYS = { ...STORAGE_KEYS };
 
@@ -235,10 +246,124 @@ function updateShoppingBubble() {
 
 function recipePageUrl(recipeId) {
   const base = window.SMARTCOOK_BASE || "";
+  if (String(recipeId).startsWith("custom-")) {
+    if (window.SMARTCOOK_STATIC) {
+      return `${base}/recipes/custom/?id=${encodeURIComponent(recipeId)}`;
+    }
+    return `${base}/recipe-custom.php?id=${encodeURIComponent(recipeId)}`;
+  }
   if (window.SMARTCOOK_STATIC) {
     return `${base}/recipes/${encodeURIComponent(recipeId)}/`;
   }
   return `${base}/recipe.php?id=${encodeURIComponent(recipeId)}`;
+}
+
+function addRecipePageUrl(recipeId) {
+  const base = window.SMARTCOOK_BASE || "";
+  const query = recipeId ? `?id=${encodeURIComponent(recipeId)}` : "";
+  if (window.SMARTCOOK_STATIC) {
+    return `${base}/add-recipe/${query}`;
+  }
+  return `${base}/add-recipe.php${query}`;
+}
+
+function recipesCatalogUrl() {
+  const base = window.SMARTCOOK_BASE || "";
+  if (window.SMARTCOOK_STATIC) {
+    return `${base}/recipes/`;
+  }
+  return `${base}/recipes.php`;
+}
+
+function getCustomRecipes() {
+  return loadZustandState(STORAGE_KEYS.CUSTOM_RECIPES, { recipes: [] }).recipes || [];
+}
+
+function saveCustomRecipes(recipes) {
+  saveZustandState(STORAGE_KEYS.CUSTOM_RECIPES, { recipes });
+}
+
+function getCustomRecipeById(id) {
+  return getCustomRecipes().find((r) => r.id === id) || null;
+}
+
+function canEditCustomRecipe(recipe) {
+  return recipe && recipe.createdBy === getCurrentUserId();
+}
+
+function deleteCustomRecipe(id) {
+  const recipe = getCustomRecipeById(id);
+  if (!recipe || !canEditCustomRecipe(recipe)) return false;
+  saveCustomRecipes(getCustomRecipes().filter((r) => r.id !== id));
+  return true;
+}
+
+function upsertCustomRecipe(recipe) {
+  const recipes = getCustomRecipes();
+  const index = recipes.findIndex((r) => r.id === recipe.id);
+  if (index >= 0) {
+    if (!canEditCustomRecipe(recipes[index])) return false;
+    recipes[index] = recipe;
+  } else {
+    recipes.unshift(recipe);
+  }
+  saveCustomRecipes(recipes);
+  return true;
+}
+
+function filterCustomRecipes(cuisine) {
+  const all = getCustomRecipes();
+  if (!cuisine || cuisine === "all") return all;
+  return all.filter((r) => (r.cuisine || "chinese") === cuisine);
+}
+
+function generateCustomRecipeId() {
+  return `custom-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
+}
+
+function renderDifficultyStars(n) {
+  const filled = Math.max(1, Math.min(5, Number(n) || 1));
+  return "★".repeat(filled) + "☆".repeat(5 - filled);
+}
+
+function escapeHtml(text) {
+  return String(text)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}
+
+function buildRecipeCardHtml(recipe) {
+  const cuisine = CUISINE_LABELS[recipe.cuisine] || CUISINE_LABELS.chinese;
+  const imageUrl = recipe.imageUrl || DEFAULT_RECIPE_IMAGE;
+  const prepTime = recipe.prepTime ? `${recipe.prepTime} 分鐘` : "—";
+  const creator = recipe.isCustom
+    ? `<div class="small text-primary mt-1">👤 ${escapeHtml(recipe.createdByName || "")} 加入</div>`
+    : "";
+  const customBadge = recipe.isCustom
+    ? `<span class="badge bg-primary-subtle text-primary fw-normal me-1">自訂</span>`
+    : "";
+  return `<div class="col">
+    <a href="${recipePageUrl(recipe.id)}" class="text-decoration-none text-dark h-100 d-block">
+      <div class="card h-100 border-0 shadow-sm overflow-hidden ${recipe.isCustom ? "border border-primary-subtle" : ""}">
+        <div class="recipe-card-img">
+          <img src="${escapeHtml(imageUrl)}" alt="${escapeHtml(recipe.name)}" class="object-fit-cover w-100 h-100" loading="lazy">
+        </div>
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-start gap-2 mb-2">
+            <h6 class="card-title mb-0">${escapeHtml(recipe.name)}</h6>
+            <span class="text-end">${customBadge}<span class="badge bg-light text-secondary fw-normal">${escapeHtml(cuisine)}</span></span>
+          </div>
+          <div class="d-flex justify-content-between align-items-center small text-secondary">
+            <span class="text-warning">${renderDifficultyStars(recipe.difficulty)}</span>
+            <span>⏱ ${prepTime}</span>
+          </div>
+          ${creator}
+        </div>
+      </div>
+    </a>
+  </div>`;
 }
 
 function speakText(text) {
