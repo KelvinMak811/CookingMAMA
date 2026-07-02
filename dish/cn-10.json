@@ -1,0 +1,45 @@
+{
+  "id": "cn-10",
+  "name": "滑蛋牛肉飯",
+  "cuisine": "chinese",
+  "baseServings": 2,
+  "description": "茶餐廳人氣乾身餸，易潔鑊快炒蓋飯，唔係湯飯！",
+  "difficulty": 2,
+  "prepTime": 20,
+  "imageUrl": "https://www.themealdb.com/images/media/meals/wuyd2h1765655837.jpg",
+  "ingredients": [
+    {
+      "id": "cn10-1",
+      "name": "牛肉片",
+      "amount": "250g"
+    },
+    {
+      "id": "cn10-2",
+      "name": "雞蛋",
+      "amount": "3隻"
+    },
+    {
+      "id": "cn10-3",
+      "name": "白飯",
+      "amount": "2碗"
+    },
+    {
+      "id": "cn10-4",
+      "name": "生抽",
+      "amount": "2湯匙"
+    },
+    {
+      "id": "cn10-5",
+      "name": "蔥",
+      "amount": "1條"
+    }
+  ],
+  "steps": [
+    "牛肉切薄片，生抽、少許糖、生粉、油醃15分鐘。",
+    "雞蛋打散加少許鹽；蔥切粒；白飯預先煮好或翻熱。",
+    "易潔鑊大火下油，炒牛肉至七成熟變色，盛起。",
+    "同一個鑊加少許油，炒蛋至半凝固關火。",
+    "倒返牛肉輕推幾下，保持蛋嫩滑。",
+    "蓋在白飯上，撒蔥花，即食。"
+  ]
+}

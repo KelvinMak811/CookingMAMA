@@ -89,29 +89,61 @@ function current_page(): string
     return basename($_SERVER['PHP_SELF'] ?? '');
 }
 
+function dish_dir(): string
+{
+    return dirname(__DIR__, 2) . DIRECTORY_SEPARATOR . 'dish';
+}
+
 function load_recipes(): array
 {
     static $cache = null;
     if ($cache !== null) {
         return $cache;
     }
-    $path = __DIR__ . '/../data/recipes.json';
-    if (!is_readable($path)) {
+
+    $dir = dish_dir();
+    $indexPath = $dir . DIRECTORY_SEPARATOR . 'index.json';
+    if (!is_readable($indexPath)) {
         return [];
     }
-    $decoded = json_decode((string) file_get_contents($path), true);
-    $cache = is_array($decoded) ? $decoded : [];
+
+    $index = json_decode((string) file_get_contents($indexPath), true);
+    if (!is_array($index)) {
+        return [];
+    }
+
+    $recipes = [];
+    foreach ($index['dishes'] ?? [] as $entry) {
+        if (!is_array($entry)) {
+            continue;
+        }
+        $id = (string) ($entry['id'] ?? '');
+        if ($id === '') {
+            continue;
+        }
+        $recipe = get_recipe_by_id($id);
+        if ($recipe !== null) {
+            $recipes[] = $recipe;
+        }
+    }
+
+    $cache = $recipes;
     return $cache;
 }
 
 function get_recipe_by_id(string $id): ?array
 {
-    foreach (load_recipes() as $recipe) {
-        if (($recipe['id'] ?? '') === $id) {
-            return $recipe;
-        }
+    if ($id === '') {
+        return null;
     }
-    return null;
+
+    $file = dish_dir() . DIRECTORY_SEPARATOR . $id . '.json';
+    if (!is_readable($file)) {
+        return null;
+    }
+
+    $decoded = json_decode((string) file_get_contents($file), true);
+    return is_array($decoded) ? $decoded : null;
 }
 
 function filter_recipes(?string $cuisine): array

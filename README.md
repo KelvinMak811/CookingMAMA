@@ -37,6 +37,7 @@ npm run build:pages
 | `php-site/` | PHP 版網站（本機測試用） |
 | `scripts/build-github-pages-static.mjs` | 靜態 HTML 產生器 |
 | `src/` | 舊版 Next.js 原始碼 |
+| `dish/` | 內建菜式 database（每道菜一個 JSON） |
 | `recipes/`, `assets/` 等（根目錄） | 已建置的 GitHub Pages 靜態檔 |
 
 ## GitHub Pages 設定

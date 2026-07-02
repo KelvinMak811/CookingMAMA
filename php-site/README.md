@@ -17,7 +17,7 @@ php-site/
 ├── header.html            → 導航列 + 手機底部選單
 ├── footer.html            → 共用 JS
 ├── includes/              → PHP 共用模組
-├── data/recipes.json      → 50 款菜式資料
+├── dish/                  → 內建菜式 database（index.json + 每道菜一個 .json）
 └── assets/css, js/        → 樣式同互動
 ```
 
@@ -47,11 +47,13 @@ php -S 127.0.0.1:8888
 
 ## 更新菜式資料
 
-若修改咗 Next.js 版 `src/data/recipes/`，可重新匯出 JSON：
+若修改咗 Next.js 版 `src/data/recipes/`，可重新匯出到 `dish/`：
 
 ```bash
-npx tsx scripts/export-recipes-json.ts
+npm run export-recipes
 ```
+
+或直接編輯 `dish/{菜式id}.json`，再執行 `npm run build:pages` 建置靜態站。
 
 ## 資料儲存
 

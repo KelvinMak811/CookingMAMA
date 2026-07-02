@@ -1,14 +1,14 @@
 import { cpSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
+import { loadDishesFromDir } from "./dish-database.mjs";
 
 const ROOT = process.cwd();
 const PHP_SITE = join(ROOT, "php-site");
+const DISH_DIR = join(ROOT, "dish");
 const OUT = join(ROOT, "out");
 const BASE = "/CookingMAMA";
 
-const recipes = JSON.parse(
-  readFileSync(join(PHP_SITE, "data", "recipes.json"), "utf8")
-);
+const recipes = loadDishesFromDir(DISH_DIR);
 
 const CUISINE_LABELS = {
   chinese: "中餐",
@@ -195,7 +195,7 @@ console.log("Building static site for GitHub Pages (Node)...");
 rmSync(OUT, { recursive: true, force: true });
 mkdirSync(OUT, { recursive: true });
 cpSync(join(PHP_SITE, "assets"), join(OUT, "assets"), { recursive: true });
-cpSync(join(PHP_SITE, "data"), join(OUT, "data"), { recursive: true });
+cpSync(DISH_DIR, join(OUT, "dish"), { recursive: true });
 writeFileSync(join(OUT, ".nojekyll"), "");
 
 writeOut("recipes/index.html", recipesPage("all"));

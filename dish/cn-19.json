@@ -1,0 +1,45 @@
+{
+  "id": "cn-19",
+  "name": "蜜糖蒜蓉豬頸肉",
+  "cuisine": "chinese",
+  "baseServings": 2,
+  "description": "甜甜地蒜香豬頸肉，零失敗家常菜，小朋友都鍾意。",
+  "difficulty": 1,
+  "prepTime": 25,
+  "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c2/Char_siu_pork.jpg/960px-Char_siu_pork.jpg",
+  "ingredients": [
+    {
+      "id": "cn19-1",
+      "name": "豬頸肉",
+      "amount": "400g"
+    },
+    {
+      "id": "cn19-2",
+      "name": "蜜糖",
+      "amount": "2湯匙"
+    },
+    {
+      "id": "cn19-3",
+      "name": "生抽",
+      "amount": "1湯匙"
+    },
+    {
+      "id": "cn19-4",
+      "name": "蒜蓉",
+      "amount": "4瓣"
+    },
+    {
+      "id": "cn19-5",
+      "name": "白醋",
+      "amount": "半茶匙"
+    }
+  ],
+  "steps": [
+    "豬頸肉切厚片拍鬆，蜜糖、生抽、蒜蓉、白醋混成醃汁。",
+    "豬頸肉放入醃汁醃至少20分鐘。",
+    "易潔鑊中火下油，下豬頸肉煎至兩面金黃。",
+    "倒入剩餘醃汁，轉小火燜3–4分鐘至熟透。",
+    "開大火收汁至汁濃稠亮澤。",
+    "切片上碟，配椰菜仔或沙律都得。"
+  ]
+}
