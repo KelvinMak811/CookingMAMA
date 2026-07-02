@@ -22,7 +22,7 @@ export function AppShell({
       <div className="container app-main px-3">
         <CuisineNavSlot />
       </div>
-      <main className="container app-main flex-grow-1 px-3 py-3">
+      <main className="container app-main flex-grow-1 px-3 py-2">
         {children}
       </main>
       <BottomNav />

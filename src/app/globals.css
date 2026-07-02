@@ -6,6 +6,7 @@
   --bs-body-font-family: var(--font-noto-sans-tc), "PingFang TC", "Microsoft JhengHei",
     sans-serif;
   --smartcook-bg: #fffbf5;
+  --app-header-height: 2.75rem;
 }
 
 body {
@@ -46,6 +47,22 @@ body {
   border-color: #f97316;
 }
 
+.app-navbar {
+  --bs-navbar-padding-y: 0;
+  min-height: var(--app-header-height);
+  padding-top: 0.25rem;
+  padding-bottom: 0.25rem;
+}
+
+.app-navbar-inner {
+  min-height: calc(var(--app-header-height) - 0.5rem);
+}
+
+.app-navbar-icon {
+  font-size: 1.125rem;
+  line-height: 1;
+}
+
 .app-main {
   max-width: 48rem;
   padding-bottom: 5.5rem;
@@ -73,7 +90,7 @@ body {
 
 .cuisine-nav-sticky {
   position: sticky;
-  top: 56px;
+  top: var(--app-header-height);
   z-index: 1020;
   background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(8px);

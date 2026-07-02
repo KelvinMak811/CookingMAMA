@@ -25,7 +25,7 @@ export function CuisineNav() {
   if (!pathname.startsWith("/recipes")) return null;
 
   return (
-    <nav className="cuisine-nav-sticky border-bottom py-2 mb-0" aria-label="菜式類別">
+    <nav className="cuisine-nav-sticky border-bottom py-1 mb-0" aria-label="菜式類別">
       <div className="date-nav-scroll">
         <Nav variant="pills" className="flex-nowrap gap-2">
           {CUISINE_NAV_ITEMS.map((item) => {
