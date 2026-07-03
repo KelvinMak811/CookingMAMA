@@ -130,6 +130,10 @@ function loadZustandState(key, fallbackState) {
 
 function saveZustandState(key, state) {
   localStorage.setItem(key, JSON.stringify({ state, version: 0 }));
+  localStorage.setItem(`${key}_cloud_meta`, JSON.stringify({ updated_at: new Date().toISOString() }));
+  if (typeof scheduleCloudSync === "function") {
+    scheduleCloudSync();
+  }
 }
 
 function generateId() {

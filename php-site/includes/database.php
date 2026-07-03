@@ -46,4 +46,12 @@ function db_migrate(PDO $pdo): void
     $pdo->exec('CREATE INDEX IF NOT EXISTS idx_logs_account ON activity_logs(account_id)');
     $pdo->exec('CREATE INDEX IF NOT EXISTS idx_logs_event ON activity_logs(event_type)');
     $pdo->exec('CREATE INDEX IF NOT EXISTS idx_logs_session ON activity_logs(session_id)');
+
+    $pdo->exec('CREATE TABLE IF NOT EXISTS user_sync_data (
+        scope TEXT NOT NULL,
+        data_key TEXT NOT NULL,
+        payload TEXT NOT NULL,
+        updated_at TEXT NOT NULL,
+        PRIMARY KEY (scope, data_key)
+    )');
 }

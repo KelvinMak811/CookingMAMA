@@ -1,0 +1,3 @@
+# Optional: PHP API URL for GitHub Pages cloud sync (no trailing slash).
+# Example: https://your-php-host.example.com
+# Leave empty to disable cloud sync on static build.

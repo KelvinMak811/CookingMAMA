@@ -1,7 +1,7 @@
 <?php
 require_once __DIR__ . '/includes/bootstrap.php';
 $pageTitle = '揀選帳戶 — SmartCook';
-$pageScripts = [asset_url('assets/js/account.js?v=20260703')];
+$pageScripts = [asset_url('assets/js/account.js?v=20260706')];
 ?>
 <!DOCTYPE html>
 <html lang="zh-HK">
@@ -30,7 +30,21 @@ include __DIR__ . '/header.html';
     </button>
   </div>
 
-  <p class="text-secondary small text-center mt-4 mb-0">兩個帳戶可以互相睇對方嘅日曆同買餸清單，但唔可以修改</p>
+  <p class="text-secondary small text-center mt-3 mb-0">兩個帳戶可以互相睇對方嘅日曆同買餸清單，但唔可以修改</p>
+
+  <div class="card border-0 shadow-sm mt-4">
+    <div class="card-body">
+      <h2 class="h6 fw-bold mb-2">換電腦？備份／還原紀錄</h2>
+      <p class="text-secondary small mb-3">買餸清單、煮食日曆會自動同步去伺服器（如有設定 API）。你亦可以手動備份 JSON 檔，喺新電腦還原。</p>
+      <div class="d-grid gap-2">
+        <button type="button" class="btn btn-outline-primary btn-sm" id="export-backup-btn">⬇️ 匯出備份檔</button>
+        <label class="btn btn-outline-secondary btn-sm mb-0">
+          ⬆️ 匯入備份檔
+          <input type="file" id="import-backup-input" accept="application/json,.json" class="d-none">
+        </label>
+      </div>
+    </div>
+  </div>
 </main>
 <?php include __DIR__ . '/footer.html'; ?>
 </body>

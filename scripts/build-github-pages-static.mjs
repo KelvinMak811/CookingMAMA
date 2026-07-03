@@ -8,6 +8,18 @@ const DISH_DIR = join(ROOT, "dish");
 const OUT = join(ROOT, "out");
 const BASE = "/CookingMAMA";
 
+function readSyncApiUrl() {
+  if (process.env.SMARTCOOK_API_URL) return process.env.SMARTCOOK_API_URL.trim();
+  const file = join(ROOT, "sync-api-url.txt");
+  try {
+    const text = readFileSync(file, "utf8");
+    const line = text.split("\n").map((l) => l.trim()).find((l) => l && !l.startsWith("#"));
+    return line || "";
+  } catch {
+    return "";
+  }
+}
+
 const recipes = loadDishesFromDir(DISH_DIR);
 
 const CUISINE_LABELS = {
@@ -114,11 +126,12 @@ function header({ showBack = false, title = "", backHref = page("recipes/"), rec
 }
 
 function footer(extraScripts = []) {
-  const apiBase = process.env.SMARTCOOK_API_URL || "";
+  const apiBase = readSyncApiUrl();
   return `<script>window.SMARTCOOK_BASE=${JSON.stringify(BASE)};window.SMARTCOOK_STATIC=true;window.SMARTCOOK_API_BASE=${JSON.stringify(apiBase)};</script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-<script src="${asset("assets/js/smartcook.js?v=20260705")}"></script>
-<script src="${asset("assets/js/analytics.js?v=20260705")}"></script>
+<script src="${asset("assets/js/smartcook.js?v=20260706")}"></script>
+<script src="${asset("assets/js/cloud-sync.js?v=20260706")}"></script>
+<script src="${asset("assets/js/analytics.js?v=20260706")}"></script>
 ${extraScripts.map((s) => `<script src="${h(s)}"></script>`).join("\n")}`;
 }
 
@@ -223,9 +236,10 @@ ${header({ title: "SmartCook" })}
 <button type="button" class="btn btn-lg account-pick-btn" data-account="kelvin"><span class="account-pick-avatar">K</span><span class="account-pick-name">Kelvin</span></button>
 <button type="button" class="btn btn-lg account-pick-btn" data-account="yuetsum"><span class="account-pick-avatar">Y</span><span class="account-pick-name">YuetSum</span></button>
 </div>
-<p class="text-secondary small text-center mt-4 mb-0">兩個帳戶可以互相睇對方嘅日曆同買餸清單，但唔可以修改</p>
+<p class="text-secondary small text-center mt-3 mb-0">兩個帳戶可以互相睇對方嘅日曆同買餸清單，但唔可以修改</p>
+<div class="card border-0 shadow-sm mt-4"><div class="card-body"><h2 class="h6 fw-bold mb-2">換電腦？備份／還原紀錄</h2><p class="text-secondary small mb-3">買餸清單、煮食日曆會自動同步去伺服器（如有設定 API）。你亦可以手動備份 JSON 檔，喺新電腦還原。</p><div class="d-grid gap-2"><button type="button" class="btn btn-outline-primary btn-sm" id="export-backup-btn">⬇️ 匯出備份檔</button><label class="btn btn-outline-secondary btn-sm mb-0">⬆️ 匯入備份檔<input type="file" id="import-backup-input" accept="application/json,.json" class="d-none"></label></div></div></div>
 </main>
-${footer([asset("assets/js/account.js?v=20260704")])}</body></html>`);
+${footer([asset("assets/js/account.js?v=20260706")])}</body></html>`);
 
 const addRecipeFormHtml = `<h1 class="h4 fw-bold mb-1" id="add-recipe-page-title">加入菜式</h1><p class="text-secondary small mb-4">填寫你嘅菜式資料。除菜式名稱同材料外，其他欄位可留空。</p>
 <form id="add-recipe-form" class="d-flex flex-column gap-4">

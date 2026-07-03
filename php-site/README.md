@@ -55,9 +55,25 @@ npm run export-recipes
 
 或直接編輯 `dish/{菜式id}.json`，再執行 `npm run build:pages` 建置靜態站。
 
-## 資料儲存
+## 資料儲存（跨裝置同步）
 
-買餸清單、煮食紀錄、預定煮食仍用瀏覽器 **localStorage**，格式相容之前 Next.js 版（`smartcook_shopping` 等 key），換 PHP 版後原有資料會保留。
+| 資料 | 儲存位置 |
+|------|----------|
+| 買餸清單、煮食日曆、打卡 | 瀏覽器 localStorage **+** PHP 伺服器 SQLite（自動同步） |
+| 自訂菜式 | 同上（兩個帳戶共用） |
+| 內建 50 道菜 | `dish/` folder |
+
+**重要：** GitHub Pages 本身唔會保存你嘅個人紀錄。要換電腦都唔會流失，需要：
+
+1. **雲端同步（建議）** — 用 PHP 主機跑 `php-site`，設定 `sync-api-url.txt` 或 `SMARTCOOK_API_URL` 後重新 build 靜態站
+2. **手動備份** — 帳戶頁「匯出備份檔」，喺新電腦「匯入備份檔」
+
+API：`POST /api/sync.php`（`cloud-sync.js` 自動處理）
+
+```text
+# sync-api-url.txt
+https://你嘅PHP網址
+```
 
 ## Backend 活動紀錄（SQLite）
 
