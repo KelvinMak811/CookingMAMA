@@ -10,9 +10,6 @@ import { useAccountStore } from "@/stores/accountStore";
 import { AccountGuard } from "@/components/providers/AccountGuard";
 
 export function AppProviders({ children }: { children: React.ReactNode }) {
-  const hydrated = useAccountStore((s) => s.hydrated);
-  const currentUserId = useAccountStore((s) => s.currentUserId);
-
   useEffect(() => {
     configureCloudSync({
       getCurrentUserId: () => useAccountStore.getState().currentUserId,
@@ -23,8 +20,12 @@ export function AppProviders({ children }: { children: React.ReactNode }) {
   }, []);
 
   useEffect(() => {
-    if (!hydrated || !currentUserId) return;
+    let cancelled = false;
     void (async () => {
+      await Promise.resolve(useAccountStore.persist.rehydrate());
+      if (cancelled) return;
+      const currentUserId = useAccountStore.getState().currentUserId;
+      if (!currentUserId) return;
       try {
         await syncOnAppLoad();
       } catch {
@@ -32,7 +33,10 @@ export function AppProviders({ children }: { children: React.ReactNode }) {
       }
       await rehydrateAllUserStores();
     })();
-  }, [hydrated, currentUserId]);
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   return <AccountGuard>{children}</AccountGuard>;
 }
