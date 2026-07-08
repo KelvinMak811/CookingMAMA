@@ -20,6 +20,33 @@ export function isBrowser(): boolean {
   return typeof window !== "undefined";
 }
 
+function safeGetItem(key: string): string | null {
+  if (!isBrowser()) return null;
+  try {
+    return localStorage.getItem(key);
+  } catch {
+    return null;
+  }
+}
+
+function safeSetItem(key: string, value: string): void {
+  if (!isBrowser()) return;
+  try {
+    localStorage.setItem(key, value);
+  } catch {
+    /* ignore storage write failures */
+  }
+}
+
+function safeRemoveItem(key: string): void {
+  if (!isBrowser()) return;
+  try {
+    localStorage.removeItem(key);
+  } catch {
+    /* ignore storage remove failures */
+  }
+}
+
 export function userStorageKey(baseKey: string, userId: string): string {
   return `${baseKey}_${userId}`;
 }
@@ -35,8 +62,7 @@ export function storageKeyToSyncKey(
 }
 
 export function getLocalPayload(localKey: string): unknown | null {
-  if (!isBrowser()) return null;
-  const raw = localStorage.getItem(localKey);
+  const raw = safeGetItem(localKey);
   if (!raw) return null;
   try {
     return JSON.parse(raw);
@@ -46,8 +72,7 @@ export function getLocalPayload(localKey: string): unknown | null {
 }
 
 export function getLocalUpdatedAt(localKey: string): string | null {
-  if (!isBrowser()) return null;
-  const metaRaw = localStorage.getItem(localKey + SYNC_META_SUFFIX);
+  const metaRaw = safeGetItem(localKey + SYNC_META_SUFFIX);
   if (metaRaw) {
     try {
       const meta = JSON.parse(metaRaw) as { updated_at?: string };
@@ -61,8 +86,7 @@ export function getLocalUpdatedAt(localKey: string): string | null {
 
 export function touchLocalMeta(localKey: string): string {
   const updatedAt = new Date().toISOString();
-  if (!isBrowser()) return updatedAt;
-  localStorage.setItem(
+  safeSetItem(
     localKey + SYNC_META_SUFFIX,
     JSON.stringify({ updated_at: updatedAt })
   );
@@ -75,8 +99,8 @@ export function applyPayloadToLocal(
   updatedAt?: string
 ): void {
   if (!isBrowser() || !payload || typeof payload !== "object") return;
-  localStorage.setItem(localKey, JSON.stringify(payload));
-  localStorage.setItem(
+  safeSetItem(localKey, JSON.stringify(payload));
+  safeSetItem(
     localKey + SYNC_META_SUFFIX,
     JSON.stringify({ updated_at: updatedAt ?? new Date().toISOString() })
   );
@@ -91,8 +115,7 @@ export function loadZustandState<T>(key: string, fallback: T): T {
 }
 
 export function saveZustandState<T>(key: string, state: T): void {
-  if (!isBrowser()) return;
-  localStorage.setItem(key, JSON.stringify({ state, version: 0 }));
+  safeSetItem(key, JSON.stringify({ state, version: 0 }));
   touchLocalMeta(key);
 }
 
@@ -103,13 +126,13 @@ export function migrateLegacyData(targetUserId: string): void {
     [LEGACY_KEYS.COOKING_LOG, STORAGE_KEYS.COOKING_LOG, { records: [] }],
     [LEGACY_KEYS.MEAL_PLAN, STORAGE_KEYS.MEAL_PLAN, { plans: [] }],
   ];
-  for (const [legacyKey, baseKey, fallback] of pairs) {
+  for (const [legacyKey, baseKey] of pairs) {
     const userKey = userStorageKey(baseKey, targetUserId);
-    if (localStorage.getItem(userKey)) continue;
-    const legacyRaw = localStorage.getItem(legacyKey);
+    if (safeGetItem(userKey)) continue;
+    const legacyRaw = safeGetItem(legacyKey);
     if (!legacyRaw) continue;
-    localStorage.setItem(userKey, legacyRaw);
-    localStorage.removeItem(legacyKey);
+    safeSetItem(userKey, legacyRaw);
+    safeRemoveItem(legacyKey);
   }
 }
 
@@ -125,24 +148,21 @@ export function loadUserPersistState<T>(
 export function createUserScopedStorage(baseKey: StorageKey, getUserId: () => string | null) {
   return {
     getItem: (): string | null => {
-      if (!isBrowser()) return null;
       const userId = getUserId();
       if (!userId) return null;
-      return localStorage.getItem(userStorageKey(baseKey, userId));
+      return safeGetItem(userStorageKey(baseKey, userId));
     },
     setItem: (_name: string, value: string): void => {
-      if (!isBrowser()) return;
       const userId = getUserId();
       if (!userId) return;
       const key = userStorageKey(baseKey, userId);
-      localStorage.setItem(key, value);
+      safeSetItem(key, value);
       touchLocalMeta(key);
     },
     removeItem: (): void => {
-      if (!isBrowser()) return;
       const userId = getUserId();
       if (!userId) return;
-      localStorage.removeItem(userStorageKey(baseKey, userId));
+      safeRemoveItem(userStorageKey(baseKey, userId));
     },
   };
 }
@@ -150,16 +170,13 @@ export function createUserScopedStorage(baseKey: StorageKey, getUserId: () => st
 export function createLocalStorageAdapter() {
   return {
     getItem: (name: string): string | null => {
-      if (!isBrowser()) return null;
-      return localStorage.getItem(name);
+      return safeGetItem(name);
     },
     setItem: (name: string, value: string): void => {
-      if (!isBrowser()) return;
-      localStorage.setItem(name, value);
+      safeSetItem(name, value);
     },
     removeItem: (name: string): void => {
-      if (!isBrowser()) return;
-      localStorage.removeItem(name);
+      safeRemoveItem(name);
     },
   };
 }
