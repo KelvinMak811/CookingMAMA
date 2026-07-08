@@ -4,6 +4,7 @@ import type { CuisineType } from "@/types";
 import { CUISINE_LABELS } from "@/types";
 import { recipes } from "@/data/recipes";
 import { AppLink } from "@/components/layout/AppLink";
+import { CalendarUserButtons } from "@/components/history/CalendarUserButtons";
 import { useCustomRecipes } from "@/hooks/useCustomRecipes";
 import { RecipeGrid } from "./RecipeGrid";
 
@@ -30,6 +31,13 @@ export function RecipeCatalog({ cuisine = "all" }: RecipeCatalogProps) {
 
   return (
     <div>
+      <div className="card border-0 shadow-sm mb-4">
+        <div className="card-body py-3">
+          <p className="small text-secondary mb-2 mb-md-1">煮食日曆</p>
+          <CalendarUserButtons />
+        </div>
+      </div>
+
       <div className="d-flex align-items-center justify-content-between gap-2 mb-1">
         <h2 className="h4 fw-bold mb-0">{title}</h2>
         <AppLink href="/add-recipe/" className="btn btn-outline-primary btn-sm">

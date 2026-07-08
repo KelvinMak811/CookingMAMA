@@ -88,6 +88,10 @@ export function ScheduleCookingCard({
           加入煮食日程
         </Button>
 
+        <AppLink href="/history" className="btn btn-sm btn-outline-primary w-100">
+          📅 去煮食日曆 →
+        </AppLink>
+
         {message && (
           <Alert variant="success" className="py-2 mb-0 small text-center">
             {message}
