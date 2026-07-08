@@ -1,61 +1,40 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { useAccountStore } from "@/stores/accountStore";
 
 const PUBLIC_PATHS = ["/account"];
 
+function isPublicPath(pathname: string): boolean {
+  return PUBLIC_PATHS.some((p) => pathname === p || pathname === `${p}/`);
+}
+
 export function AccountGuard({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
-  const hydrated = useAccountStore((s) => s.hydrated);
-  const currentUserId = useAccountStore((s) => s.currentUserId);
-  const [ready, setReady] = useState(false);
+
+  useEffect(() => {
+    void useAccountStore.persist.rehydrate();
+  }, []);
 
   useEffect(() => {
     let cancelled = false;
 
-    void Promise.resolve(useAccountStore.persist.rehydrate()).finally(() => {
+    void Promise.resolve(useAccountStore.persist.rehydrate()).then(() => {
       if (cancelled) return;
       useAccountStore.setState({ hydrated: true });
-      setReady(true);
-    });
 
-    const timer = window.setTimeout(() => {
-      if (cancelled) return;
-      useAccountStore.setState({ hydrated: true });
-      setReady(true);
-    }, 1500);
+      const userId = useAccountStore.getState().currentUserId;
+      if (!userId && !isPublicPath(pathname)) {
+        router.replace("/account/");
+      }
+    });
 
     return () => {
       cancelled = true;
-      window.clearTimeout(timer);
     };
-  }, []);
-
-  useEffect(() => {
-    if (!ready && !hydrated) return;
-    const isPublic = PUBLIC_PATHS.some(
-      (p) => pathname === p || pathname === `${p}/`
-    );
-    if (!currentUserId && !isPublic) {
-      router.replace("/account/");
-    }
-  }, [ready, hydrated, currentUserId, pathname, router]);
-
-  const canRender = ready || hydrated;
-  const isPublic = PUBLIC_PATHS.some(
-    (p) => pathname === p || pathname === `${p}/`
-  );
-
-  if (!canRender && !isPublic) {
-    return (
-      <div className="d-flex align-items-center justify-content-center min-vh-100 text-secondary">
-        載入中…
-      </div>
-    );
-  }
+  }, [pathname, router]);
 
   return <>{children}</>;
 }

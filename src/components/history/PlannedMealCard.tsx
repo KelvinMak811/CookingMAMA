@@ -36,7 +36,7 @@ export function PlannedMealCard({ plan, onRemove, showDate }: PlannedMealCardPro
           <p className="mb-2 small text-secondary">
             {plan.servings} 人份量 × {plan.mealBatches} 餐
           </p>
-          <HardLink href={`/recipes/${plan.recipeId}`} className="btn btn-sm btn-outline-primary">
+          <HardLink href={`/recipes/${plan.recipeId}/`} className="btn btn-sm btn-outline-primary">
             睇菜式
           </HardLink>
         </div>

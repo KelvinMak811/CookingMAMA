@@ -1,7 +1,7 @@
 import Badge from "react-bootstrap/Badge";
 import type { Recipe } from "@/types";
 import { CUISINE_LABELS } from "@/types";
-import { HardLink } from "@/components/layout/HardLink";
+import { AppLink } from "@/components/layout/AppLink";
 import { DifficultyStars } from "./DifficultyStars";
 
 interface RecipeCardProps {
@@ -10,7 +10,7 @@ interface RecipeCardProps {
 
 export function RecipeCard({ recipe }: RecipeCardProps) {
   return (
-    <HardLink href={`/recipes/${recipe.id}`} className="text-decoration-none text-dark h-100 d-block">
+    <AppLink href={`/recipes/${recipe.id}/`} className="text-decoration-none text-dark h-100 d-block">
       <div className="card h-100 border-0 shadow-sm overflow-hidden">
         <div className="position-relative recipe-card-img">
           <img
@@ -33,6 +33,6 @@ export function RecipeCard({ recipe }: RecipeCardProps) {
           </div>
         </div>
       </div>
-    </HardLink>
+    </AppLink>
   );
 }

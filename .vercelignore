@@ -1,0 +1,11 @@
+# GitHub Pages static artifacts (conflict with Next.js routes on Vercel)
+/index.html
+/404.html
+/.nojekyll
+/recipes/
+/shopping-list/
+/history/
+/expenses/
+/account/
+/add-recipe/
+/assets/
