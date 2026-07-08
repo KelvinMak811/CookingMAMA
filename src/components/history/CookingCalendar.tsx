@@ -3,6 +3,7 @@
 import { useMemo } from "react";
 import Card from "react-bootstrap/Card";
 import Button from "react-bootstrap/Button";
+import type { CookingRecord, MealPlan } from "@/types";
 import { useCookingLogStore } from "@/stores/cookingLogStore";
 import { useMealPlanStore } from "@/stores/mealPlanStore";
 import { DaySchedulePanel } from "./DaySchedulePanel";
@@ -14,11 +15,17 @@ const WEEKDAYS = ["日", "一", "二", "三", "四", "五", "六"];
 interface CookingCalendarProps {
   selectedDate: Date;
   onSelectDate: (date: Date) => void;
+  records?: CookingRecord[];
+  plans?: MealPlan[];
+  readOnly?: boolean;
 }
 
 export function CookingCalendar({
   selectedDate,
   onSelectDate,
+  records: recordsProp,
+  plans: plansProp,
+  readOnly = false,
 }: CookingCalendarProps) {
   const today = new Date();
   const viewDate = useMemo(
@@ -26,8 +33,10 @@ export function CookingCalendar({
     [selectedDate]
   );
 
-  const records = useCookingLogStore((s) => s.records);
-  const plans = useMealPlanStore((s) => s.plans);
+  const storeRecords = useCookingLogStore((s) => s.records);
+  const storePlans = useMealPlanStore((s) => s.plans);
+  const records = recordsProp ?? storeRecords;
+  const plans = plansProp ?? storePlans;
   const removeRecord = useCookingLogStore((s) => s.removeRecord);
   const removePlan = useMealPlanStore((s) => s.removePlan);
 
@@ -164,8 +173,8 @@ export function CookingCalendar({
         selectedDate={selectedDate}
         plans={selectedPlans}
         records={selectedRecords}
-        onRemovePlan={removePlan}
-        onRemoveRecord={removeRecord}
+        onRemovePlan={readOnly ? undefined : removePlan}
+        onRemoveRecord={readOnly ? undefined : removeRecord}
       />
     </div>
   );

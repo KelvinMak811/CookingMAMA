@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build && node scripts/postbuild-github-pages.mjs",
+    "build": "next build",
     "build:pages": "npm run export-recipes && node scripts/build-github-pages-static.mjs",
     "export-recipes": "npx tsx scripts/export-recipes-json.ts",
     "start": "next start",
@@ -16,6 +16,7 @@
     "react": "19.2.4",
     "react-bootstrap": "^2.10.10",
     "react-dom": "19.2.4",
+    "@vercel/postgres": "^0.10.0",
     "zustand": "^5.0.14"
   },
   "devDependencies": {

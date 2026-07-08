@@ -8,8 +8,8 @@ interface DaySchedulePanelProps {
   selectedDate: Date;
   plans: MealPlan[];
   records: CookingRecord[];
-  onRemovePlan: (id: string) => void;
-  onRemoveRecord: (id: string) => void;
+  onRemovePlan?: (id: string) => void;
+  onRemoveRecord?: (id: string) => void;
 }
 
 export function DaySchedulePanel({

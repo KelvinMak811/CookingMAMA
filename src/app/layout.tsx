@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Noto_Sans_TC } from "next/font/google";
+import { AppProviders } from "@/components/providers/AppProviders";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./globals.css";
 
@@ -29,7 +30,7 @@ export default function RootLayout({
   return (
     <html lang="zh-HK">
       <body className={`${notoSansTC.variable} d-flex flex-column min-vh-100`}>
-        {children}
+        <AppProviders>{children}</AppProviders>
       </body>
     </html>
   );

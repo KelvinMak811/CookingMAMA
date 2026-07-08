@@ -1,13 +1,26 @@
 "use client";
 
+import { useMemo } from "react";
 import Card from "react-bootstrap/Card";
+import type { ShoppingItem } from "@/types";
 import { useShoppingStore } from "@/stores/shoppingStore";
 import { formatCurrency } from "@/lib/utils";
+import { migrateShoppingItem } from "@/lib/shoppingUtils";
 
-export function ShoppingTotal() {
-  const getBoughtTotal = useShoppingStore((s) => s.getBoughtTotal);
-  const boughtCount = useShoppingStore((s) => s.items.filter((i) => i.isBought).length);
-  const total = getBoughtTotal();
+interface ShoppingTotalProps {
+  items?: ShoppingItem[];
+}
+
+export function ShoppingTotal({ items: itemsProp }: ShoppingTotalProps) {
+  const storeItems = useShoppingStore((s) => s.items);
+  const items = useMemo(
+    () => (itemsProp ?? storeItems).map(migrateShoppingItem),
+    [itemsProp, storeItems]
+  );
+  const boughtCount = items.filter((i) => i.isBought).length;
+  const total = items
+    .filter((i) => i.isBought)
+    .reduce((sum, item) => sum + item.price, 0);
 
   if (boughtCount === 0) return null;
 

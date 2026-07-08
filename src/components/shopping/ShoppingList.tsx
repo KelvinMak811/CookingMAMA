@@ -1,11 +1,18 @@
 "use client";
 
 import ListGroup from "react-bootstrap/ListGroup";
+import type { ShoppingItem } from "@/types";
 import { useShoppingStore } from "@/stores/shoppingStore";
 import { ShoppingListItem } from "./ShoppingListItem";
 
-export function ShoppingList() {
-  const items = useShoppingStore((s) => s.items);
+interface ShoppingListProps {
+  items?: ShoppingItem[];
+  readOnly?: boolean;
+}
+
+export function ShoppingList({ items: itemsProp, readOnly = false }: ShoppingListProps) {
+  const storeItems = useShoppingStore((s) => s.items);
+  const items = itemsProp ?? storeItems;
   const unbought = items.filter((i) => !i.isBought);
   const bought = items.filter((i) => i.isBought);
 
@@ -28,7 +35,7 @@ export function ShoppingList() {
           </h6>
           <ListGroup variant="flush">
             {unbought.map((item) => (
-              <ShoppingListItem key={item.id} item={item} />
+              <ShoppingListItem key={item.id} item={item} readOnly={readOnly} />
             ))}
           </ListGroup>
         </section>
@@ -40,7 +47,7 @@ export function ShoppingList() {
           </h6>
           <ListGroup variant="flush">
             {bought.map((item) => (
-              <ShoppingListItem key={item.id} item={item} />
+              <ShoppingListItem key={item.id} item={item} readOnly={readOnly} />
             ))}
           </ListGroup>
         </section>

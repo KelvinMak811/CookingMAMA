@@ -1,7 +1,9 @@
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 import type { MealPlan } from "@/types";
-import { STORAGE_KEYS, createLocalStorageAdapter } from "@/lib/storage";
+import { STORAGE_KEYS, createUserScopedStorage } from "@/lib/storage";
+import { scheduleCloudSync } from "@/lib/cloud-sync";
+import { getCurrentUserIdSync } from "@/stores/accountStore";
 import { generateId } from "@/lib/utils";
 import { isSameDay } from "@/lib/utils";
 
@@ -19,6 +21,17 @@ interface MealPlanState {
   getPlansByRecipe: (recipeId: string) => MealPlan[];
   hasPlanOnDate: (recipeId: string, date: Date) => boolean;
 }
+
+const userStorage = createUserScopedStorage(STORAGE_KEYS.MEAL_PLAN, getCurrentUserIdSync);
+
+const storageWithSync = {
+  getItem: userStorage.getItem,
+  setItem: (name: string, value: string) => {
+    userStorage.setItem(name, value);
+    scheduleCloudSync();
+  },
+  removeItem: userStorage.removeItem,
+};
 
 export const useMealPlanStore = create<MealPlanState>()(
   persist(
@@ -58,7 +71,11 @@ export const useMealPlanStore = create<MealPlanState>()(
     }),
     {
       name: STORAGE_KEYS.MEAL_PLAN,
-      storage: createJSONStorage(() => createLocalStorageAdapter()),
+      storage: createJSONStorage(() => storageWithSync),
     }
   )
 );
+
+export async function rehydrateMealPlanStore(): Promise<void> {
+  await useMealPlanStore.persist.rehydrate();
+}

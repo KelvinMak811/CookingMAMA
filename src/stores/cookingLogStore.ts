@@ -1,7 +1,9 @@
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 import type { CookingRecord } from "@/types";
-import { STORAGE_KEYS, createLocalStorageAdapter } from "@/lib/storage";
+import { STORAGE_KEYS, createUserScopedStorage } from "@/lib/storage";
+import { scheduleCloudSync } from "@/lib/cloud-sync";
+import { getCurrentUserIdSync } from "@/stores/accountStore";
 import { generateId } from "@/lib/utils";
 
 interface CookingLogState {
@@ -16,6 +18,17 @@ interface CookingLogState {
   removeRecord: (id: string) => void;
   getRecordsByDate: (date: Date) => CookingRecord[];
 }
+
+const userStorage = createUserScopedStorage(STORAGE_KEYS.COOKING_LOG, getCurrentUserIdSync);
+
+const storageWithSync = {
+  getItem: userStorage.getItem,
+  setItem: (name: string, value: string) => {
+    userStorage.setItem(name, value);
+    scheduleCloudSync();
+  },
+  removeItem: userStorage.removeItem,
+};
 
 export const useCookingLogStore = create<CookingLogState>()(
   persist(
@@ -58,7 +71,11 @@ export const useCookingLogStore = create<CookingLogState>()(
     }),
     {
       name: STORAGE_KEYS.COOKING_LOG,
-      storage: createJSONStorage(() => createLocalStorageAdapter()),
+      storage: createJSONStorage(() => storageWithSync),
     }
   )
 );
+
+export async function rehydrateCookingLogStore(): Promise<void> {
+  await useCookingLogStore.persist.rehydrate();
+}

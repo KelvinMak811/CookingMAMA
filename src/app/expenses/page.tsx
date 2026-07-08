@@ -4,10 +4,14 @@ import { useMemo, useState } from "react";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import { AppShell } from "@/components/layout/AppShell";
+import { UserToggle } from "@/components/account/UserToggle";
 import { ExpenseMonthNav } from "@/components/expenses/ExpenseMonthNav";
 import { ExpenseSummary } from "@/components/expenses/ExpenseSummary";
 import { ExpensePieChart } from "@/components/expenses/ExpensePieChart";
 import { ExpenseLedger } from "@/components/expenses/ExpenseLedger";
+import type { AccountId } from "@/lib/accounts";
+import { useViewingUserData } from "@/hooks/useViewingUserData";
+import { useAccountStore } from "@/stores/accountStore";
 import { useShoppingStore } from "@/stores/shoppingStore";
 import { useCookingLogStore } from "@/stores/cookingLogStore";
 import {
@@ -22,8 +26,19 @@ export default function ExpensesPage() {
   const [year, setYear] = useState(today.getFullYear());
   const [month, setMonth] = useState(today.getMonth());
 
-  const items = useShoppingStore((s) => s.items);
-  const records = useCookingLogStore((s) => s.records);
+  const currentUserId = useAccountStore((s) => s.currentUserId);
+  const viewingUserId = useAccountStore((s) => s.viewingUserId);
+  const setViewingUser = useAccountStore((s) => s.setViewingUser);
+  const canEdit = useAccountStore((s) => s.canEditViewingUser);
+
+  const activeViewId = (viewingUserId ?? currentUserId) as AccountId;
+  const viewingData = useViewingUserData(activeViewId);
+  const readOnly = !canEdit();
+
+  const storeItems = useShoppingStore((s) => s.items);
+  const storeRecords = useCookingLogStore((s) => s.records);
+  const items = readOnly ? viewingData.items : storeItems;
+  const records = readOnly ? viewingData.records : storeRecords;
 
   const stats = useMemo(
     () => computeMonthStats(items, records, year, month),
@@ -31,11 +46,11 @@ export default function ExpensesPage() {
   );
   const ledger = useMemo(
     () => groupExpensesByDay(items, year, month),
-    [items, year, month, items]
+    [items, year, month]
   );
   const recipeChart = useMemo(
     () => spendingByRecipe(items, year, month),
-    [items, year, month, items]
+    [items, year, month]
   );
   const mealChart = useMemo(
     () => monthlyMealChart(records, year),
@@ -44,6 +59,12 @@ export default function ExpensesPage() {
 
   return (
     <AppShell title="開支紀錄">
+      {currentUserId && (
+        <UserToggle
+          viewingUserId={activeViewId}
+          onChange={(id) => setViewingUser(id)}
+        />
+      )}
       <ExpenseMonthNav
         year={year}
         month={month}

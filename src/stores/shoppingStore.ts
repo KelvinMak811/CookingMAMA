@@ -1,7 +1,9 @@
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 import type { ShoppingItem } from "@/types";
-import { STORAGE_KEYS, createLocalStorageAdapter } from "@/lib/storage";
+import { STORAGE_KEYS, createUserScopedStorage } from "@/lib/storage";
+import { scheduleCloudSync } from "@/lib/cloud-sync";
+import { getCurrentUserIdSync } from "@/stores/accountStore";
 import { generateId } from "@/lib/utils";
 import { migrateShoppingItem, shoppingItemKey } from "@/lib/shoppingUtils";
 
@@ -24,6 +26,17 @@ interface ShoppingState {
 function normalizeItems(items: ShoppingItem[]): ShoppingItem[] {
   return items.map(migrateShoppingItem);
 }
+
+const userStorage = createUserScopedStorage(STORAGE_KEYS.SHOPPING, getCurrentUserIdSync);
+
+const storageWithSync = {
+  getItem: userStorage.getItem,
+  setItem: (name: string, value: string) => {
+    userStorage.setItem(name, value);
+    scheduleCloudSync();
+  },
+  removeItem: userStorage.removeItem,
+};
 
 export const useShoppingStore = create<ShoppingState>()(
   persist(
@@ -110,7 +123,7 @@ export const useShoppingStore = create<ShoppingState>()(
     }),
     {
       name: STORAGE_KEYS.SHOPPING,
-      storage: createJSONStorage(() => createLocalStorageAdapter()),
+      storage: createJSONStorage(() => storageWithSync),
       merge: (persisted, current) => {
         const state = persisted as ShoppingState | undefined;
         if (state?.items) {
@@ -121,3 +134,7 @@ export const useShoppingStore = create<ShoppingState>()(
     }
   )
 );
+
+export async function rehydrateShoppingStore(): Promise<void> {
+  await useShoppingStore.persist.rehydrate();
+}

@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo } from "react";
+import type { CookingRecord, MealPlan } from "@/types";
 import { useCookingLogStore } from "@/stores/cookingLogStore";
 import { useMealPlanStore } from "@/stores/mealPlanStore";
 import { CookingRecordCard } from "./CookingRecordCard";
@@ -9,11 +10,21 @@ import { formatDate, isSameDay } from "@/lib/utils";
 
 interface CookingTimelineProps {
   filterDate?: Date;
+  records?: CookingRecord[];
+  plans?: MealPlan[];
+  readOnly?: boolean;
 }
 
-export function CookingTimeline({ filterDate }: CookingTimelineProps) {
-  const records = useCookingLogStore((s) => s.records);
-  const plans = useMealPlanStore((s) => s.plans);
+export function CookingTimeline({
+  filterDate,
+  records: recordsProp,
+  plans: plansProp,
+  readOnly = false,
+}: CookingTimelineProps) {
+  const storeRecords = useCookingLogStore((s) => s.records);
+  const storePlans = useMealPlanStore((s) => s.plans);
+  const records = recordsProp ?? storeRecords;
+  const plans = plansProp ?? storePlans;
   const removeRecord = useCookingLogStore((s) => s.removeRecord);
   const removePlan = useMealPlanStore((s) => s.removePlan);
 
@@ -83,13 +94,13 @@ export function CookingTimeline({ filterDate }: CookingTimelineProps) {
                 <PlannedMealCard
                   key={entry.plan.id}
                   plan={entry.plan}
-                  onRemove={removePlan}
+                  onRemove={readOnly ? undefined : removePlan}
                 />
               ) : (
                 <CookingRecordCard
                   key={entry.record.id}
                   record={entry.record}
-                  onRemove={removeRecord}
+                  onRemove={readOnly ? undefined : removeRecord}
                 />
               )
             )}

@@ -1,6 +1,7 @@
 "use client";
 
 import { AppLink } from "@/components/layout/AppLink";
+import { AccountMenu } from "@/components/account/AccountMenu";
 import { usePathname } from "next/navigation";
 import Container from "react-bootstrap/Container";
 import Navbar from "react-bootstrap/Navbar";
@@ -54,7 +55,7 @@ export function Header({ title, showBack, backHref = "/recipes" }: HeaderProps) 
             </AppLink>
           )}
           {!title && !showBack && (
-            <Nav className="ms-auto d-none d-md-flex gap-1">
+            <Nav className="ms-auto d-none d-md-flex gap-1 align-items-center">
               {navItems.map((item) => {
                 const isActive =
                   pathname === item.href || pathname.startsWith(item.href + "/");
@@ -68,7 +69,13 @@ export function Header({ title, showBack, backHref = "/recipes" }: HeaderProps) 
                   </AppLink>
                 );
               })}
+              <AccountMenu />
             </Nav>
+          )}
+          {(title || showBack) && (
+            <div className="ms-auto flex-shrink-0">
+              <AccountMenu />
+            </div>
           )}
         </div>
       </Container>

@@ -10,12 +10,26 @@ import { ShoppingItemDetails } from "./ShoppingItemDetails";
 
 interface ShoppingListItemProps {
   item: ShoppingItem;
+  readOnly?: boolean;
 }
 
-export function ShoppingListItem({ item }: ShoppingListItemProps) {
+export function ShoppingListItem({ item, readOnly = false }: ShoppingListItemProps) {
   const toggleBought = useShoppingStore((s) => s.toggleBought);
   const updatePrice = useShoppingStore((s) => s.updatePrice);
   const removeItem = useShoppingStore((s) => s.removeItem);
+
+  if (readOnly) {
+    return (
+      <ListGroup.Item
+        className={`d-flex align-items-start gap-2 rounded-3 mb-2 border py-3 ${item.isBought ? "bg-light opacity-75" : ""}`}
+      >
+        <ShoppingItemDetails item={item} strikethrough={item.isBought} />
+        {item.isBought && item.price > 0 && (
+          <span className="text-secondary small flex-shrink-0">${item.price}</span>
+        )}
+      </ListGroup.Item>
+    );
+  }
 
   return (
     <ListGroup.Item

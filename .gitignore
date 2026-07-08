@@ -23,6 +23,9 @@ yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
+# local sync db fallback (dev without Postgres)
+.data/
+
 # misc
 .DS_Store
 *.pem

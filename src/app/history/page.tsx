@@ -4,9 +4,13 @@ import { useState } from "react";
 import ButtonGroup from "react-bootstrap/ButtonGroup";
 import ToggleButton from "react-bootstrap/ToggleButton";
 import { AppShell } from "@/components/layout/AppShell";
+import { UserToggle } from "@/components/account/UserToggle";
 import { CookingCalendar } from "@/components/history/CookingCalendar";
 import { CookingTimeline } from "@/components/history/CookingTimeline";
 import { DateQuickNav } from "@/components/history/DateQuickNav";
+import type { AccountId } from "@/lib/accounts";
+import { useViewingUserData } from "@/hooks/useViewingUserData";
+import { useAccountStore } from "@/stores/accountStore";
 import { useCookingLogStore } from "@/stores/cookingLogStore";
 import { useMealPlanStore } from "@/stores/mealPlanStore";
 
@@ -15,11 +19,29 @@ type ViewMode = "calendar" | "timeline";
 export default function HistoryPage() {
   const [view, setView] = useState<ViewMode>("calendar");
   const [selectedDate, setSelectedDate] = useState(new Date());
-  const records = useCookingLogStore((s) => s.records);
-  const plans = useMealPlanStore((s) => s.plans);
+
+  const currentUserId = useAccountStore((s) => s.currentUserId);
+  const viewingUserId = useAccountStore((s) => s.viewingUserId);
+  const setViewingUser = useAccountStore((s) => s.setViewingUser);
+  const canEdit = useAccountStore((s) => s.canEditViewingUser);
+
+  const activeViewId = (viewingUserId ?? currentUserId) as AccountId;
+  const viewingData = useViewingUserData(activeViewId);
+  const readOnly = !canEdit();
+
+  const storeRecords = useCookingLogStore((s) => s.records);
+  const storePlans = useMealPlanStore((s) => s.plans);
+  const records = readOnly ? viewingData.records : storeRecords;
+  const plans = readOnly ? viewingData.plans : storePlans;
 
   return (
     <AppShell title="煮食日曆">
+      {currentUserId && (
+        <UserToggle
+          viewingUserId={activeViewId}
+          onChange={(id) => setViewingUser(id)}
+        />
+      )}
       <p className="text-secondary small mb-3">
         撳日子查看預定煮食（藍點）同已完成（綠點）。可切換日曆或時間軸檢視。
       </p>
@@ -58,9 +80,17 @@ export default function HistoryPage() {
         <CookingCalendar
           selectedDate={selectedDate}
           onSelectDate={setSelectedDate}
+          records={records}
+          plans={plans}
+          readOnly={readOnly}
         />
       ) : (
-        <CookingTimeline filterDate={selectedDate} />
+        <CookingTimeline
+          filterDate={selectedDate}
+          records={records}
+          plans={plans}
+          readOnly={readOnly}
+        />
       )}
     </AppShell>
   );
