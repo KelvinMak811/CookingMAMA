@@ -29,6 +29,17 @@ jobs:
       - name: Build static HTML site
         run: node scripts/build-github-pages-static.mjs
 
+      - name: Disable Vercel auto-deploy for gh-pages branch
+        run: |
+          cat > out/vercel.json << 'EOF'
+          {
+            "$schema": "https://openapi.vercel.sh/vercel.json",
+            "git": {
+              "deploymentEnabled": false
+            }
+          }
+          EOF
+
       - name: Verify build output
         run: test -f out/recipes/recipe-1/index.html
 
