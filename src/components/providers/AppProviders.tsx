@@ -25,7 +25,11 @@ export function AppProviders({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (!hydrated || !currentUserId) return;
     void (async () => {
-      await syncOnAppLoad();
+      try {
+        await syncOnAppLoad();
+      } catch {
+        /* sync optional until database is connected */
+      }
       await rehydrateAllUserStores();
     })();
   }, [hydrated, currentUserId]);

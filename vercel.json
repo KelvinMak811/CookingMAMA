@@ -1,0 +1,7 @@
+{
+  "rewrites": [
+    { "source": "/CookingMAMA", "destination": "/" },
+    { "source": "/CookingMAMA/", "destination": "/" },
+    { "source": "/CookingMAMA/:path*", "destination": "/:path*" }
+  ]
+}

@@ -14,45 +14,42 @@ interface AccountState {
   canEditViewingUser: () => boolean;
 }
 
-function readLegacyUserId(): AccountId | null {
-  if (typeof window === "undefined") return null;
-  const raw = localStorage.getItem(STORAGE_KEY_CURRENT_USER);
-  if (!raw) return null;
-  if (isAccountId(raw)) return raw;
-  try {
-    const parsed = JSON.parse(raw) as { state?: { currentUserId?: string } };
-    const id = parsed?.state?.currentUserId;
-    return isAccountId(id) ? id : null;
-  } catch {
-    return null;
+function normalizeRehydratedState(state?: Pick<AccountState, "currentUserId" | "viewingUserId">) {
+  if (state?.currentUserId && !state.viewingUserId) {
+    useAccountStore.setState({ viewingUserId: state.currentUserId });
   }
 }
 
 const accountStorage = {
   getItem: (name: string): string | null => {
     if (typeof window === "undefined") return null;
-    const raw = localStorage.getItem(name);
-    if (!raw) {
-      const legacy = readLegacyUserId();
-      if (!legacy) return null;
-      return JSON.stringify({
-        state: { currentUserId: legacy, viewingUserId: legacy },
-        version: 0,
-      });
+    try {
+      const raw = localStorage.getItem(name);
+      if (!raw) return null;
+      if (isAccountId(raw)) {
+        return JSON.stringify({
+          state: { currentUserId: raw, viewingUserId: raw },
+          version: 0,
+        });
+      }
+      return raw;
+    } catch {
+      return null;
     }
-    if (isAccountId(raw)) {
-      return JSON.stringify({
-        state: { currentUserId: raw, viewingUserId: raw },
-        version: 0,
-      });
-    }
-    return raw;
   },
   setItem: (name: string, value: string): void => {
-    localStorage.setItem(name, value);
+    try {
+      localStorage.setItem(name, value);
+    } catch {
+      /* private browsing / storage blocked */
+    }
   },
   removeItem: (name: string): void => {
-    localStorage.removeItem(name);
+    try {
+      localStorage.removeItem(name);
+    } catch {
+      /* ignore */
+    }
   },
 };
 
@@ -89,9 +86,7 @@ export const useAccountStore = create<AccountState>()(
         viewingUserId: state.viewingUserId,
       }),
       onRehydrateStorage: () => (state) => {
-        if (state?.currentUserId && !state.viewingUserId) {
-          state.viewingUserId = state.currentUserId;
-        }
+        normalizeRehydratedState(state);
         useAccountStore.setState({ hydrated: true });
       },
     }

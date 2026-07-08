@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { useAccountStore } from "@/stores/accountStore";
 
@@ -11,18 +11,45 @@ export function AccountGuard({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const hydrated = useAccountStore((s) => s.hydrated);
   const currentUserId = useAccountStore((s) => s.currentUserId);
+  const [ready, setReady] = useState(false);
 
   useEffect(() => {
-    if (!hydrated) return;
+    let cancelled = false;
+
+    void Promise.resolve(useAccountStore.persist.rehydrate()).finally(() => {
+      if (cancelled) return;
+      useAccountStore.setState({ hydrated: true });
+      setReady(true);
+    });
+
+    const timer = window.setTimeout(() => {
+      if (cancelled) return;
+      useAccountStore.setState({ hydrated: true });
+      setReady(true);
+    }, 1500);
+
+    return () => {
+      cancelled = true;
+      window.clearTimeout(timer);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!ready && !hydrated) return;
     const isPublic = PUBLIC_PATHS.some(
       (p) => pathname === p || pathname === `${p}/`
     );
     if (!currentUserId && !isPublic) {
       router.replace("/account/");
     }
-  }, [hydrated, currentUserId, pathname, router]);
+  }, [ready, hydrated, currentUserId, pathname, router]);
 
-  if (!hydrated) {
+  const canRender = ready || hydrated;
+  const isPublic = PUBLIC_PATHS.some(
+    (p) => pathname === p || pathname === `${p}/`
+  );
+
+  if (!canRender && !isPublic) {
     return (
       <div className="d-flex align-items-center justify-content-center min-vh-100 text-secondary">
         載入中…
