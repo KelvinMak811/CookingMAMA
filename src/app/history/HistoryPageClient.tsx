@@ -10,6 +10,8 @@ import { CookingCalendar } from "@/components/history/CookingCalendar";
 import { CookingTimeline } from "@/components/history/CookingTimeline";
 import { DateQuickNav } from "@/components/history/DateQuickNav";
 import { isAccountId, type AccountId } from "@/lib/accounts";
+import { syncPullAccount } from "@/lib/cloud-sync";
+import { rehydrateAllUserStores } from "@/lib/rehydrate-stores";
 import { useViewingUserData } from "@/hooks/useViewingUserData";
 import { useAccountStore } from "@/stores/accountStore";
 import { useCookingLogStore } from "@/stores/cookingLogStore";
@@ -35,6 +37,22 @@ export function HistoryPageClient() {
   }, [searchParams, setViewingUser]);
 
   const activeViewId = (viewingUserId ?? currentUserId) as AccountId;
+
+  useEffect(() => {
+    if (!activeViewId) return;
+    let cancelled = false;
+    void (async () => {
+      const changed = await syncPullAccount(activeViewId);
+      if (cancelled) return;
+      if (changed && currentUserId && activeViewId === currentUserId) {
+        await rehydrateAllUserStores();
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [activeViewId, currentUserId]);
+
   const viewingData = useViewingUserData(activeViewId);
   const readOnly = !canEdit();
 

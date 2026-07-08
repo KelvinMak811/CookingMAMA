@@ -80,7 +80,8 @@ export default function AccountPage() {
           <Card.Body>
             <h2 className="h6 fw-bold mb-2">換電腦？備份／還原紀錄</h2>
             <p className="text-secondary small mb-3">
-              買餸清單、煮食日曆會自動同步去伺服器。你亦可以手動備份 JSON 檔，喺新電腦還原。
+              買餸清單、煮食日曆、預定煮食會自動同步去伺服器（需喺 Vercel 連接 Postgres / Neon 資料庫）。
+              你亦可以手動備份 JSON 檔，喺新電腦還原。
             </p>
             <div className="d-grid gap-2">
               <Button

@@ -2,7 +2,7 @@ import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 import type { MealPlan } from "@/types";
 import { STORAGE_KEYS, createUserScopedStorage } from "@/lib/storage";
-import { scheduleCloudSync } from "@/lib/cloud-sync";
+import { syncPushNow } from "@/lib/cloud-sync";
 import { getCurrentUserIdSync } from "@/stores/accountStore";
 import { generateId } from "@/lib/utils";
 import { isSameDay } from "@/lib/utils";
@@ -28,7 +28,7 @@ const storageWithSync = {
   getItem: userStorage.getItem,
   setItem: (name: string, value: string) => {
     userStorage.setItem(name, value);
-    scheduleCloudSync();
+    void syncPushNow();
   },
   removeItem: userStorage.removeItem,
 };

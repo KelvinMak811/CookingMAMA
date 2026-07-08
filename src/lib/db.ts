@@ -15,8 +15,19 @@ const DATA_FILE = path.join(DATA_DIR, "sync-db.json");
 
 let fileCache: SyncRow[] | null = null;
 
+function ensurePostgresEnv(): void {
+  if (!process.env.POSTGRES_URL && process.env.DATABASE_URL) {
+    process.env.POSTGRES_URL = process.env.DATABASE_URL;
+  }
+}
+
 function hasPostgres(): boolean {
+  ensurePostgresEnv();
   return Boolean(process.env.POSTGRES_URL);
+}
+
+export function getDatabaseMode(): "postgres" | "file" {
+  return hasPostgres() ? "postgres" : "file";
 }
 
 async function readFileRows(): Promise<SyncRow[]> {
