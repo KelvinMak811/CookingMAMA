@@ -19,6 +19,11 @@ export interface Recipe {
   ingredients: Ingredient[];
   steps: string[];
   imageUrl: string;
+  isCustom?: boolean;
+  createdBy?: string;
+  createdByName?: string;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 // 食材模型

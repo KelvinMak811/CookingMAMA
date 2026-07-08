@@ -1,6 +1,10 @@
+"use client";
+
 import type { CuisineType } from "@/types";
 import { CUISINE_LABELS } from "@/types";
 import { recipes } from "@/data/recipes";
+import { AppLink } from "@/components/layout/AppLink";
+import { useCustomRecipes } from "@/hooks/useCustomRecipes";
 import { RecipeGrid } from "./RecipeGrid";
 
 interface RecipeCatalogProps {
@@ -16,13 +20,22 @@ const CUISINE_HINTS: Record<CuisineType | "all", string> = {
 };
 
 export function RecipeCatalog({ cuisine = "all" }: RecipeCatalogProps) {
+  const { recipes: customRecipes } = useCustomRecipes();
+  const allRecipes = [...customRecipes, ...recipes];
   const filtered =
-    cuisine === "all" ? recipes : recipes.filter((r) => r.cuisine === cuisine);
+    cuisine === "all"
+      ? allRecipes
+      : allRecipes.filter((recipe) => recipe.cuisine === cuisine);
   const title = cuisine === "all" ? "全部菜式" : CUISINE_LABELS[cuisine];
 
   return (
     <div>
-      <h2 className="h4 fw-bold mb-1">{title}</h2>
+      <div className="d-flex align-items-center justify-content-between gap-2 mb-1">
+        <h2 className="h4 fw-bold mb-0">{title}</h2>
+        <AppLink href="/add-recipe/" className="btn btn-outline-primary btn-sm">
+          + 加入菜式
+        </AppLink>
+      </div>
       <p className="text-secondary small mb-4">
         {CUISINE_HINTS[cuisine]} 共 {filtered.length} 款。
       </p>
