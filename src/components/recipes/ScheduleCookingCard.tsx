@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Card from "react-bootstrap/Card";
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
@@ -30,7 +30,11 @@ export function ScheduleCookingCard({
   const addPlan = useMealPlanStore((s) => s.addPlan);
   const removePlan = useMealPlanStore((s) => s.removePlan);
   const hasPlanOnDate = useMealPlanStore((s) => s.hasPlanOnDate);
-  const existingPlans = useMealPlanStore((s) => s.getPlansByRecipe(recipe.id));
+  const plans = useMealPlanStore((s) => s.plans);
+  const existingPlans = useMemo(
+    () => plans.filter((p) => p.recipeId === recipe.id),
+    [plans, recipe.id]
+  );
 
   useEffect(() => {
     if (mounted && !plannedDate) {
