@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect } from "react";
-import { usePathname, useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
 import { useAccountStore } from "@/stores/accountStore";
 
 const PUBLIC_PATHS = ["/account"];
@@ -12,29 +12,16 @@ function isPublicPath(pathname: string): boolean {
 
 export function AccountGuard({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const router = useRouter();
 
   useEffect(() => {
-    void useAccountStore.persist.rehydrate();
-  }, []);
-
-  useEffect(() => {
-    let cancelled = false;
-
     void Promise.resolve(useAccountStore.persist.rehydrate()).then(() => {
-      if (cancelled) return;
       useAccountStore.setState({ hydrated: true });
-
       const userId = useAccountStore.getState().currentUserId;
       if (!userId && !isPublicPath(pathname)) {
-        router.replace("/account/");
+        window.location.replace("/account/");
       }
     });
-
-    return () => {
-      cancelled = true;
-    };
-  }, [pathname, router]);
+  }, [pathname]);
 
   return <>{children}</>;
 }

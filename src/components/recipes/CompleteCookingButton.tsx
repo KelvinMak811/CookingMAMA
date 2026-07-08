@@ -1,11 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Card from "react-bootstrap/Card";
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
 import type { Recipe } from "@/types";
 import { useCookingLogStore } from "@/stores/cookingLogStore";
+import { useMounted } from "@/hooks/useMounted";
 import { toDateInputValue, formatDayLabel } from "@/lib/dateNav";
 import { parseDateInputValue } from "@/lib/dateNav";
 
@@ -14,12 +15,20 @@ interface CompleteCookingButtonProps {
 }
 
 export function CompleteCookingButton({ recipe }: CompleteCookingButtonProps) {
+  const mounted = useMounted();
   const [done, setDone] = useState(false);
   const [rating, setRating] = useState(5);
-  const [cookedDate, setCookedDate] = useState(toDateInputValue(new Date()));
+  const [cookedDate, setCookedDate] = useState("");
   const addRecord = useCookingLogStore((s) => s.addRecord);
 
+  useEffect(() => {
+    if (mounted && !cookedDate) {
+      setCookedDate(toDateInputValue(new Date()));
+    }
+  }, [mounted, cookedDate]);
+
   const handleComplete = () => {
+    if (!cookedDate) return;
     addRecord(recipe.id, recipe.name, rating, parseDateInputValue(cookedDate));
     setDone(true);
   };
@@ -42,12 +51,16 @@ export function CompleteCookingButton({ recipe }: CompleteCookingButtonProps) {
       <Card.Body className="d-flex flex-column gap-3">
         <Form.Group>
           <Form.Label className="small fw-semibold">幾時煮？</Form.Label>
-          <Form.Control
-            type="date"
-            value={cookedDate}
-            max={toDateInputValue(new Date())}
-            onChange={(e) => setCookedDate(e.target.value)}
-          />
+          {mounted ? (
+            <Form.Control
+              type="date"
+              value={cookedDate}
+              max={toDateInputValue(new Date())}
+              onChange={(e) => setCookedDate(e.target.value)}
+            />
+          ) : (
+            <Form.Control type="date" disabled />
+          )}
           <Form.Text className="text-secondary">可以補登之前煮過嘅餸</Form.Text>
         </Form.Group>
 

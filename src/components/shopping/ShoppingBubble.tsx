@@ -22,7 +22,7 @@ export function ShoppingBubble() {
 
   useEffect(() => setMounted(true), []);
 
-  if (!mounted || pathname === "/shopping-list") return null;
+  if (!mounted || pathname === "/shopping-list" || pathname === "/shopping-list/") return null;
 
   const normalized = items.map(migrateShoppingItem);
   const unbought = normalized.filter((i) => !i.isBought);

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Card from "react-bootstrap/Card";
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
@@ -9,6 +9,7 @@ import Badge from "react-bootstrap/Badge";
 import { AppLink } from "@/components/layout/AppLink";
 import type { Recipe } from "@/types";
 import { useMealPlanStore } from "@/stores/mealPlanStore";
+import { useMounted } from "@/hooks/useMounted";
 import { toDateInputValue, formatDayLabel } from "@/lib/dateNav";
 import { parseDateInputValue } from "@/lib/dateNav";
 
@@ -23,14 +24,22 @@ export function ScheduleCookingCard({
   servings,
   mealBatches,
 }: ScheduleCookingCardProps) {
-  const [plannedDate, setPlannedDate] = useState(toDateInputValue(new Date()));
+  const mounted = useMounted();
+  const [plannedDate, setPlannedDate] = useState("");
   const [message, setMessage] = useState<string | null>(null);
   const addPlan = useMealPlanStore((s) => s.addPlan);
   const removePlan = useMealPlanStore((s) => s.removePlan);
   const hasPlanOnDate = useMealPlanStore((s) => s.hasPlanOnDate);
   const existingPlans = useMealPlanStore((s) => s.getPlansByRecipe(recipe.id));
 
+  useEffect(() => {
+    if (mounted && !plannedDate) {
+      setPlannedDate(toDateInputValue(new Date()));
+    }
+  }, [mounted, plannedDate]);
+
   const handleSchedule = () => {
+    if (!plannedDate) return;
     const date = parseDateInputValue(plannedDate);
     if (hasPlanOnDate(recipe.id, date)) {
       setMessage("呢個日子已經預定咗呢道菜");
@@ -56,12 +65,16 @@ export function ScheduleCookingCard({
 
         <Form.Group>
           <Form.Label className="small fw-semibold">幾時煮？</Form.Label>
-          <Form.Control
-            type="date"
-            value={plannedDate}
-            min={toDateInputValue(new Date())}
-            onChange={(e) => setPlannedDate(e.target.value)}
-          />
+          {mounted ? (
+            <Form.Control
+              type="date"
+              value={plannedDate}
+              min={toDateInputValue(new Date())}
+              onChange={(e) => setPlannedDate(e.target.value)}
+            />
+          ) : (
+            <Form.Control type="date" disabled />
+          )}
           <Form.Text className="text-secondary">
             會用上面份量設定（{servings}人 × {mealBatches}餐）
           </Form.Text>

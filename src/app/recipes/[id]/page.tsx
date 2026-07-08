@@ -25,7 +25,7 @@ export default async function RecipePage({ params }: RecipePageProps) {
     <AppShell
       title={recipe.name}
       showBack
-      backHref={`/recipes/cuisine/${recipe.cuisine}`}
+      backHref={`/recipes/cuisine/${recipe.cuisine}/`}
     >
       <article className="d-flex flex-column gap-4">
         <div className="position-relative rounded-3 overflow-hidden shadow ratio ratio-16x9">
