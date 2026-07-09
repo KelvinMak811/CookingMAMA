@@ -2,7 +2,7 @@ import type { CuisineType } from "@/types";
 import { CUISINE_LABELS } from "@/types";
 import { recipes, getRecipesByCuisine } from "@/data/recipes";
 
-export type CuisineFilter = CuisineType | "all";
+export type CuisineFilter = CuisineType | "all" | "fridge";
 
 export interface CuisineNavItem {
   value: CuisineFilter;
@@ -48,6 +48,13 @@ export const CUISINE_NAV_ITEMS: CuisineNavItem[] = [
     icon: "🍝",
     count: getRecipesByCuisine("italian").length,
   },
+  {
+    value: "fridge",
+    href: "/recipes/fridge",
+    label: "雪櫃推薦",
+    icon: "🧊",
+    count: 0,
+  },
 ];
 
 export function isValidCuisine(value: string): value is CuisineType {
@@ -55,8 +62,9 @@ export function isValidCuisine(value: string): value is CuisineType {
 }
 
 export function getActiveCuisineFromPath(pathname: string): CuisineFilter {
+  if (pathname.startsWith("/recipes/fridge")) return "fridge";
   const match = pathname.match(/^\/recipes\/cuisine\/([^/]+)/);
   if (match && isValidCuisine(match[1])) return match[1];
-  if (pathname === "/recipes" || pathname.startsWith("/recipes/")) return "all";
+  if (pathname === "/" || pathname === "/recipes" || pathname.startsWith("/recipes/")) return "all";
   return "all";
 }

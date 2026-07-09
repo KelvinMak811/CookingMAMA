@@ -5,6 +5,6 @@ import { CuisineNav } from "./CuisineNav";
 
 export function CuisineNavSlot() {
   const pathname = usePathname();
-  if (!pathname.startsWith("/recipes")) return null;
+  if (!pathname.startsWith("/recipes") && pathname !== "/") return null;
   return <CuisineNav />;
 }

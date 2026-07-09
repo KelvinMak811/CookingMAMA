@@ -20,6 +20,7 @@ export const viewport: Viewport = {
   initialScale: 1,
   maximumScale: 1,
   viewportFit: "cover",
+  interactiveWidget: "resizes-content",
   themeColor: "#f97316",
 };
 
@@ -30,7 +31,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="zh-HK">
-      <body className={`${notoSansTC.variable} d-flex flex-column min-vh-100`}>
+      <body className={`${notoSansTC.variable} antialiased`}>
         <AppProviders>{children}</AppProviders>
       </body>
     </html>

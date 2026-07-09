@@ -25,6 +25,7 @@ export function AppShell({
       <main className="container app-main flex-grow-1 px-3 py-2">
         {children}
       </main>
+      <div className="app-bottom-nav-spacer" aria-hidden="true" />
       <BottomNav />
       <ShoppingBubble />
     </div>
