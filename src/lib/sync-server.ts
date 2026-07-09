@@ -97,12 +97,6 @@ export async function syncApplyClient(
   await ensureSyncTables();
   validateAccount(accountId);
 
-  const merged: SyncPayload = {
-    account_id: accountId,
-    data: {},
-    custom_recipes: null,
-  };
-
   const clientData = body.data;
   if (clientData && typeof clientData === "object") {
     for (const key of SYNC_USER_KEYS) {
@@ -112,7 +106,7 @@ export async function syncApplyClient(
       const updatedAt =
         typeof entry.updated_at === "string" ? entry.updated_at : null;
       if (payload === undefined || updatedAt === null) continue;
-      merged.data[key] = await mergeRow(accountId, key, payload, updatedAt);
+      await mergeRow(accountId, key, payload, updatedAt);
     }
   }
 
@@ -122,7 +116,7 @@ export async function syncApplyClient(
     const updatedAt =
       typeof entry.updated_at === "string" ? entry.updated_at : null;
     if (payload !== undefined && updatedAt !== null) {
-      merged.custom_recipes = await mergeRow(
+      await mergeRow(
         "shared",
         SYNC_SHARED_CUSTOM,
         payload,
@@ -131,5 +125,5 @@ export async function syncApplyClient(
     }
   }
 
-  return merged;
+  return syncFetchAccount(accountId);
 }

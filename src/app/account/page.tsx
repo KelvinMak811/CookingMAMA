@@ -9,6 +9,7 @@ import { syncPullAccount } from "@/lib/cloud-sync";
 import { exportUserBackup, importUserBackup } from "@/lib/cloud-sync";
 import { rehydrateAllUserStores } from "@/lib/rehydrate-stores";
 import { useAccountStore } from "@/stores/accountStore";
+import { CalendarUserButtons } from "@/components/history/CalendarUserButtons";
 
 export default function AccountPage() {
   const router = useRouter();
@@ -70,11 +71,17 @@ export default function AccountPage() {
           兩個帳戶可以互相睇對方嘅日曆同買餸清單，但唔可以修改
         </p>
 
+        <div className="mx-auto mt-4" style={{ maxWidth: 360 }}>
+          <p className="text-secondary small text-center mb-2">快速睇煮食日曆</p>
+          <CalendarUserButtons size="lg" />
+        </div>
+
         <Card className="border-0 shadow-sm mt-4 mx-auto" style={{ maxWidth: 480 }}>
           <Card.Body>
             <h2 className="h6 fw-bold mb-2">換電腦？備份／還原紀錄</h2>
             <p className="text-secondary small mb-3">
-              買餸清單、煮食日曆會自動同步去伺服器。你亦可以手動備份 JSON 檔，喺新電腦還原。
+              買餸清單、煮食日曆、預定煮食會自動同步去伺服器（需喺 Vercel 連接 Postgres / Neon 資料庫）。
+              你亦可以手動備份 JSON 檔，喺新電腦還原。
             </p>
             <div className="d-grid gap-2">
               <Button

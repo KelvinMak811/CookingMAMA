@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import type { AccountId } from "@/lib/accounts";
 import type { CookingRecord, FridgeItem, MealPlan, ShoppingItem } from "@/types";
+import { syncPullAccount } from "@/lib/cloud-sync";
 import { STORAGE_KEYS, loadUserPersistState } from "@/lib/storage";
 import { migrateShoppingItem } from "@/lib/shoppingUtils";
 
@@ -27,7 +28,7 @@ function loadViewingData(userId: AccountId): ViewingUserData {
   };
 }
 
-/** 讀取指定帳戶嘅 localStorage 資料（用於只讀檢視對方紀錄） */
+/** 讀取指定帳戶資料（先從伺服器同步，再讀 localStorage） */
 export function useViewingUserData(viewingUserId: AccountId | null): ViewingUserData {
   const [data, setData] = useState<ViewingUserData>({
     items: [],
@@ -38,16 +39,25 @@ export function useViewingUserData(viewingUserId: AccountId | null): ViewingUser
 
   useEffect(() => {
     if (!viewingUserId) return;
-    const refresh = () => setData(loadViewingData(viewingUserId));
-    refresh();
+    let cancelled = false;
+
+    const refresh = () => {
+      if (!cancelled) setData(loadViewingData(viewingUserId));
+    };
+
+    void (async () => {
+      await syncPullAccount(viewingUserId);
+      refresh();
+    })();
 
     const onStorage = (e: StorageEvent) => {
       if (!e.key?.includes(viewingUserId)) return;
       refresh();
     };
     window.addEventListener("storage", onStorage);
-    const interval = setInterval(refresh, 2000);
+    const interval = setInterval(refresh, 5000);
     return () => {
+      cancelled = true;
       window.removeEventListener("storage", onStorage);
       clearInterval(interval);
     };

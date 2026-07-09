@@ -83,7 +83,7 @@ export function getLocalUpdatedAt(localKey: string): string | null {
       /* ignore */
     }
   }
-  return getLocalPayload(localKey) ? new Date().toISOString() : null;
+  return null;
 }
 
 export function touchLocalMeta(localKey: string): string {
@@ -93,6 +93,14 @@ export function touchLocalMeta(localKey: string): string {
     JSON.stringify({ updated_at: updatedAt })
   );
   return updatedAt;
+}
+
+/** 取得同步用時間戳；若舊資料未有 meta，會補寫並返回 */
+export function getOrCreateLocalUpdatedAt(localKey: string): string | null {
+  const existing = getLocalUpdatedAt(localKey);
+  if (existing) return existing;
+  if (!getLocalPayload(localKey)) return null;
+  return touchLocalMeta(localKey);
 }
 
 export function applyPayloadToLocal(

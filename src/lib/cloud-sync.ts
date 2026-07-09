@@ -4,9 +4,9 @@ import {
   applyPayloadToLocal,
   getLocalPayload,
   getLocalUpdatedAt,
+  getOrCreateLocalUpdatedAt,
   STORAGE_KEYS,
   storageKeyToSyncKey,
-  touchLocalMeta,
   userStorageKey,
 } from "@/lib/storage";
 
@@ -43,22 +43,21 @@ function collectAccountSyncPayload(accountId: AccountId) {
   for (const [syncName, localKey] of pairs) {
     const payload = getLocalPayload(localKey);
     if (!payload) continue;
+    const updatedAt = getOrCreateLocalUpdatedAt(localKey);
+    if (!updatedAt) continue;
     const key = storageKeyToSyncKey(syncName);
     if (!key) continue;
-    data[key] = {
-      payload,
-      updated_at: getLocalUpdatedAt(localKey) ?? new Date().toISOString(),
-    };
+    data[key] = { payload, updated_at: updatedAt };
   }
 
   const customPayload = getLocalPayload(STORAGE_KEYS.CUSTOM_RECIPES);
-  const customRecipes = customPayload
-    ? {
-        payload: customPayload,
-        updated_at:
-          getLocalUpdatedAt(STORAGE_KEYS.CUSTOM_RECIPES) ?? new Date().toISOString(),
-      }
+  const customUpdatedAt = customPayload
+    ? getOrCreateLocalUpdatedAt(STORAGE_KEYS.CUSTOM_RECIPES)
     : null;
+  const customRecipes =
+    customPayload && customUpdatedAt
+      ? { payload: customPayload, updated_at: customUpdatedAt }
+      : null;
 
   return { account_id: accountId, data, custom_recipes: customRecipes };
 }
@@ -104,6 +103,19 @@ function applyServerSync(sync: {
   return changed;
 }
 
+async function fetchAccountFromServer(accountId: AccountId) {
+  const res = await fetch(`/api/sync/?account=${encodeURIComponent(accountId)}`);
+  const json = (await res.json().catch(() => ({}))) as {
+    ok?: boolean;
+    error?: string;
+    sync?: Parameters<typeof applyServerSync>[0];
+  };
+  if (!res.ok || !json.ok) {
+    throw new Error(json.error || "Sync fetch failed");
+  }
+  return json.sync;
+}
+
 async function cloudSyncRequest(accountId: AccountId) {
   const body = collectAccountSyncPayload(accountId);
   const res = await fetch("/api/sync/", {
@@ -122,12 +134,41 @@ async function cloudSyncRequest(accountId: AccountId) {
   return json.sync;
 }
 
+function notifyIfChanged(changed: boolean): boolean {
+  if (changed) onSyncApplied?.();
+  return changed;
+}
+
 export async function syncPullAccount(accountId: AccountId): Promise<boolean> {
   try {
+    let changed = false;
+
+    const serverSync = await fetchAccountFromServer(accountId);
+    if (serverSync) {
+      changed = applyServerSync(serverSync) || changed;
+    }
+
+    const merged = await cloudSyncRequest(accountId);
+    if (merged) {
+      changed = applyServerSync(merged) || changed;
+    }
+
+    return notifyIfChanged(changed);
+  } catch {
+    return false;
+  }
+}
+
+export async function syncPushNow(): Promise<boolean> {
+  const accountId = getCurrentUserId();
+  if (!accountId) return false;
+  if (syncTimer) {
+    clearTimeout(syncTimer);
+    syncTimer = null;
+  }
+  try {
     const sync = await cloudSyncRequest(accountId);
-    const changed = sync ? applyServerSync(sync) : false;
-    if (changed) onSyncApplied?.();
-    return changed;
+    return notifyIfChanged(sync ? applyServerSync(sync) : false);
   } catch {
     return false;
   }
@@ -138,11 +179,8 @@ export function scheduleCloudSync(): void {
   if (!accountId) return;
   if (syncTimer) clearTimeout(syncTimer);
   syncTimer = setTimeout(() => {
-    cloudSyncRequest(accountId)
-      .then((sync) => {
-        if (sync && applyServerSync(sync)) onSyncApplied?.();
-      })
-      .catch(() => {});
+    syncTimer = null;
+    void syncPushNow();
   }, DEBOUNCE_MS);
 }
 

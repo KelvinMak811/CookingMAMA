@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Card from "react-bootstrap/Card";
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
@@ -30,7 +30,11 @@ export function ScheduleCookingCard({
   const addPlan = useMealPlanStore((s) => s.addPlan);
   const removePlan = useMealPlanStore((s) => s.removePlan);
   const hasPlanOnDate = useMealPlanStore((s) => s.hasPlanOnDate);
-  const existingPlans = useMealPlanStore((s) => s.getPlansByRecipe(recipe.id));
+  const plans = useMealPlanStore((s) => s.plans);
+  const existingPlans = useMemo(
+    () => plans.filter((p) => p.recipeId === recipe.id),
+    [plans, recipe.id]
+  );
 
   useEffect(() => {
     if (mounted && !plannedDate) {
@@ -83,6 +87,10 @@ export function ScheduleCookingCard({
         <Button variant="primary" className="w-100" onClick={handleSchedule}>
           加入煮食日程
         </Button>
+
+        <AppLink href="/history" className="btn btn-sm btn-outline-primary w-100">
+          📅 去煮食日曆 →
+        </AppLink>
 
         {message && (
           <Alert variant="success" className="py-2 mb-0 small text-center">
