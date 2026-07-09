@@ -33,6 +33,26 @@ export interface Ingredient {
   amount: string;
 }
 
+// 雪櫃庫存項目
+export interface FridgeItem {
+  id: string;
+  ingredientName: string;
+  amount: string;
+  updatedAt: string;
+  source?: "shopping" | "manual";
+}
+
+// 菜式材料相對雪櫃嘅可用狀態
+export interface IngredientAvailability {
+  ingredient: Ingredient;
+  inFridge: boolean;
+  needToBuy: boolean;
+  needAmount?: string;
+  fridgeAmount?: string;
+  unitMismatch?: boolean;
+  displayAmount: string;
+}
+
 // 買餸清單項目模型
 export interface ShoppingItem {
   id: string;

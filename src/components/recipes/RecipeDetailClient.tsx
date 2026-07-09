@@ -5,8 +5,12 @@ import Card from "react-bootstrap/Card";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import Button from "react-bootstrap/Button";
+import Form from "react-bootstrap/Form";
 import type { Recipe } from "@/types";
 import { scaleIngredients } from "@/lib/scaleIngredients";
+import { computeFridgeAvailability } from "@/lib/fridgeRecipe";
+import { useFridgeStore } from "@/stores/fridgeStore";
+import { useFridgeCalcEnabled } from "@/hooks/useFridgeCalcEnabled";
 import { IngredientList } from "./IngredientList";
 import { AddToShoppingButton } from "./AddToShoppingButton";
 import { ScheduleCookingCard } from "./ScheduleCookingCard";
@@ -70,10 +74,17 @@ interface RecipeDetailClientProps {
 export function RecipeDetailClient({ recipe }: RecipeDetailClientProps) {
   const [servings, setServings] = useState(recipe.baseServings);
   const [mealBatches, setMealBatches] = useState(1);
+  const fridgeItems = useFridgeStore((s) => s.items);
+  const { enabled: useFridgeCalc, setEnabled: setUseFridgeCalc } = useFridgeCalcEnabled(true);
 
   const scaledIngredients = useMemo(
     () => scaleIngredients(recipe.ingredients, recipe.baseServings, servings, mealBatches),
     [recipe, servings, mealBatches]
+  );
+
+  const availability = useMemo(
+    () => computeFridgeAvailability(scaledIngredients, fridgeItems),
+    [scaledIngredients, fridgeItems]
   );
 
   return (
@@ -85,16 +96,37 @@ export function RecipeDetailClient({ recipe }: RecipeDetailClientProps) {
         onServingsChange={setServings}
         onMealBatchesChange={setMealBatches}
       />
-      <h5 className="fw-bold mb-3">
-        材料 <small className="text-secondary fw-normal">({servings}人 × {mealBatches}餐)</small>
-      </h5>
-      <IngredientList ingredients={scaledIngredients} />
+      <div className="d-flex justify-content-between align-items-center mb-3 gap-2">
+        <h5 className="fw-bold mb-0">
+          材料 <small className="text-secondary fw-normal">({servings}人 × {mealBatches}餐)</small>
+        </h5>
+        <Form.Check
+          type="switch"
+          id="fridge-calc-toggle"
+          label="計算雪櫃庫存"
+          checked={useFridgeCalc}
+          onChange={(e) => setUseFridgeCalc(e.target.checked)}
+          className="small text-secondary flex-shrink-0"
+        />
+      </div>
+      {useFridgeCalc && (
+        <p className="small text-secondary mb-3">
+          紅色材料表示雪櫃庫存不足，需額外購買。
+        </p>
+      )}
+      <IngredientList
+        ingredients={scaledIngredients}
+        availability={availability}
+        useFridgeCalc={useFridgeCalc}
+      />
       <div className="my-4">
         <AddToShoppingButton
           recipe={recipe}
           scaledIngredients={scaledIngredients}
           servings={servings}
           mealBatches={mealBatches}
+          availability={availability}
+          useFridgeCalc={useFridgeCalc}
         />
       </div>
       <ScheduleCookingCard

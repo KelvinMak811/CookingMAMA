@@ -3,7 +3,7 @@ import { dbGetRow, dbSaveRow, ensureSyncTables } from "@/lib/db";
 export const SYNC_VALID_ACCOUNTS = ["kelvin", "yuetsum"] as const;
 export type AccountId = (typeof SYNC_VALID_ACCOUNTS)[number];
 
-export const SYNC_USER_KEYS = ["shopping", "cooking_log", "meal_plan"] as const;
+export const SYNC_USER_KEYS = ["shopping", "cooking_log", "meal_plan", "fridge"] as const;
 export type SyncUserKey = (typeof SYNC_USER_KEYS)[number];
 
 export const SYNC_SHARED_CUSTOM = "custom_recipes";

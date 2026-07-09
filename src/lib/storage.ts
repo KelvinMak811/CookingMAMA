@@ -9,6 +9,7 @@ export const STORAGE_KEYS = {
   SHOPPING: "smartcook_shopping",
   COOKING_LOG: "smartcook_cooking_log",
   MEAL_PLAN: "smartcook_meal_plan",
+  FRIDGE: "smartcook_fridge",
   CUSTOM_RECIPES: "smartcook_custom_recipes",
 } as const;
 
@@ -53,10 +54,11 @@ export function userStorageKey(baseKey: string, userId: string): string {
 
 export function storageKeyToSyncKey(
   localKey: string
-): "shopping" | "cooking_log" | "meal_plan" | "custom_recipes" | null {
+): "shopping" | "cooking_log" | "meal_plan" | "fridge" | "custom_recipes" | null {
   if (localKey === STORAGE_KEYS.SHOPPING) return "shopping";
   if (localKey === STORAGE_KEYS.COOKING_LOG) return "cooking_log";
   if (localKey === STORAGE_KEYS.MEAL_PLAN) return "meal_plan";
+  if (localKey === STORAGE_KEYS.FRIDGE) return "fridge";
   if (localKey === STORAGE_KEYS.CUSTOM_RECIPES) return "custom_recipes";
   return null;
 }
@@ -125,6 +127,7 @@ export function migrateLegacyData(targetUserId: string): void {
     [LEGACY_KEYS.SHOPPING, STORAGE_KEYS.SHOPPING, { items: [] }],
     [LEGACY_KEYS.COOKING_LOG, STORAGE_KEYS.COOKING_LOG, { records: [] }],
     [LEGACY_KEYS.MEAL_PLAN, STORAGE_KEYS.MEAL_PLAN, { plans: [] }],
+    [LEGACY_KEYS.FRIDGE, STORAGE_KEYS.FRIDGE, { items: [] }],
   ];
   for (const [legacyKey, baseKey] of pairs) {
     const userKey = userStorageKey(baseKey, targetUserId);

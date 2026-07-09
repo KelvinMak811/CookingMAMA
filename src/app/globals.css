@@ -6,12 +6,27 @@
   --bs-body-font-family: var(--font-noto-sans-tc), "PingFang TC", "Microsoft JhengHei",
     sans-serif;
   --smartcook-bg: #fffbf5;
-  --app-header-height: 2.75rem;
+  --safe-area-top: env(safe-area-inset-top, 0px);
+  --safe-area-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-area-left: env(safe-area-inset-left, 0px);
+  --safe-area-right: env(safe-area-inset-right, 0px);
+  --app-header-base: 2.75rem;
+  --app-bottom-nav-base: 3.75rem;
+  --app-header-height: calc(var(--app-header-base) + var(--safe-area-top));
+  --app-bottom-nav-height: calc(var(--app-bottom-nav-base) + var(--safe-area-bottom));
+}
+
+html {
+  height: -webkit-fill-available;
 }
 
 body {
   background-color: var(--smartcook-bg);
   min-height: 100vh;
+  min-height: 100dvh;
+  min-height: -webkit-fill-available;
+  padding-left: var(--safe-area-left);
+  padding-right: var(--safe-area-right);
 }
 
 .btn-primary {
@@ -49,13 +64,15 @@ body {
 
 .app-navbar {
   --bs-navbar-padding-y: 0;
+  top: 0;
+  z-index: 1030;
   min-height: var(--app-header-height);
-  padding-top: 0.25rem;
+  padding-top: calc(0.25rem + var(--safe-area-top));
   padding-bottom: 0.25rem;
 }
 
 .app-navbar-inner {
-  min-height: calc(var(--app-header-height) - 0.5rem);
+  min-height: calc(var(--app-header-base) - 0.5rem);
 }
 
 .app-navbar-icon {
@@ -63,19 +80,61 @@ body {
   line-height: 1;
 }
 
+.app-shell {
+  min-height: 100vh;
+  min-height: 100dvh;
+  min-height: -webkit-fill-available;
+}
+
 .app-main {
   max-width: 48rem;
-  padding-bottom: 5.5rem;
+  padding-bottom: calc(var(--app-bottom-nav-height) + 0.75rem);
+}
+
+.app-bottom-nav {
+  z-index: 1030;
+  min-height: var(--app-bottom-nav-height);
+  padding-bottom: var(--safe-area-bottom);
+  padding-left: var(--safe-area-left);
+  padding-right: var(--safe-area-right);
+}
+
+.app-bottom-nav-link {
+  padding: 0.4rem 0.25rem 0.35rem;
+}
+
+.app-bottom-nav-icon {
+  font-size: 1.25rem;
+  line-height: 1.2;
+}
+
+.app-bottom-nav-label {
+  font-size: 0.7rem;
+  line-height: 1.2;
 }
 
 @media (min-width: 768px) {
-  .app-main {
-    padding-bottom: 2rem;
+  .app-bottom-nav {
+    max-width: 48rem;
+    margin-left: auto;
+    margin-right: auto;
+    left: var(--safe-area-left);
+    right: var(--safe-area-right);
+    border-radius: 1rem 1rem 0 0;
+    box-shadow: 0 -2px 12px rgba(0, 0, 0, 0.06);
   }
-}
 
-.safe-area-bottom {
-  padding-bottom: env(safe-area-inset-bottom, 0px);
+  .app-bottom-nav-link {
+    padding: 0.5rem 0.5rem 0.4rem;
+  }
+
+  .app-bottom-nav-icon {
+    font-size: 1.35rem;
+  }
+
+  .app-bottom-nav-label {
+    font-size: 0.75rem;
+  }
 }
 
 .date-nav-scroll {
@@ -98,8 +157,8 @@ body {
 
 .shopping-fab {
   position: fixed;
-  right: 1rem;
-  bottom: 5.5rem;
+  right: calc(1rem + var(--safe-area-right));
+  bottom: calc(var(--app-bottom-nav-height) + 0.75rem);
   z-index: 1040;
   width: 3.5rem;
   height: 3.5rem;
@@ -108,7 +167,8 @@ body {
 
 @media (min-width: 768px) {
   .shopping-fab {
-    bottom: 1.5rem;
+    right: calc(50% - 24rem + 1rem + var(--safe-area-right));
+    max-width: 48rem;
   }
 }
 

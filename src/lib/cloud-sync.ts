@@ -27,10 +27,17 @@ export function configureCloudSync(options: {
 function collectAccountSyncPayload(accountId: AccountId) {
   const data: Record<string, { payload: unknown; updated_at: string }> = {};
 
-  const pairs: [typeof STORAGE_KEYS.SHOPPING | typeof STORAGE_KEYS.COOKING_LOG | typeof STORAGE_KEYS.MEAL_PLAN, string][] = [
+  const pairs: [
+    | typeof STORAGE_KEYS.SHOPPING
+    | typeof STORAGE_KEYS.COOKING_LOG
+    | typeof STORAGE_KEYS.MEAL_PLAN
+    | typeof STORAGE_KEYS.FRIDGE,
+    string
+  ][] = [
     [STORAGE_KEYS.SHOPPING, userStorageKey(STORAGE_KEYS.SHOPPING, accountId)],
     [STORAGE_KEYS.COOKING_LOG, userStorageKey(STORAGE_KEYS.COOKING_LOG, accountId)],
     [STORAGE_KEYS.MEAL_PLAN, userStorageKey(STORAGE_KEYS.MEAL_PLAN, accountId)],
+    [STORAGE_KEYS.FRIDGE, userStorageKey(STORAGE_KEYS.FRIDGE, accountId)],
   ];
 
   for (const [syncName, localKey] of pairs) {
@@ -69,6 +76,7 @@ function applyServerSync(sync: {
     shopping: userStorageKey(STORAGE_KEYS.SHOPPING, accountId),
     cooking_log: userStorageKey(STORAGE_KEYS.COOKING_LOG, accountId),
     meal_plan: userStorageKey(STORAGE_KEYS.MEAL_PLAN, accountId),
+    fridge: userStorageKey(STORAGE_KEYS.FRIDGE, accountId),
   } as const;
 
   for (const [key, localKey] of Object.entries(map)) {
@@ -159,6 +167,7 @@ export function exportUserBackup(): void {
       shopping: getLocalPayload(userStorageKey(STORAGE_KEYS.SHOPPING, accountId)),
       cooking_log: getLocalPayload(userStorageKey(STORAGE_KEYS.COOKING_LOG, accountId)),
       meal_plan: getLocalPayload(userStorageKey(STORAGE_KEYS.MEAL_PLAN, accountId)),
+      fridge: getLocalPayload(userStorageKey(STORAGE_KEYS.FRIDGE, accountId)),
     };
   }
 
@@ -205,6 +214,13 @@ export async function importUserBackup(file: File): Promise<void> {
       applyPayloadToLocal(
         userStorageKey(STORAGE_KEYS.MEAL_PLAN, accountId),
         data.meal_plan,
+        exportedAt
+      );
+    }
+    if (data.fridge) {
+      applyPayloadToLocal(
+        userStorageKey(STORAGE_KEYS.FRIDGE, accountId),
+        data.fridge,
         exportedAt
       );
     }

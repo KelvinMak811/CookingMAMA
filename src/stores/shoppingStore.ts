@@ -6,6 +6,7 @@ import { scheduleCloudSync } from "@/lib/cloud-sync";
 import { getCurrentUserIdSync } from "@/stores/accountStore";
 import { generateId } from "@/lib/utils";
 import { migrateShoppingItem, shoppingItemKey } from "@/lib/shoppingUtils";
+import { useFridgeStore } from "@/stores/fridgeStore";
 
 interface ShoppingState {
   items: ShoppingItem[];
@@ -90,17 +91,28 @@ export const useShoppingStore = create<ShoppingState>()(
       },
 
       toggleBought: (id) =>
-        set((state) => ({
-          items: state.items.map((item) => {
-            if (item.id !== id) return item;
-            const nextBought = !item.isBought;
-            return {
-              ...item,
-              isBought: nextBought,
-              boughtAt: nextBought ? new Date().toISOString() : undefined,
-            };
-          }),
-        })),
+        set((state) => {
+          const target = state.items.find((item) => item.id === id);
+          if (!target) return state;
+
+          const nextBought = !target.isBought;
+          if (nextBought) {
+            useFridgeStore
+              .getState()
+              .addFromPurchase(target.ingredientName, target.amount ?? "適量");
+          }
+
+          return {
+            items: state.items.map((item) => {
+              if (item.id !== id) return item;
+              return {
+                ...item,
+                isBought: nextBought,
+                boughtAt: nextBought ? new Date().toISOString() : undefined,
+              };
+            }),
+          };
+        }),
 
       updatePrice: (id, price) =>
         set((state) => ({

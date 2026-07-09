@@ -17,7 +17,7 @@ export function AppShell({
   backHref,
 }: AppShellProps) {
   return (
-    <div className="d-flex flex-column min-vh-100">
+    <div className="d-flex flex-column app-shell">
       <Header title={title} showBack={showBack} backHref={backHref} />
       <div className="container app-main px-3">
         <CuisineNavSlot />
