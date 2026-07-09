@@ -1,5 +1,6 @@
 import type { Recipe } from "@/types";
 import { chineseExtraRecipes } from "./chinese-extra";
+import { chineseBatch2Recipes } from "./chinese-batch2";
 
 const chineseBaseRecipes: Recipe[] = [
   {
@@ -306,4 +307,5 @@ const chineseBaseRecipes: Recipe[] = [
 export const chineseRecipes: Recipe[] = [
   ...chineseBaseRecipes,
   ...chineseExtraRecipes,
+  ...chineseBatch2Recipes,
 ];
