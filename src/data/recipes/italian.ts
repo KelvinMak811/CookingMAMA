@@ -1,6 +1,8 @@
 import type { Recipe } from "@/types";
+import { italianBatch2Recipes } from "./italian-batch2";
+import { italianBatch3Recipes } from "./italian-batch3";
 
-export const italianRecipes: Recipe[] = [
+const italianBaseRecipes: Recipe[] = [
   {
     id: "it-1",
     name: "蒜香橄榄油意粉",
@@ -251,4 +253,10 @@ export const italianRecipes: Recipe[] = [
       "拌入芝士碎同少許牛油（可選），攪拌至絲滑即可起鑊。",
     ],
   },
+];
+
+export const italianRecipes: Recipe[] = [
+  ...italianBaseRecipes,
+  ...italianBatch2Recipes,
+  ...italianBatch3Recipes,
 ];

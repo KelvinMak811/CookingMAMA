@@ -1,6 +1,8 @@
 import type { Recipe } from "@/types";
+import { japaneseBatch2Recipes } from "./japanese-batch2";
+import { japaneseBatch3Recipes } from "./japanese-batch3";
 
-export const japaneseRecipes: Recipe[] = [
+const japaneseBaseRecipes: Recipe[] = [
   {
     id: "j-1",
     name: "親子丼",
@@ -251,4 +253,10 @@ export const japaneseRecipes: Recipe[] = [
       "取出淋少許醬油，趁熱食。",
     ],
   },
+];
+
+export const japaneseRecipes: Recipe[] = [
+  ...japaneseBaseRecipes,
+  ...japaneseBatch2Recipes,
+  ...japaneseBatch3Recipes,
 ];

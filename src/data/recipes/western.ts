@@ -1,6 +1,8 @@
 import type { Recipe } from "@/types";
+import { westernBatch2Recipes } from "./western-batch2";
+import { westernBatch3Recipes } from "./western-batch3";
 
-export const westernRecipes: Recipe[] = [
+const westernBaseRecipes: Recipe[] = [
   {
     id: "w-1",
     name: "美式炒蛋多士",
@@ -250,4 +252,10 @@ export const westernRecipes: Recipe[] = [
       "試味加鹽同黑胡椒，汁收至略濃即可起鑊。",
     ],
   },
+];
+
+export const westernRecipes: Recipe[] = [
+  ...westernBaseRecipes,
+  ...westernBatch2Recipes,
+  ...westernBatch3Recipes,
 ];
