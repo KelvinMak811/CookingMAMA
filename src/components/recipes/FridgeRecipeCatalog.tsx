@@ -1,20 +1,36 @@
 "use client";
 
-import { useMemo } from "react";
+import { Suspense, useMemo } from "react";
 import { recipes } from "@/data/recipes";
 import { AppLink } from "@/components/layout/AppLink";
 import { CalendarUserButtons } from "@/components/history/CalendarUserButtons";
 import { useCustomRecipes } from "@/hooks/useCustomRecipes";
 import { useFridgeStore } from "@/stores/fridgeStore";
+import { useRecipeSearchQuery } from "@/hooks/useRecipeSearchQuery";
+import { filterRecipesBySearch } from "@/lib/recipeSearch";
 import {
   getFridgeRecipeMatches,
   splitFridgeRecipeMatches,
+  type FridgeRecipeMatch,
 } from "@/lib/fridgeRecommendations";
 import { RecipeGrid } from "./RecipeGrid";
 
-export function FridgeRecipeCatalog() {
+function filterMatchesBySearch(
+  matches: FridgeRecipeMatch[],
+  query: string
+): FridgeRecipeMatch[] {
+  const recipes = matches.map((match) => match.recipe);
+  const filteredIds = new Set(
+    filterRecipesBySearch(recipes, query).map((recipe) => recipe.id)
+  );
+  return matches.filter((match) => filteredIds.has(match.recipe.id));
+}
+
+function FridgeRecipeCatalogInner() {
   const { recipes: customRecipes } = useCustomRecipes();
   const fridgeItems = useFridgeStore((s) => s.items);
+  const { query } = useRecipeSearchQuery();
+  const isSearching = query.trim().length > 0;
 
   const allRecipes = useMemo(
     () => [...customRecipes, ...recipes],
@@ -26,10 +42,14 @@ export function FridgeRecipeCatalog() {
     [allRecipes, fridgeItems]
   );
 
-  const { readyNow, almostReady } = useMemo(
-    () => splitFridgeRecipeMatches(matches),
-    [matches]
-  );
+  const { readyNow, almostReady } = useMemo(() => {
+    const split = splitFridgeRecipeMatches(matches);
+    if (!isSearching) return split;
+    return {
+      readyNow: filterMatchesBySearch(split.readyNow, query),
+      almostReady: filterMatchesBySearch(split.almostReady, query),
+    };
+  }, [matches, query, isSearching]);
 
   return (
     <div>
@@ -47,7 +67,9 @@ export function FridgeRecipeCatalog() {
         </AppLink>
       </div>
       <p className="text-secondary small mb-4">
-        根據你雪櫃現有材料，推薦而家可以煮或者差少少就煮到嘅菜式。
+        {isSearching
+          ? `搜尋「${query.trim()}」— 材料齊 ${readyNow.length} 款，差少少 ${almostReady.length} 款`
+          : "根據你雪櫃現有材料，推薦而家可以煮或者差少少就煮到嘅菜式。"}
       </p>
 
       {fridgeItems.length === 0 ? (
@@ -64,6 +86,10 @@ export function FridgeRecipeCatalog() {
       ) : matches.length === 0 ? (
         <div className="text-center py-5 text-secondary">
           暫時搵唔到同雪櫃材料配對嘅菜式，試下加多啲常用材料。
+        </div>
+      ) : isSearching && readyNow.length === 0 && almostReady.length === 0 ? (
+        <div className="text-center py-5 text-secondary">
+          搵唔到「{query.trim()}」相關推薦菜式，試下其他關鍵字。
         </div>
       ) : (
         <div className="d-flex flex-column gap-4">
@@ -97,5 +123,13 @@ export function FridgeRecipeCatalog() {
         </div>
       )}
     </div>
+  );
+}
+
+export function FridgeRecipeCatalog() {
+  return (
+    <Suspense fallback={<div className="text-secondary py-4">載入中…</div>}>
+      <FridgeRecipeCatalogInner />
+    </Suspense>
   );
 }

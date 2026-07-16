@@ -2,7 +2,7 @@
 
 import { useMemo } from "react";
 import { AppLink } from "@/components/layout/AppLink";
-import { usePathname } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 import Nav from "react-bootstrap/Nav";
 import { CUISINE_NAV_ITEMS, isValidCuisine } from "@/lib/cuisineNav";
 import type { CuisineFilter } from "@/lib/cuisineNav";
@@ -33,6 +33,8 @@ function resolveActiveCuisine(pathname: string): CuisineFilter {
 
 export function CuisineNav() {
   const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const searchQuery = searchParams.get("q");
   const active = resolveActiveCuisine(pathname);
   const { recipes: customRecipes } = useCustomRecipes();
   const fridgeItems = useFridgeStore((s) => s.items);
@@ -63,7 +65,11 @@ export function CuisineNav() {
             return (
               <Nav.Item key={item.value}>
                 <AppLink
-                  href={item.href}
+                  href={
+                    searchQuery
+                      ? `${item.href}?q=${encodeURIComponent(searchQuery)}`
+                      : item.href
+                  }
                   className={`nav-link rounded-3 d-flex align-items-center gap-1 px-3 ${isActive ? "active" : ""}`}
                 >
                   <span>{item.icon}</span>

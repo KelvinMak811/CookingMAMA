@@ -10,6 +10,7 @@ import Form from "react-bootstrap/Form";
 import Row from "react-bootstrap/Row";
 import { AppShell } from "@/components/layout/AppShell";
 import { AppLink } from "@/components/layout/AppLink";
+import { InstagramImportCard } from "@/components/recipes/InstagramImportCard";
 import { ACCOUNTS } from "@/lib/accounts";
 import {
   generateCustomRecipeId,
@@ -17,6 +18,7 @@ import {
   upsertCustomRecipe,
   deleteCustomRecipe,
 } from "@/lib/customRecipes";
+import type { RecipeDraft } from "@/lib/recipeDraft";
 import { generateId } from "@/lib/utils";
 import type { CuisineType, Ingredient, Recipe } from "@/types";
 import { useAccountStore } from "@/stores/accountStore";
@@ -114,6 +116,31 @@ export function AddRecipePageClient() {
   };
   const updateStep = (index: number, value: string) => {
     setSteps((prev) => prev.map((step, i) => (i === index ? value : step)));
+  };
+
+  const applyImportDraft = (draft: RecipeDraft) => {
+    setName(draft.name || "");
+    setCuisine(draft.cuisine || "chinese");
+    setDescription(draft.description || "");
+    setDifficulty(Math.max(1, Math.min(5, draft.difficulty || 1)));
+    setPrepTime(draft.prepTime > 0 ? String(draft.prepTime) : "");
+    setBaseServings(Math.max(1, Math.min(12, draft.baseServings || 2)));
+    if (draft.imageUrl) setImageUrl(draft.imageUrl);
+    setIngredients(
+      draft.ingredients.length > 0
+        ? draft.ingredients.map((ing) => ({
+            id: generateId(),
+            name: ing.name,
+            amount: ing.amount,
+          }))
+        : [{ id: generateId(), name: "", amount: "" }]
+    );
+    setSteps(draft.steps.length > 0 ? draft.steps : [""]);
+    setMessage(
+      draft.sourceNote
+        ? `${draft.sourceNote}${draft.sourceUrl ? `（來源：${draft.sourceUrl}）` : ""}`
+        : "已從 Instagram 內容填入表單，請核對後再儲存。"
+    );
   };
 
   const handleDelete = () => {
@@ -216,6 +243,8 @@ export function AddRecipePageClient() {
             {message}
           </Alert>
         )}
+
+        {!isEditing && <InstagramImportCard onApplyDraft={applyImportDraft} />}
 
         <Card className="border-0 shadow-sm">
           <Card.Body>

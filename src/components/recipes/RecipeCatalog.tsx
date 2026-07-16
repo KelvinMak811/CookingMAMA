@@ -1,11 +1,14 @@
 "use client";
 
+import { Suspense, useMemo } from "react";
 import type { CuisineType } from "@/types";
 import { CUISINE_LABELS } from "@/types";
 import { recipes } from "@/data/recipes";
 import { AppLink } from "@/components/layout/AppLink";
 import { CalendarUserButtons } from "@/components/history/CalendarUserButtons";
 import { useCustomRecipes } from "@/hooks/useCustomRecipes";
+import { useRecipeSearchQuery } from "@/hooks/useRecipeSearchQuery";
+import { filterRecipesBySearch } from "@/lib/recipeSearch";
 import { RecipeGrid } from "./RecipeGrid";
 
 interface RecipeCatalogProps {
@@ -20,14 +23,26 @@ const CUISINE_HINTS: Record<CuisineType | "all", string> = {
   italian: "意粉同燉菜，易潔鑊就煮到意式風味。",
 };
 
-export function RecipeCatalog({ cuisine = "all" }: RecipeCatalogProps) {
+function RecipeCatalogInner({ cuisine = "all" }: RecipeCatalogProps) {
   const { recipes: customRecipes } = useCustomRecipes();
-  const allRecipes = [...customRecipes, ...recipes];
-  const filtered =
-    cuisine === "all"
-      ? allRecipes
-      : allRecipes.filter((recipe) => recipe.cuisine === cuisine);
+  const { query } = useRecipeSearchQuery();
+  const allRecipes = useMemo(
+    () => [...customRecipes, ...recipes],
+    [customRecipes]
+  );
+  const filtered = useMemo(
+    () =>
+      cuisine === "all"
+        ? allRecipes
+        : allRecipes.filter((recipe) => recipe.cuisine === cuisine),
+    [allRecipes, cuisine]
+  );
+  const displayed = useMemo(
+    () => filterRecipesBySearch(filtered, query),
+    [filtered, query]
+  );
   const title = cuisine === "all" ? "全部菜式" : CUISINE_LABELS[cuisine];
+  const isSearching = query.trim().length > 0;
 
   return (
     <div>
@@ -45,13 +60,34 @@ export function RecipeCatalog({ cuisine = "all" }: RecipeCatalogProps) {
         </AppLink>
       </div>
       <p className="text-secondary small mb-4">
-        {CUISINE_HINTS[cuisine]} 共 {filtered.length} 款。
+        {isSearching ? (
+          <>
+            搜尋「{query.trim()}」— 搵到 {displayed.length} 款
+            {cuisine !== "all" ? `（${CUISINE_LABELS[cuisine]}）` : ""}
+          </>
+        ) : (
+          <>
+            {CUISINE_HINTS[cuisine]} 共 {filtered.length} 款。
+          </>
+        )}
       </p>
-      {filtered.length === 0 ? (
-        <div className="text-center py-5 text-secondary">呢個分類暫時冇菜式</div>
+      {displayed.length === 0 ? (
+        <div className="text-center py-5 text-secondary">
+          {isSearching
+            ? `搵唔到「${query.trim()}」相關菜式，試下其他關鍵字。`
+            : "呢個分類暫時冇菜式"}
+        </div>
       ) : (
-        <RecipeGrid recipes={filtered} />
+        <RecipeGrid recipes={displayed} />
       )}
     </div>
+  );
+}
+
+export function RecipeCatalog(props: RecipeCatalogProps) {
+  return (
+    <Suspense fallback={<div className="text-secondary py-4">載入中…</div>}>
+      <RecipeCatalogInner {...props} />
+    </Suspense>
   );
 }

@@ -1,0 +1,74 @@
+import { NextResponse } from "next/server";
+import { draftRecipeFromText } from "@/lib/draftRecipeFromText";
+import { extractInstagramPost, isInstagramUrl } from "@/lib/instagramFetch";
+
+export const runtime = "nodejs";
+
+interface ImportBody {
+  url?: string;
+  text?: string;
+}
+
+export async function POST(request: Request) {
+  let body: ImportBody;
+  try {
+    body = (await request.json()) as ImportBody;
+  } catch {
+    return NextResponse.json({ ok: false, error: "Invalid JSON" }, { status: 400 });
+  }
+
+  const url = typeof body.url === "string" ? body.url.trim() : "";
+  let text = typeof body.text === "string" ? body.text.trim() : "";
+  let imageUrl: string | undefined;
+  let fetchNote: string | undefined;
+
+  if (url) {
+    if (!isInstagramUrl(url)) {
+      return NextResponse.json(
+        { ok: false, error: "請貼上有效嘅 Instagram 連結（post 或 reels）" },
+        { status: 400 }
+      );
+    }
+
+    const extracted = await extractInstagramPost(url);
+    if (extracted?.caption) {
+      text = text ? `${extracted.caption}\n\n${text}` : extracted.caption;
+      imageUrl = extracted.imageUrl;
+    } else if (extracted?.imageUrl) {
+      imageUrl = extracted.imageUrl;
+      fetchNote =
+        "已取得貼文圖片，但讀唔到完整文字。請喺下面貼上 caption／材料步驟。";
+    } else {
+      fetchNote =
+        "Instagram 暫時讀唔到呢條貼文內容（常見）。請複製貼文文字貼上再按匯入。";
+    }
+  }
+
+  if (!text) {
+    return NextResponse.json(
+      {
+        ok: false,
+        error: fetchNote || "請貼上 Instagram 連結，或者貼上貼文文字／材料步驟",
+        needsCaption: true,
+        imageUrl,
+      },
+      { status: 422 }
+    );
+  }
+
+  const { draft, mode } = await draftRecipeFromText(text, {
+    sourceUrl: url || undefined,
+    imageUrl,
+  });
+
+  return NextResponse.json({
+    ok: true,
+    draft,
+    mode,
+    note:
+      fetchNote ||
+      (mode === "ai"
+        ? "已用 AI 整理成草稿，請核對後再儲存。"
+        : "已用文字規則整理成草稿（未設定 AI key 時會用呢個模式），請核對後再儲存。"),
+  });
+}
