@@ -230,7 +230,7 @@ export function AddRecipePageClient() {
 
   return (
     <AppShell title={isEditing ? "編輯菜式" : "加入菜式"} showBack backHref="/recipes/">
-      <Form className="d-flex flex-column gap-4" onSubmit={handleSubmit}>
+      <div className="d-flex flex-column gap-4">
         <div>
           <h1 className="h4 fw-bold mb-1">{isEditing ? "編輯菜式" : "加入菜式"}</h1>
           <p className="text-secondary small mb-0">
@@ -239,13 +239,14 @@ export function AddRecipePageClient() {
         </div>
 
         {message && (
-          <Alert variant="warning" className="py-2 mb-0">
+          <Alert variant="success" className="py-2 mb-0">
             {message}
           </Alert>
         )}
 
         {!isEditing && <InstagramImportCard onApplyDraft={applyImportDraft} />}
 
+        <Form className="d-flex flex-column gap-4" onSubmit={handleSubmit}>
         <Card className="border-0 shadow-sm">
           <Card.Body>
             <h6 className="fw-bold mb-3">基本資料</h6>
@@ -413,7 +414,8 @@ export function AddRecipePageClient() {
             </Button>
           )}
         </div>
-      </Form>
+        </Form>
+      </div>
     </AppShell>
   );
 }

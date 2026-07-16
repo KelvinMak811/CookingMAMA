@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import Alert from "react-bootstrap/Alert";
 import Button from "react-bootstrap/Button";
 import Card from "react-bootstrap/Card";
@@ -30,7 +30,9 @@ export function InstagramImportCard({ onApplyDraft }: InstagramImportCardProps) 
         };
         if (cancelled) return;
         if (json.ai?.hasApiKey) {
-          setAiStatus(`AI 已就緒（${json.ai.provider}${json.ai.model ? ` / ${json.ai.model}` : ""}）`);
+          setAiStatus(
+            `AI 已就緒（${json.ai.provider}${json.ai.model ? ` / ${json.ai.model}` : ""}）`
+          );
         } else {
           setAiStatus(
             "伺服器未偵測到 AI key。Vercel 加完 env 後要 Redeploy；本機要有 .env.local 並重開 dev。"
@@ -45,8 +47,7 @@ export function InstagramImportCard({ onApplyDraft }: InstagramImportCardProps) 
     };
   }, []);
 
-  const handleImport = async (event: FormEvent) => {
-    event.preventDefault();
+  const handleImport = async () => {
     setError(null);
     setNote(null);
 
@@ -81,11 +82,13 @@ export function InstagramImportCard({ onApplyDraft }: InstagramImportCardProps) 
       }
 
       onApplyDraft(json.draft);
-      setNote(json.note || "已填入表單，請核對後再儲存。");
+      const filledName = json.draft.name ? `「${json.draft.name}」` : "草稿";
+      setNote(
+        `${json.note || "已填入下方表單"} → 請向下檢查${filledName}，確認後再撳「加入菜式」。`
+      );
       if (json.mode !== "ai" && json.aiError) {
         setError(json.aiError);
       }
-      setText("");
     } catch {
       setError("網絡錯誤，請稍後再試");
     } finally {
@@ -98,15 +101,18 @@ export function InstagramImportCard({ onApplyDraft }: InstagramImportCardProps) 
       <Card.Body>
         <h6 className="fw-bold mb-1">📱 從 Instagram 匯入</h6>
         <p className="small text-secondary mb-2">
-          貼上 post／reels 連結，或者直接貼 caption／材料步驟。系統會整理成草稿，你核對後先儲存。
+          貼上 post／reels 連結，或者直接貼 caption／材料步驟。系統會整理成草稿填入下面表單，你核對後先儲存。
         </p>
         {aiStatus && (
-          <p className={`small mb-3 ${aiStatus.includes("未偵測") ? "text-danger" : "text-success"}`}>
+          <p
+            className={`small mb-3 ${aiStatus.includes("未偵測") ? "text-danger" : "text-success"}`}
+          >
             {aiStatus}
           </p>
         )}
 
-        <Form onSubmit={handleImport} className="d-flex flex-column gap-3">
+        {/* 唔用巢狀 <form>，避免觸發外層「加入菜式」提交 */}
+        <div className="d-flex flex-column gap-3">
           <Form.Group>
             <Form.Label className="small text-secondary mb-1">Instagram 連結</Form.Label>
             <Form.Control
@@ -127,7 +133,9 @@ export function InstagramImportCard({ onApplyDraft }: InstagramImportCardProps) 
               rows={4}
               value={text}
               onChange={(e) => setText(e.target.value)}
-              placeholder={"例如：\n菜式名稱：菠蘿咕嚕肉\n材料：豬梅頭肉 300克、…\n步驟：\n1. …"}
+              placeholder={
+                "例如：\n菜式名稱：菠蘿咕嚕肉\n材料：豬梅頭肉 300克、…\n步驟：\n1. …"
+              }
             />
           </Form.Group>
 
@@ -142,10 +150,15 @@ export function InstagramImportCard({ onApplyDraft }: InstagramImportCardProps) 
             </Alert>
           )}
 
-          <Button type="submit" variant="outline-primary" disabled={loading}>
+          <Button
+            type="button"
+            variant="outline-primary"
+            disabled={loading}
+            onClick={() => void handleImport()}
+          >
             {loading ? "整理緊…" : "匯入並填入表單"}
           </Button>
-        </Form>
+        </div>
       </Card.Body>
     </Card>
   );
