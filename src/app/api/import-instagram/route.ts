@@ -1,5 +1,8 @@
 import { NextResponse } from "next/server";
-import { draftRecipeFromText } from "@/lib/draftRecipeFromText";
+import {
+  draftRecipeFromText,
+  getAiConfigStatus,
+} from "@/lib/draftRecipeFromText";
 import { extractInstagramPost, isInstagramUrl } from "@/lib/instagramFetch";
 
 export const runtime = "nodejs";
@@ -7,6 +10,15 @@ export const runtime = "nodejs";
 interface ImportBody {
   url?: string;
   text?: string;
+}
+
+/** 檢查 AI key 有冇生效（唔會洩露 key） */
+export async function GET() {
+  return NextResponse.json({
+    ok: true,
+    ai: getAiConfigStatus(),
+    tip: "若 hasApiKey=false：Vercel 請 Redeploy；本機請建 .env.local 後重開 dev server。",
+  });
 }
 
 export async function POST(request: Request) {
@@ -51,24 +63,35 @@ export async function POST(request: Request) {
         error: fetchNote || "請貼上 Instagram 連結，或者貼上貼文文字／材料步驟",
         needsCaption: true,
         imageUrl,
+        ai: getAiConfigStatus(),
       },
       { status: 422 }
     );
   }
 
-  const { draft, mode } = await draftRecipeFromText(text, {
+  const result = await draftRecipeFromText(text, {
     sourceUrl: url || undefined,
     imageUrl,
   });
 
+  const noteParts: string[] = [];
+  if (fetchNote) noteParts.push(fetchNote);
+  if (result.mode === "ai") {
+    noteParts.push(`已用 AI 整理成草稿（${result.provider} / ${result.model}），請核對後再儲存。`);
+  } else if (result.aiError) {
+    noteParts.push(`AI 未成功，已改用文字規則草稿。原因：${result.aiError}`);
+  } else {
+    noteParts.push("已用文字規則整理成草稿，請核對後再儲存。");
+  }
+
   return NextResponse.json({
     ok: true,
-    draft,
-    mode,
-    note:
-      fetchNote ||
-      (mode === "ai"
-        ? "已用 AI 整理成草稿，請核對後再儲存。"
-        : "已用文字規則整理成草稿（未設定 AI key 時會用呢個模式），請核對後再儲存。"),
+    draft: result.draft,
+    mode: result.mode,
+    hasApiKey: result.hasApiKey,
+    provider: result.provider,
+    model: result.model,
+    aiError: result.aiError,
+    note: noteParts.join(" "),
   });
 }

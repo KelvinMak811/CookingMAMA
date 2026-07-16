@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import Alert from "react-bootstrap/Alert";
 import Button from "react-bootstrap/Button";
 import Card from "react-bootstrap/Card";
@@ -18,6 +18,32 @@ export function InstagramImportCard({ onApplyDraft }: InstagramImportCardProps) 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [note, setNote] = useState<string | null>(null);
+  const [aiStatus, setAiStatus] = useState<string | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    void (async () => {
+      try {
+        const res = await fetch(appPath("/api/import-instagram"));
+        const json = (await res.json()) as {
+          ai?: { hasApiKey?: boolean; provider?: string; model?: string | null };
+        };
+        if (cancelled) return;
+        if (json.ai?.hasApiKey) {
+          setAiStatus(`AI 已就緒（${json.ai.provider}${json.ai.model ? ` / ${json.ai.model}` : ""}）`);
+        } else {
+          setAiStatus(
+            "伺服器未偵測到 AI key。Vercel 加完 env 後要 Redeploy；本機要有 .env.local 並重開 dev。"
+          );
+        }
+      } catch {
+        if (!cancelled) setAiStatus(null);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const handleImport = async (event: FormEvent) => {
     event.preventDefault();
@@ -44,7 +70,8 @@ export function InstagramImportCard({ onApplyDraft }: InstagramImportCardProps) 
         error?: string;
         note?: string;
         draft?: RecipeDraft;
-        needsCaption?: boolean;
+        mode?: string;
+        aiError?: string;
       };
 
       if (!res.ok || !json.ok || !json.draft) {
@@ -55,6 +82,9 @@ export function InstagramImportCard({ onApplyDraft }: InstagramImportCardProps) 
 
       onApplyDraft(json.draft);
       setNote(json.note || "已填入表單，請核對後再儲存。");
+      if (json.mode !== "ai" && json.aiError) {
+        setError(json.aiError);
+      }
       setText("");
     } catch {
       setError("網絡錯誤，請稍後再試");
@@ -67,15 +97,21 @@ export function InstagramImportCard({ onApplyDraft }: InstagramImportCardProps) 
     <Card className="border-0 shadow-sm border-start border-4 border-primary">
       <Card.Body>
         <h6 className="fw-bold mb-1">📱 從 Instagram 匯入</h6>
-        <p className="small text-secondary mb-3">
+        <p className="small text-secondary mb-2">
           貼上 post／reels 連結，或者直接貼 caption／材料步驟。系統會整理成草稿，你核對後先儲存。
         </p>
+        {aiStatus && (
+          <p className={`small mb-3 ${aiStatus.includes("未偵測") ? "text-danger" : "text-success"}`}>
+            {aiStatus}
+          </p>
+        )}
 
         <Form onSubmit={handleImport} className="d-flex flex-column gap-3">
           <Form.Group>
             <Form.Label className="small text-secondary mb-1">Instagram 連結</Form.Label>
             <Form.Control
-              type="url"
+              type="text"
+              inputMode="url"
               value={url}
               onChange={(e) => setUrl(e.target.value)}
               placeholder="https://www.instagram.com/reel/… 或 /p/…"
@@ -84,7 +120,7 @@ export function InstagramImportCard({ onApplyDraft }: InstagramImportCardProps) 
 
           <Form.Group>
             <Form.Label className="small text-secondary mb-1">
-              貼文文字（建議貼上；IG 好多時讀唔到完整內容）
+              貼文文字（強烈建議貼上；只貼連結好多時會失敗）
             </Form.Label>
             <Form.Control
               as="textarea"
@@ -100,8 +136,8 @@ export function InstagramImportCard({ onApplyDraft }: InstagramImportCardProps) 
               {error}
             </Alert>
           )}
-          {note && !error && (
-            <Alert variant="success" className="py-2 mb-0 small">
+          {note && (
+            <Alert variant={error ? "light" : "success"} className="py-2 mb-0 small">
               {note}
             </Alert>
           )}
