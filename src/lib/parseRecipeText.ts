@@ -91,15 +91,25 @@ function guessName(text: string): string {
   const firstLine = text
     .split(/\n/)
     .map((l) => l.trim())
-    .find((l) => l && !/^https?:\/\//i.test(l) && !/^#/.test(l));
+    .find(
+      (l) =>
+        l &&
+        !/^https?:\/\//i.test(l) &&
+        !/^#/.test(l) &&
+        !/\d+\s+likes?/i.test(l) &&
+        !/\d+\s+comments?/i.test(l)
+    );
 
   if (!firstLine) return "";
 
-  return firstLine
+  const cleaned = firstLine
     .replace(/^[\p{Emoji_Presentation}\p{Extended_Pictographic}\s]+/gu, "")
     .replace(/#.+$/u, "")
     .trim()
     .slice(0, 80);
+
+  if (!cleaned || cleaned === "&" || cleaned.length < 2) return "";
+  return cleaned;
 }
 
 function parseDifficulty(text: string): number {
@@ -148,8 +158,15 @@ export function parseRecipeText(raw: string, options?: { sourceUrl?: string }): 
 
   const name = guessName(text);
 
+  // IG 只抽出 truncated metadata、冇真正菜式文字時，唔好亂填菜名
+  const looksLikeGarbage =
+    !name ||
+    /\d+\s+likes?/i.test(name) ||
+    name === "&" ||
+    name.length < 2;
+
   return emptyRecipeDraft({
-    name: name || "未命名菜式",
+    name: looksLikeGarbage ? "" : name,
     cuisine: detectCuisine(text),
     description: description.slice(0, 200),
     difficulty: parseDifficulty(text),
@@ -161,6 +178,8 @@ export function parseRecipeText(raw: string, options?: { sourceUrl?: string }): 
         : [{ name: "（請手動補充材料）", amount: "適量" }],
     steps,
     sourceUrl: options?.sourceUrl,
-    sourceNote: "由貼文文字自動解析，請核對後再儲存",
+    sourceNote: looksLikeGarbage
+      ? "Instagram 文字唔齊／被截斷，請手動貼上完整 caption 或材料步驟後再匯入"
+      : "由貼文文字自動解析，請核對後再儲存",
   });
 }

@@ -31,6 +31,31 @@ function decodeHtmlEntities(input: string): string {
     .replace(/\\"/g, '"');
 }
 
+/**
+ * IG og:description 常見格式：
+ * "150 likes, 0 comments - username on July 14, 2026: \"實際 caption...\""
+ */
+export function cleanInstagramCaption(raw: string): string {
+  let text = decodeHtmlEntities(raw).trim();
+  if (!text) return "";
+
+  const quoted = text.match(
+    /\d+\s+likes?,\s*\d+\s+comments?\s*-\s*.+?:\s*[“"']([\s\S]*?)[”"']\s*$/i
+  );
+  if (quoted?.[1]) {
+    text = quoted[1].trim();
+  } else {
+    text = text
+      .replace(/^\d+\s+likes?,\s*\d+\s+comments?\s*-\s*[^:]+:\s*/i, "")
+      .replace(/^["“]|["”]$/g, "")
+      .trim();
+  }
+
+  // 太短／只係 truncated 符號，當冇 caption
+  if (!text || text === "&" || text.length < 3) return "";
+  return text;
+}
+
 function pickMeta(html: string, property: string): string | null {
   const re = new RegExp(
     `<meta[^>]+(?:property|name)=["']${property}["'][^>]+content=["']([^"']+)["']`,
@@ -64,16 +89,17 @@ export async function extractInstagramPost(
       if (!res.ok) continue;
       const html = await res.text();
 
-      const caption =
+      const rawCaption =
         pickMeta(html, "og:description") ||
         pickMeta(html, "description") ||
         "";
+      const caption = cleanInstagramCaption(rawCaption);
       const imageUrl = pickMeta(html, "og:image") || undefined;
       const title = pickMeta(html, "og:title") || undefined;
 
       if (caption || imageUrl) {
         return {
-          caption: caption.trim(),
+          caption,
           imageUrl,
           title: title?.trim(),
         };

@@ -49,7 +49,7 @@ export async function POST(request: Request) {
     } else if (extracted?.imageUrl) {
       imageUrl = extracted.imageUrl;
       fetchNote =
-        "已取得貼文圖片，但讀唔到完整文字。請喺下面貼上 caption／材料步驟。";
+        "已取得貼文圖片，但讀唔到完整文字（IG 經常截斷）。請喺下面貼上完整 caption／材料步驟。";
     } else {
       fetchNote =
         "Instagram 暫時讀唔到呢條貼文內容（常見）。請複製貼文文字貼上再按匯入。";

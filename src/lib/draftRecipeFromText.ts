@@ -212,7 +212,11 @@ export async function draftRecipeFromText(
         hasApiKey: true,
         provider,
         model,
-        aiError: `AI API 失敗 (${res.status}): ${detail}`,
+        aiError: `AI API 失敗 (${res.status}): ${detail}${
+          /credit card/i.test(detail)
+            ? " → 解法：去 Vercel AI Gateway 綁信用卡解鎖免費額度，或改用 OPENAI_API_KEY（唔經 Gateway）。"
+            : ""
+        }`,
       };
     }
 
