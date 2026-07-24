@@ -261,11 +261,85 @@ body {
   padding: 0 0.05rem;
 }
 
-.recipe-search-bar {
+.recipe-browse-tools {
   position: sticky;
-  top: calc(var(--app-header-height) + 2.75rem);
+  top: calc(var(--app-header-height) + 2.55rem);
   z-index: 1019;
   background: var(--smartcook-bg);
+  padding-bottom: 0.35rem;
+  margin-bottom: 0.15rem;
+}
+
+.recipe-search-bar {
+  position: static;
+  background: transparent;
+}
+
+.recipe-filter-bar {
+  padding: 0.15rem 0 0.25rem;
+}
+
+.recipe-filter-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.4rem;
+  margin-bottom: 0.3rem;
+}
+
+.recipe-filter-row-label {
+  flex: 0 0 auto;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--bs-secondary-color);
+  line-height: 1.6;
+  padding-top: 0.1rem;
+  min-width: 3.25rem;
+}
+
+.recipe-filter-label {
+  flex: 0 0 auto;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--bs-secondary-color);
+  line-height: 1.6;
+  padding-top: 0.1rem;
+  min-width: 1.75rem;
+}
+
+.recipe-filter-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+  min-width: 0;
+}
+
+.recipe-filter-chip {
+  border: 1px solid var(--bs-border-color);
+  background: #fff;
+  color: var(--bs-body-color);
+  border-radius: 999px;
+  font-size: 0.72rem;
+  line-height: 1.2;
+  padding: 0.18rem 0.55rem;
+  white-space: nowrap;
+  transition: border-color 0.15s ease, background-color 0.15s ease,
+    color 0.15s ease;
+}
+
+.recipe-filter-chip:hover {
+  border-color: #fdba74;
+}
+
+.recipe-filter-chip.is-active {
+  border-color: #f97316;
+  background: #fff7ed;
+  color: #c2410c;
+  font-weight: 600;
+}
+
+.recipe-filter-actions {
+  margin-top: 0.05rem;
+  margin-left: 2.15rem;
 }
 
 .shopping-fab {

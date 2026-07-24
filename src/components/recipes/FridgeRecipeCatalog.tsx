@@ -7,7 +7,13 @@ import { CalendarUserButtons } from "@/components/history/CalendarUserButtons";
 import { useCustomRecipes } from "@/hooks/useCustomRecipes";
 import { useFridgeStore } from "@/stores/fridgeStore";
 import { useRecipeSearchQuery } from "@/hooks/useRecipeSearchQuery";
+import { useRecipeIngredientFilters } from "@/hooks/useRecipeIngredientFilters";
 import { filterRecipesBySearch } from "@/lib/recipeSearch";
+import {
+  filterRecipesByIngredients,
+  type MeatFilterId,
+  type VegFilterId,
+} from "@/lib/recipeIngredientFilters";
 import {
   getFridgeRecipeMatches,
   splitFridgeRecipeMatches,
@@ -15,14 +21,16 @@ import {
 } from "@/lib/fridgeRecommendations";
 import { RecipeGrid } from "./RecipeGrid";
 
-function filterMatchesBySearch(
+function filterMatchesByBrowse(
   matches: FridgeRecipeMatch[],
-  query: string
+  query: string,
+  meats: MeatFilterId[],
+  vegs: VegFilterId[]
 ): FridgeRecipeMatch[] {
-  const recipes = matches.map((match) => match.recipe);
-  const filteredIds = new Set(
-    filterRecipesBySearch(recipes, query).map((recipe) => recipe.id)
-  );
+  let list = matches.map((match) => match.recipe);
+  list = filterRecipesByIngredients(list, meats, vegs);
+  list = filterRecipesBySearch(list, query);
+  const filteredIds = new Set(list.map((recipe) => recipe.id));
   return matches.filter((match) => filteredIds.has(match.recipe.id));
 }
 
@@ -30,7 +38,9 @@ function FridgeRecipeCatalogInner() {
   const { recipes: customRecipes } = useCustomRecipes();
   const fridgeItems = useFridgeStore((s) => s.items);
   const { query } = useRecipeSearchQuery();
+  const { meats, vegs, hasFilters } = useRecipeIngredientFilters();
   const isSearching = query.trim().length > 0;
+  const isNarrowed = isSearching || hasFilters;
 
   const allRecipes = useMemo(
     () => [...customRecipes, ...recipes],
@@ -44,12 +54,12 @@ function FridgeRecipeCatalogInner() {
 
   const { readyNow, almostReady } = useMemo(() => {
     const split = splitFridgeRecipeMatches(matches);
-    if (!isSearching) return split;
+    if (!isNarrowed) return split;
     return {
-      readyNow: filterMatchesBySearch(split.readyNow, query),
-      almostReady: filterMatchesBySearch(split.almostReady, query),
+      readyNow: filterMatchesByBrowse(split.readyNow, query, meats, vegs),
+      almostReady: filterMatchesByBrowse(split.almostReady, query, meats, vegs),
     };
-  }, [matches, query, isSearching]);
+  }, [matches, query, meats, vegs, isNarrowed]);
 
   return (
     <div>
@@ -67,8 +77,10 @@ function FridgeRecipeCatalogInner() {
         </AppLink>
       </div>
       <p className="text-secondary small mb-4">
-        {isSearching
-          ? `搜尋「${query.trim()}」— 材料齊 ${readyNow.length} 款，差少少 ${almostReady.length} 款`
+        {isNarrowed
+          ? `${isSearching ? `搜尋「${query.trim()}」` : "材料篩選"}${
+              hasFilters && isSearching ? " + 篩選" : ""
+            }— 材料齊 ${readyNow.length} 款，差少少 ${almostReady.length} 款`
           : "根據你雪櫃現有材料，推薦而家可以煮或者差少少就煮到嘅菜式。"}
       </p>
 
@@ -87,9 +99,9 @@ function FridgeRecipeCatalogInner() {
         <div className="text-center py-5 text-secondary">
           暫時搵唔到同雪櫃材料配對嘅菜式，試下加多啲常用材料。
         </div>
-      ) : isSearching && readyNow.length === 0 && almostReady.length === 0 ? (
+      ) : isNarrowed && readyNow.length === 0 && almostReady.length === 0 ? (
         <div className="text-center py-5 text-secondary">
-          搵唔到「{query.trim()}」相關推薦菜式，試下其他關鍵字。
+          搵唔到符合條件嘅推薦菜式，試下改關鍵字或清除篩選。
         </div>
       ) : (
         <div className="d-flex flex-column gap-4">

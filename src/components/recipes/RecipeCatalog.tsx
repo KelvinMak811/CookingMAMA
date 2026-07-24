@@ -8,7 +8,9 @@ import { AppLink } from "@/components/layout/AppLink";
 import { CalendarUserButtons } from "@/components/history/CalendarUserButtons";
 import { useCustomRecipes } from "@/hooks/useCustomRecipes";
 import { useRecipeSearchQuery } from "@/hooks/useRecipeSearchQuery";
+import { useRecipeIngredientFilters } from "@/hooks/useRecipeIngredientFilters";
 import { filterRecipesBySearch } from "@/lib/recipeSearch";
+import { filterRecipesByIngredients } from "@/lib/recipeIngredientFilters";
 import { RecipeGrid } from "./RecipeGrid";
 
 interface RecipeCatalogProps {
@@ -26,6 +28,7 @@ const CUISINE_HINTS: Record<CuisineType | "all", string> = {
 function RecipeCatalogInner({ cuisine = "all" }: RecipeCatalogProps) {
   const { recipes: customRecipes } = useCustomRecipes();
   const { query } = useRecipeSearchQuery();
+  const { meats, vegs, hasFilters } = useRecipeIngredientFilters();
   const allRecipes = useMemo(
     () => [...customRecipes, ...recipes],
     [customRecipes]
@@ -37,12 +40,17 @@ function RecipeCatalogInner({ cuisine = "all" }: RecipeCatalogProps) {
         : allRecipes.filter((recipe) => recipe.cuisine === cuisine),
     [allRecipes, cuisine]
   );
+  const ingredientFiltered = useMemo(
+    () => filterRecipesByIngredients(filtered, meats, vegs),
+    [filtered, meats, vegs]
+  );
   const displayed = useMemo(
-    () => filterRecipesBySearch(filtered, query),
-    [filtered, query]
+    () => filterRecipesBySearch(ingredientFiltered, query),
+    [ingredientFiltered, query]
   );
   const title = cuisine === "all" ? "全部菜式" : CUISINE_LABELS[cuisine];
   const isSearching = query.trim().length > 0;
+  const isNarrowed = isSearching || hasFilters;
 
   return (
     <div>
@@ -60,9 +68,11 @@ function RecipeCatalogInner({ cuisine = "all" }: RecipeCatalogProps) {
         </AppLink>
       </div>
       <p className="text-secondary small mb-4">
-        {isSearching ? (
+        {isNarrowed ? (
           <>
-            搜尋「{query.trim()}」— 搵到 {displayed.length} 款
+            {isSearching ? `搜尋「${query.trim()}」` : "材料篩選"}
+            {hasFilters && isSearching ? " + 篩選" : ""}
+            — 搵到 {displayed.length} 款
             {cuisine !== "all" ? `（${CUISINE_LABELS[cuisine]}）` : ""}
           </>
         ) : (
@@ -73,8 +83,8 @@ function RecipeCatalogInner({ cuisine = "all" }: RecipeCatalogProps) {
       </p>
       {displayed.length === 0 ? (
         <div className="text-center py-5 text-secondary">
-          {isSearching
-            ? `搵唔到「${query.trim()}」相關菜式，試下其他關鍵字。`
+          {isNarrowed
+            ? "搵唔到符合條件嘅菜式，試下改關鍵字或清除篩選。"
             : "呢個分類暫時冇菜式"}
         </div>
       ) : (
