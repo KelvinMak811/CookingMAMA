@@ -347,31 +347,26 @@ function escapeHtml(text) {
 
 function buildRecipeCardHtml(recipe) {
   const cuisine = CUISINE_LABELS[recipe.cuisine] || CUISINE_LABELS.chinese;
-  const imageUrl = recipe.imageUrl || DEFAULT_RECIPE_IMAGE;
-  const prepTime = recipe.prepTime ? `${recipe.prepTime} 分鐘` : "—";
-  const creator = recipe.isCustom
-    ? `<div class="small text-primary mt-1">👤 ${escapeHtml(recipe.createdByName || "")} 加入</div>`
-    : "";
+  const prepTime = recipe.prepTime ? `${recipe.prepTime}分` : "—";
   const customBadge = recipe.isCustom
-    ? `<span class="badge bg-primary-subtle text-primary fw-normal me-1">自訂</span>`
+    ? `<span class="badge bg-primary-subtle text-primary fw-normal">自訂</span>`
     : "";
-  return `<div class="col">
+  const haystack = [
+    recipe.name || "",
+    ...((recipe.ingredients || []).map((ing) => ing.name || "")),
+  ].join(" ");
+  return `<div class="col" data-recipe-card data-recipe-id="${escapeHtml(recipe.id || "")}" data-haystack="${escapeHtml(haystack)}">
     <a href="${recipePageUrl(recipe.id)}" class="text-decoration-none text-dark h-100 d-block">
-      <div class="card h-100 border-0 shadow-sm overflow-hidden ${recipe.isCustom ? "border border-primary-subtle" : ""}">
-        <div class="recipe-card-img">
-          <img src="${escapeHtml(imageUrl)}" alt="${escapeHtml(recipe.name)}" class="object-fit-cover w-100 h-100" loading="lazy">
+      <div class="recipe-pick-card h-100 ${recipe.isCustom ? "recipe-pick-card--custom" : ""}">
+        <div class="d-flex justify-content-between align-items-start gap-1 mb-1">
+          <h6 class="recipe-pick-title mb-0">${escapeHtml(recipe.name)}</h6>
+          <span class="badge bg-light text-secondary fw-normal flex-shrink-0">${escapeHtml(cuisine)}</span>
         </div>
-        <div class="card-body">
-          <div class="d-flex justify-content-between align-items-start gap-2 mb-2">
-            <h6 class="card-title mb-0">${escapeHtml(recipe.name)}</h6>
-            <span class="text-end">${customBadge}<span class="badge bg-light text-secondary fw-normal">${escapeHtml(cuisine)}</span></span>
-          </div>
-          <div class="d-flex justify-content-between align-items-center small text-secondary">
-            <span class="text-warning">${renderDifficultyStars(recipe.difficulty)}</span>
-            <span>⏱ ${prepTime}</span>
-          </div>
-          ${creator}
+        <div class="d-flex justify-content-between align-items-center recipe-pick-meta">
+          <span class="text-warning">${renderDifficultyStars(recipe.difficulty)}</span>
+          <span>⏱ ${prepTime}</span>
         </div>
+        ${customBadge ? `<div class="mt-1">${customBadge}</div>` : ""}
       </div>
     </a>
   </div>`;
