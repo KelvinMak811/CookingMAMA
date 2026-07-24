@@ -1,0 +1,45 @@
+{
+  "id": "recipe-4",
+  "name": "麻婆豆腐",
+  "cuisine": "chinese",
+  "baseServings": 2,
+  "description": "香辣下飯，一個易潔鑊炒晒，送白飯可以食多幾碗。",
+  "difficulty": 2,
+  "prepTime": 25,
+  "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a5/Billyfoodmabodofu3.jpg/960px-Billyfoodmabodofu3.jpg",
+  "ingredients": [
+    {
+      "id": "i4-1",
+      "name": "嫩豆腐",
+      "amount": "1盒"
+    },
+    {
+      "id": "i4-2",
+      "name": "免治豬肉",
+      "amount": "150g"
+    },
+    {
+      "id": "i4-3",
+      "name": "豆瓣醬",
+      "amount": "1湯匙"
+    },
+    {
+      "id": "i4-4",
+      "name": "花椒粉",
+      "amount": "半茶匙"
+    },
+    {
+      "id": "i4-5",
+      "name": "蒜蓉",
+      "amount": "2瓣"
+    }
+  ],
+  "steps": [
+    "豆腐切約2厘米粒；滾水加少許鹽，焯豆腐1分鐘去豆腥，瀝乾。",
+    "易潔鑊中火下油，炒豬肉碎至鬆散變色。",
+    "加豆瓣醬同蒜蓉，小火炒出紅油（約1分鐘）。",
+    "下豆腐，加約100ml水，輕輕推匀，蓋蓋中火燜5分鐘。",
+    "開大火收汁，可加少許生粉水令汁掛豆腐。",
+    "起鑊前撒花椒粉同蔥花，試味調整辣度。"
+  ]
+}

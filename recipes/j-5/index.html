@@ -1,0 +1,69 @@
+<!DOCTYPE html><html lang="zh-HK"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>味噌汤 — SmartCook</title>
+<meta name="description" content="简单日式味噌汤，易洁锅几分钟煮好。">
+<meta name="theme-color" content="#f97316">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="/CookingMAMA/assets/css/style.css?v=20260704" rel="stylesheet">
+</head>
+<body class="d-flex flex-column min-vh-100">
+<header class="navbar navbar-light bg-white border-bottom sticky-top shadow-sm app-navbar">
+  <div class="container app-main px-3 py-0">
+    <div class="d-flex align-items-center w-100 gap-2 app-navbar-inner">
+      <a href="/CookingMAMA/recipes/cuisine/japanese/" class="btn btn-light btn-sm rounded-3 flex-shrink-0" aria-label="返回">←</a>
+           <span class="mb-0 fw-bold text-truncate flex-grow-1 min-w-0">味噌汤</span>
+      <div class="d-flex align-items-center ms-auto gap-2 flex-shrink-0">
+        <div class="dropdown" id="account-menu">
+          <button class="btn btn-outline-primary btn-sm dropdown-toggle account-menu-btn" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="帳戶選單">
+            <span id="account-display-name">帳戶</span>
+          </button>
+          <ul class="dropdown-menu dropdown-menu-end shadow-sm">
+            <li><a class="dropdown-item" href="/CookingMAMA/history/">📅 煮食日曆</a></li>
+            <li><a class="dropdown-item" href="/CookingMAMA/shopping-list/">🛒 買餸清單</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="/CookingMAMA/account/">🔄 切換帳戶</a></li>
+          </ul>
+        </div>
+        <nav class="d-none d-md-flex gap-1">
+        <a href="/CookingMAMA/recipes/" class="nav-link rounded-3 px-3 py-2 bg-primary-subtle text-primary fw-semibold">菜式庫</a>
+        <a href="/CookingMAMA/shopping-list/" class="nav-link rounded-3 px-3 py-2 text-secondary">買餸清單</a>
+        <a href="/CookingMAMA/history/" class="nav-link rounded-3 px-3 py-2 text-secondary">煮食日曆</a>
+        <a href="/CookingMAMA/expenses/" class="nav-link rounded-3 px-3 py-2 text-secondary">開支紀錄</a>
+        </nav>
+      </div>
+    </div>
+  </div>
+</header>
+<nav class="fixed-bottom bg-white border-top d-md-none bottom-nav safe-area-bottom" aria-label="主要導航">
+  <div class="d-flex justify-content-around">
+    <a href="/CookingMAMA/recipes/" class="bottom-nav-link active"><span class="fs-5">📖</span><small>菜式</small></a>
+    <a href="/CookingMAMA/shopping-list/" class="bottom-nav-link "><span class="fs-5">🛒</span><small>買餸</small></a>
+    <a href="/CookingMAMA/history/" class="bottom-nav-link "><span class="fs-5">📅</span><small>日曆</small></a>
+    <a href="/CookingMAMA/expenses/" class="bottom-nav-link "><span class="fs-5">💰</span><small>開支</small></a>
+  </div>
+</nav>
+<a href="/CookingMAMA/shopping-list/" id="shopping-bubble" class="shopping-bubble d-none" aria-label="買餸清單"><span>🛒</span><span id="shopping-bubble-count" class="shopping-bubble-count">0</span></a>
+<div class="container app-main px-3"><nav class="cuisine-nav-sticky border-bottom py-1 mb-0" aria-label="菜式類別"><div class="date-nav-scroll"><ul class="nav nav-pills flex-nowrap gap-2 mb-0">
+<li class="nav-item"><a href="/CookingMAMA/recipes/" class="nav-link rounded-3 d-flex align-items-center gap-1 px-3 "><span>🍽️</span><span>全部</span><span class="badge rounded-pill bg-secondary-subtle text-secondary" data-cuisine-count="all" data-base-count="50">50</span></a></li><li class="nav-item"><a href="/CookingMAMA/recipes/cuisine/chinese/" class="nav-link rounded-3 d-flex align-items-center gap-1 px-3 "><span>🥢</span><span>中餐</span><span class="badge rounded-pill bg-secondary-subtle text-secondary" data-cuisine-count="chinese" data-base-count="20">20</span></a></li><li class="nav-item"><a href="/CookingMAMA/recipes/cuisine/western/" class="nav-link rounded-3 d-flex align-items-center gap-1 px-3 "><span>🍝</span><span>西餐</span><span class="badge rounded-pill bg-secondary-subtle text-secondary" data-cuisine-count="western" data-base-count="10">10</span></a></li><li class="nav-item"><a href="/CookingMAMA/recipes/cuisine/japanese/" class="nav-link rounded-3 d-flex align-items-center gap-1 px-3 active"><span>🍱</span><span>日式</span><span class="badge rounded-pill bg-light text-primary" data-cuisine-count="japanese" data-base-count="10">10</span></a></li><li class="nav-item"><a href="/CookingMAMA/recipes/cuisine/italian/" class="nav-link rounded-3 d-flex align-items-center gap-1 px-3 "><span>🍕</span><span>意式</span><span class="badge rounded-pill bg-secondary-subtle text-secondary" data-cuisine-count="italian" data-base-count="10">10</span></a></li>
+</ul></div></nav></div>
+<main class="container app-main flex-grow-1 px-3 py-2"><article class="d-flex flex-column gap-4">
+<div class="position-relative rounded-3 overflow-hidden shadow ratio ratio-16x9"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c9/Miso_soup_001.jpg/960px-Miso_soup_001.jpg" alt="味噌汤" class="object-fit-cover w-100 h-100"></div>
+<div class="d-flex justify-content-between align-items-center flex-wrap gap-2"><div class="d-flex align-items-center gap-2"><span class="text-warning">★☆☆☆☆</span><span class="badge bg-warning text-dark">日式</span></div><span class="text-secondary small">⏱ 約 10 分鐘 · 易潔鑊</span></div>
+<section><h2 class="h5 fw-bold">簡介</h2><p class="text-secondary">简单日式味噌汤，易洁锅几分钟煮好。</p></section>
+<div class="card border-0 shadow-sm" id="serving-scaler"><div class="card-body"><div class="d-flex justify-content-between align-items-center mb-3"><h6 class="fw-bold mb-0">份量設定</h6><span class="badge bg-primary-subtle text-primary" id="scale-factor-badge">材料 × 1</span></div><div class="row g-3"><div class="col-6"><label class="form-label small text-secondary">煮幾多人食？</label><div class="d-flex align-items-center gap-2"><button type="button" class="btn btn-light btn-sm" data-servings-delta="-1">−</button><span class="fw-bold flex-grow-1 text-center" id="servings-label">2 人</span><button type="button" class="btn btn-light btn-sm" data-servings-delta="1">+</button></div></div><div class="col-6"><label class="form-label small text-secondary">一次煮幾多餐？</label><div class="d-flex align-items-center gap-2"><button type="button" class="btn btn-light btn-sm" data-batches-delta="-1">−</button><span class="fw-bold flex-grow-1 text-center" id="batches-label">1 餐</span><button type="button" class="btn btn-light btn-sm" data-batches-delta="1">+</button></div></div></div><p class="small text-secondary mt-3 mb-0">菜式預設 2 人份量，調整後材料自動按比例計算。</p></div></div>
+<section><h5 class="fw-bold mb-3">材料 <small class="text-secondary fw-normal" id="ingredients-heading">(2人 × 1餐)</small></h5><ul class="list-group list-group-flush" id="ingredients-list"></ul><div class="my-4"><button type="button" class="btn btn-primary w-100" id="add-to-shopping-btn">🛒 一鍵加入買餸清單</button></div></section>
+<section class="card border-0 shadow-sm"><div class="card-body"><h6 class="fw-bold">📅 預定煮食日子</h6><p class="small text-secondary">揀定幾時煮，會顯示喺煮食紀錄日曆，方便你提前買餸</p><label class="form-label small">幾時煮？</label><input type="date" class="form-control mb-3" id="plan-date"><button type="button" class="btn btn-outline-primary w-100" id="add-plan-btn">加入煮食日程</button></div></section>
+<section><h2 class="h5 fw-bold mb-2">煮食步驟</h2><p class="text-secondary small mb-3">每個步驟都可以撳「朗讀步驟」用語音播放</p><ol class="list-group list-group-numbered gap-2" id="steps-list"><li class="list-group-item border rounded-3"><div class="d-flex justify-content-between align-items-start gap-2"><span>豆腐切約1.5厘米小方粒；海帶用濕布輕拭淨，唔使洗；蔥切細花。</span><button type="button" class="btn btn-sm btn-light flex-shrink-0 speak-step-btn" data-text="豆腐切約1.5厘米小方粒；海帶用濕布輕拭淨，唔使洗；蔥切細花。">🔊 朗讀</button></div></li><li class="list-group-item border rounded-3"><div class="d-flex justify-content-between align-items-start gap-2"><span>易潔鑊倒入500ml水，中火煮滾。</span><button type="button" class="btn btn-sm btn-light flex-shrink-0 speak-step-btn" data-text="易潔鑊倒入500ml水，中火煮滾。">🔊 朗讀</button></div></li><li class="list-group-item border rounded-3"><div class="d-flex justify-content-between align-items-start gap-2"><span>下海帶煮約2分鐘出味，撈起海帶（可選保留）。</span><button type="button" class="btn btn-sm btn-light flex-shrink-0 speak-step-btn" data-text="下海帶煮約2分鐘出味，撈起海帶（可選保留）。">🔊 朗讀</button></div></li><li class="list-group-item border rounded-3"><div class="d-flex justify-content-between align-items-start gap-2"><span>輕輕放入豆腐粒，煮約1分鐘至豆腐熱透，唔好大力攪拌以免碎。</span><button type="button" class="btn btn-sm btn-light flex-shrink-0 speak-step-btn" data-text="輕輕放入豆腐粒，煮約1分鐘至豆腐熱透，唔好大力攪拌以免碎。">🔊 朗讀</button></div></li><li class="list-group-item border rounded-3"><div class="d-flex justify-content-between align-items-start gap-2"><span>關火，味噌用少許湯調開至順滑，倒回鑊內輕輕拌勻，唔好再煮沸（避免味噌香味流失）。</span><button type="button" class="btn btn-sm btn-light flex-shrink-0 speak-step-btn" data-text="關火，味噌用少許湯調開至順滑，倒回鑊內輕輕拌勻，唔好再煮沸（避免味噌香味流失）。">🔊 朗讀</button></div></li><li class="list-group-item border rounded-3"><div class="d-flex justify-content-between align-items-start gap-2"><span>盛碗撒蔥花，趁熱飲。</span><button type="button" class="btn btn-sm btn-light flex-shrink-0 speak-step-btn" data-text="盛碗撒蔥花，趁熱飲。">🔊 朗讀</button></div></li></ol></section>
+<section class="card border-0 shadow-sm"><div class="card-body"><label class="form-label small text-secondary">幾時煮？可以補登之前煮過嘅餸</label><input type="date" class="form-control mb-3" id="cooked-date"><p class="small text-secondary mb-2">幫自己評個分</p><div class="mb-3" id="rating-stars"><button type="button" class="btn btn-link p-0 rating-star" data-rating="1">☆</button><button type="button" class="btn btn-link p-0 rating-star" data-rating="2">☆</button><button type="button" class="btn btn-link p-0 rating-star" data-rating="3">☆</button><button type="button" class="btn btn-link p-0 rating-star" data-rating="4">☆</button><button type="button" class="btn btn-link p-0 rating-star" data-rating="5">☆</button></div><button type="button" class="btn btn-success w-100" id="complete-cooking-btn">✅ 完成煮食 · 打卡</button></div></section>
+</article></main>
+<script id="recipe-data" type="application/json">{"id":"j-5","name":"味噌汤","cuisine":"japanese","baseServings":2,"description":"简单日式味噌汤，易洁锅几分钟煮好。","difficulty":1,"prepTime":10,"imageUrl":"https://upload.wikimedia.org/wikipedia/commons/thumb/c/c9/Miso_soup_001.jpg/960px-Miso_soup_001.jpg","ingredients":[{"id":"j5-1","name":"味噌","amount":"2汤匙"},{"id":"j5-2","name":"豆腐","amount":"半盒"},{"id":"j5-3","name":"海带","amount":"5g"},{"id":"j5-4","name":"葱花","amount":"适量"},{"id":"j5-5","name":"水","amount":"500ml"}],"steps":["豆腐切約1.5厘米小方粒；海帶用濕布輕拭淨，唔使洗；蔥切細花。","易潔鑊倒入500ml水，中火煮滾。","下海帶煮約2分鐘出味，撈起海帶（可選保留）。","輕輕放入豆腐粒，煮約1分鐘至豆腐熱透，唔好大力攪拌以免碎。","關火，味噌用少許湯調開至順滑，倒回鑊內輕輕拌勻，唔好再煮沸（避免味噌香味流失）。","盛碗撒蔥花，趁熱飲。"]}</script>
+<script>window.SMARTCOOK_BASE="/CookingMAMA";window.SMARTCOOK_STATIC=true;window.SMARTCOOK_API_BASE="";</script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="/CookingMAMA/assets/js/smartcook.js?v=20260706"></script>
+<script src="/CookingMAMA/assets/js/cloud-sync.js?v=20260706"></script>
+<script src="/CookingMAMA/assets/js/analytics.js?v=20260706"></script>
+<script src="/CookingMAMA/assets/js/recipe-detail.js?v=20260704"></script></body></html>

@@ -1,0 +1,57 @@
+<!DOCTYPE html><html lang="zh-HK"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>自訂菜式 — SmartCook</title>
+<meta name="description" content="undefined">
+<meta name="theme-color" content="#f97316">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="/CookingMAMA/assets/css/style.css?v=20260704" rel="stylesheet">
+</head>
+<body class="d-flex flex-column min-vh-100" data-cuisine="all">
+<header class="navbar navbar-light bg-white border-bottom sticky-top shadow-sm app-navbar">
+  <div class="container app-main px-3 py-0">
+    <div class="d-flex align-items-center w-100 gap-2 app-navbar-inner">
+      <a href="/CookingMAMA/recipes/" class="btn btn-light btn-sm rounded-3 flex-shrink-0" aria-label="返回">←</a>
+           <span class="mb-0 fw-bold text-truncate flex-grow-1 min-w-0">自訂菜式</span>
+      <div class="d-flex align-items-center ms-auto gap-2 flex-shrink-0">
+        <div class="dropdown" id="account-menu">
+          <button class="btn btn-outline-primary btn-sm dropdown-toggle account-menu-btn" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="帳戶選單">
+            <span id="account-display-name">帳戶</span>
+          </button>
+          <ul class="dropdown-menu dropdown-menu-end shadow-sm">
+            <li><a class="dropdown-item" href="/CookingMAMA/history/">📅 煮食日曆</a></li>
+            <li><a class="dropdown-item" href="/CookingMAMA/shopping-list/">🛒 買餸清單</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="/CookingMAMA/account/">🔄 切換帳戶</a></li>
+          </ul>
+        </div>
+        <nav class="d-none d-md-flex gap-1">
+        <a href="/CookingMAMA/recipes/" class="nav-link rounded-3 px-3 py-2 bg-primary-subtle text-primary fw-semibold">菜式庫</a>
+        <a href="/CookingMAMA/shopping-list/" class="nav-link rounded-3 px-3 py-2 text-secondary">買餸清單</a>
+        <a href="/CookingMAMA/history/" class="nav-link rounded-3 px-3 py-2 text-secondary">煮食日曆</a>
+        <a href="/CookingMAMA/expenses/" class="nav-link rounded-3 px-3 py-2 text-secondary">開支紀錄</a>
+        </nav>
+      </div>
+    </div>
+  </div>
+</header>
+<nav class="fixed-bottom bg-white border-top d-md-none bottom-nav safe-area-bottom" aria-label="主要導航">
+  <div class="d-flex justify-content-around">
+    <a href="/CookingMAMA/recipes/" class="bottom-nav-link active"><span class="fs-5">📖</span><small>菜式</small></a>
+    <a href="/CookingMAMA/shopping-list/" class="bottom-nav-link "><span class="fs-5">🛒</span><small>買餸</small></a>
+    <a href="/CookingMAMA/history/" class="bottom-nav-link "><span class="fs-5">📅</span><small>日曆</small></a>
+    <a href="/CookingMAMA/expenses/" class="bottom-nav-link "><span class="fs-5">💰</span><small>開支</small></a>
+  </div>
+</nav>
+<a href="/CookingMAMA/shopping-list/" id="shopping-bubble" class="shopping-bubble d-none" aria-label="買餸清單"><span>🛒</span><span id="shopping-bubble-count" class="shopping-bubble-count">0</span></a>
+<main class="container app-main flex-grow-1 px-3 py-2"><div id="recipe-custom-app"></div></main>
+<script>window.SMARTCOOK_BASE="/CookingMAMA";window.SMARTCOOK_STATIC=true;window.SMARTCOOK_API_BASE="";</script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="/CookingMAMA/assets/js/smartcook.js?v=20260706"></script>
+<script src="/CookingMAMA/assets/js/cloud-sync.js?v=20260706"></script>
+<script src="/CookingMAMA/assets/js/analytics.js?v=20260706"></script>
+<script src="/CookingMAMA/assets/js/recipe-detail.js?v=20260704"></script>
+<script src="/CookingMAMA/assets/js/recipe-custom-view.js?v=20260704"></script></body></html>
