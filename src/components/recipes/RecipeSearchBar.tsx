@@ -25,7 +25,7 @@ export function RecipeSearchBar() {
 
   return (
     <Form
-      className="recipe-search-bar py-2"
+      className="recipe-search-bar py-2 mb-0"
       role="search"
       onSubmit={(e) => {
         e.preventDefault();

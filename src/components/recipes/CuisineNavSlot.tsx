@@ -4,6 +4,7 @@ import { Suspense } from "react";
 import { usePathname } from "next/navigation";
 import { CuisineNav } from "./CuisineNav";
 import { RecipeSearchBar } from "./RecipeSearchBar";
+import { RecipeIngredientFilterBar } from "./RecipeIngredientFilterBar";
 
 function CuisineNavSlotInner() {
   const pathname = usePathname();
@@ -12,7 +13,10 @@ function CuisineNavSlotInner() {
   return (
     <>
       <CuisineNav />
-      <RecipeSearchBar />
+      <div className="recipe-browse-tools">
+        <RecipeSearchBar />
+        <RecipeIngredientFilterBar />
+      </div>
     </>
   );
 }

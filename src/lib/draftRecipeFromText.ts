@@ -17,16 +17,23 @@ const SYSTEM_PROMPT = `你係香港煮食助手。根據用戶貼上嘅 Instagra
 若果資料唔齊，合理推斷並喺 description 註明「請核對」。材料至少 1 項。`;
 
 export type DraftMode = "ai" | "heuristic";
+export type AiProvider = "groq" | "gemini" | "openai" | "ai-gateway" | "none";
 
 export interface DraftRecipeResult {
   draft: RecipeDraft;
   mode: DraftMode;
-  /** 有冇偵測到 AI key（唔會回傳 key 內容） */
   hasApiKey: boolean;
-  provider: "ai-gateway" | "openai" | "none";
+  provider: AiProvider;
   model?: string;
-  /** AI 失敗原因（方便排查） */
   aiError?: string;
+}
+
+interface ProviderConfig {
+  apiKey: string;
+  provider: Exclude<AiProvider, "none">;
+  baseUrl: string;
+  defaultModel: string;
+  label: string;
 }
 
 function coerceCuisine(value: unknown): CuisineType {
@@ -99,45 +106,129 @@ function extractJsonObject(content: string): unknown {
   }
 }
 
-function resolveProvider(): {
-  apiKey: string;
-  provider: "ai-gateway" | "openai" | "none";
-  baseUrl: string;
-  defaultModel: string;
-} {
-  const gatewayKey = process.env.AI_GATEWAY_API_KEY?.trim() || "";
+/**
+ * 優先用免費方案（Groq / Gemini），再先 OpenAI / Vercel Gateway。
+ * 可用 SMARTCOOK_AI_PROVIDER=groq|gemini|openai|ai-gateway 強制指定。
+ */
+function listProviders(): ProviderConfig[] {
+  const groqKey = process.env.GROQ_API_KEY?.trim() || "";
+  const geminiKey =
+    process.env.GEMINI_API_KEY?.trim() ||
+    process.env.GOOGLE_GENERATIVE_AI_API_KEY?.trim() ||
+    "";
   const openaiKey = process.env.OPENAI_API_KEY?.trim() || "";
+  const gatewayKey = process.env.AI_GATEWAY_API_KEY?.trim() || "";
 
-  if (gatewayKey) {
-    return {
-      apiKey: gatewayKey,
-      provider: "ai-gateway",
-      baseUrl: "https://ai-gateway.vercel.sh/v1",
-      // 較穩陣、平、快；可用 SMARTCOOK_AI_MODEL 覆寫
-      defaultModel: "openai/gpt-4.1-mini",
-    };
+  const all: ProviderConfig[] = [];
+
+  if (groqKey) {
+    all.push({
+      apiKey: groqKey,
+      provider: "groq",
+      baseUrl: "https://api.groq.com/openai/v1",
+      defaultModel: "llama-3.3-70b-versatile",
+      label: "Groq（免費額度）",
+    });
+  }
+
+  if (geminiKey) {
+    all.push({
+      apiKey: geminiKey,
+      provider: "gemini",
+      baseUrl: "https://generativelanguage.googleapis.com/v1beta/openai",
+      defaultModel: "gemini-2.0-flash",
+      label: "Google Gemini（免費額度）",
+    });
   }
 
   if (openaiKey) {
-    return {
+    all.push({
       apiKey: openaiKey,
       provider: "openai",
       baseUrl: "https://api.openai.com/v1",
       defaultModel: "gpt-4.1-mini",
-    };
+      label: "OpenAI",
+    });
   }
 
-  return {
-    apiKey: "",
-    provider: "none",
-    baseUrl: "",
-    defaultModel: "",
+  if (gatewayKey) {
+    all.push({
+      apiKey: gatewayKey,
+      provider: "ai-gateway",
+      baseUrl: "https://ai-gateway.vercel.sh/v1",
+      defaultModel: "openai/gpt-4.1-mini",
+      label: "Vercel AI Gateway（要綁卡）",
+    });
+  }
+
+  const forced = process.env.SMARTCOOK_AI_PROVIDER?.trim().toLowerCase();
+  if (forced) {
+    const match = all.filter((p) => p.provider === forced);
+    if (match.length > 0) return match;
+  }
+
+  return all;
+}
+
+function resolveProvider(): ProviderConfig | null {
+  return listProviders()[0] ?? null;
+}
+
+async function callChatCompletion(
+  provider: ProviderConfig,
+  text: string,
+  sourceUrl?: string
+): Promise<{ content: string; model: string }> {
+  const model = process.env.SMARTCOOK_AI_MODEL?.trim() || provider.defaultModel;
+  const res = await fetch(`${provider.baseUrl}/chat/completions`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${provider.apiKey}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      model,
+      temperature: 0.2,
+      messages: [
+        { role: "system", content: SYSTEM_PROMPT },
+        {
+          role: "user",
+          content: `來源連結：${sourceUrl || "（無）"}\n\n貼文內容：\n${text.slice(0, 6000)}`,
+        },
+      ],
+    }),
+    signal: AbortSignal.timeout(30000),
+  });
+
+  const rawText = await res.text();
+  if (!res.ok) {
+    let detail = rawText.slice(0, 400);
+    try {
+      const errJson = JSON.parse(rawText) as {
+        error?: { message?: string } | string;
+        message?: string;
+      };
+      if (typeof errJson.error === "string") detail = errJson.error;
+      else if (errJson.error && typeof errJson.error === "object" && errJson.error.message) {
+        detail = errJson.error.message;
+      } else if (errJson.message) detail = errJson.message;
+    } catch {
+      /* keep detail */
+    }
+    throw new Error(`${provider.label} 失敗 (${res.status}): ${detail}`);
+  }
+
+  const json = JSON.parse(rawText) as {
+    choices?: Array<{ message?: { content?: string } }>;
   };
+  const content = json.choices?.[0]?.message?.content;
+  if (!content) throw new Error(`${provider.label} 冇回傳內容`);
+  return { content, model };
 }
 
 /**
- * 若設定咗 AI Gateway／OpenAI key，用 LLM 整理；否則用規則解析。
- * AI 失敗時會帶 aiError，方便前端顯示真正原因。
+ * 若設定咗 AI key，用 LLM 整理；否則用規則解析。
+ * 會按優先序嘗試：Groq → Gemini → OpenAI → AI Gateway。
  */
 export async function draftRecipeFromText(
   text: string,
@@ -146,16 +237,16 @@ export async function draftRecipeFromText(
   const heuristic = parseRecipeText(text, { sourceUrl: options?.sourceUrl });
   if (options?.imageUrl) heuristic.imageUrl = options.imageUrl;
 
-  const { apiKey, provider, baseUrl, defaultModel } = resolveProvider();
+  const providers = listProviders();
 
-  if (!apiKey || provider === "none") {
+  if (providers.length === 0) {
     return {
       draft: heuristic,
       mode: "heuristic",
       hasApiKey: false,
       provider: "none",
       aiError:
-        "伺服器偵測唔到 AI_GATEWAY_API_KEY / OPENAI_API_KEY。若已喺 Vercel 加咗，請 Redeploy；本機請加 .env.local 後重開 npm run dev。",
+        "伺服器偵測唔到 AI key。建議加免費 GROQ_API_KEY（見 .env.example）。Vercel 加完要 Redeploy；本機要 .env.local 後重開 npm run dev。",
     };
   }
 
@@ -164,115 +255,65 @@ export async function draftRecipeFromText(
       draft: heuristic,
       mode: "heuristic",
       hasApiKey: true,
-      provider,
+      provider: providers[0].provider,
       aiError: "文字太短，無法用 AI 整理。",
     };
   }
 
-  const model = process.env.SMARTCOOK_AI_MODEL?.trim() || defaultModel;
+  const errors: string[] = [];
 
-  try {
-    const res = await fetch(`${baseUrl}/chat/completions`, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${apiKey}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model,
-        temperature: 0.2,
-        messages: [
-          { role: "system", content: SYSTEM_PROMPT },
-          {
-            role: "user",
-            content: `來源連結：${options?.sourceUrl || "（無）"}\n\n貼文內容：\n${text.slice(0, 6000)}`,
-          },
-        ],
-      }),
-      signal: AbortSignal.timeout(30000),
-    });
-
-    const rawText = await res.text();
-    if (!res.ok) {
-      let detail = rawText.slice(0, 400);
-      try {
-        const errJson = JSON.parse(rawText) as {
-          error?: { message?: string } | string;
-          message?: string;
-        };
-        if (typeof errJson.error === "string") detail = errJson.error;
-        else if (errJson.error?.message) detail = errJson.error.message;
-        else if (errJson.message) detail = errJson.message;
-      } catch {
-        /* keep detail */
+  for (const provider of providers) {
+    try {
+      const { content, model } = await callChatCompletion(
+        provider,
+        text,
+        options?.sourceUrl
+      );
+      const parsed = extractJsonObject(content);
+      const draft = normalizeAiDraft(parsed, options?.sourceUrl);
+      if (!draft) {
+        errors.push(`${provider.label}: JSON 格式唔啱（缺菜名）`);
+        continue;
       }
+      if (options?.imageUrl) draft.imageUrl = options.imageUrl;
       return {
-        draft: heuristic,
-        mode: "heuristic",
+        draft,
+        mode: "ai",
         hasApiKey: true,
-        provider,
+        provider: provider.provider,
         model,
-        aiError: `AI API 失敗 (${res.status}): ${detail}${
-          /credit card/i.test(detail)
-            ? " → 解法：去 Vercel AI Gateway 綁信用卡解鎖免費額度，或改用 OPENAI_API_KEY（唔經 Gateway）。"
-            : ""
-        }`,
       };
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      errors.push(message);
     }
-
-    const json = JSON.parse(rawText) as {
-      choices?: Array<{ message?: { content?: string } }>;
-    };
-    const content = json.choices?.[0]?.message?.content;
-    if (!content) {
-      return {
-        draft: heuristic,
-        mode: "heuristic",
-        hasApiKey: true,
-        provider,
-        model,
-        aiError: "AI 冇回傳內容",
-      };
-    }
-
-    const parsed = extractJsonObject(content);
-    const draft = normalizeAiDraft(parsed, options?.sourceUrl);
-    if (!draft) {
-      return {
-        draft: heuristic,
-        mode: "heuristic",
-        hasApiKey: true,
-        provider,
-        model,
-        aiError: "AI JSON 格式唔啱（缺菜名）",
-      };
-    }
-    if (options?.imageUrl) draft.imageUrl = options.imageUrl;
-    return {
-      draft,
-      mode: "ai",
-      hasApiKey: true,
-      provider,
-      model,
-    };
-  } catch (error) {
-    const message = error instanceof Error ? error.message : String(error);
-    return {
-      draft: heuristic,
-      mode: "heuristic",
-      hasApiKey: true,
-      provider,
-      model,
-      aiError: `AI 呼叫出錯: ${message}`,
-    };
   }
+
+  return {
+    draft: heuristic,
+    mode: "heuristic",
+    hasApiKey: true,
+    provider: providers[0].provider,
+    model: process.env.SMARTCOOK_AI_MODEL?.trim() || providers[0].defaultModel,
+    aiError: `${errors.join(" | ")} → 建議改用免費 GROQ_API_KEY（console.groq.com），或綁 Vercel 信用卡。`,
+  };
 }
 
 export function getAiConfigStatus() {
-  const { apiKey, provider, defaultModel } = resolveProvider();
+  const providers = listProviders();
+  const primary = providers[0] ?? null;
   return {
-    hasApiKey: Boolean(apiKey),
-    provider,
-    model: process.env.SMARTCOOK_AI_MODEL?.trim() || defaultModel || null,
+    hasApiKey: Boolean(primary),
+    provider: primary?.provider ?? "none",
+    model: primary
+      ? process.env.SMARTCOOK_AI_MODEL?.trim() || primary.defaultModel
+      : null,
+    availableProviders: providers.map((p) => p.provider),
+    tip:
+      primary?.provider === "ai-gateway"
+        ? "而家優先用 AI Gateway（要綁卡）。想免費可用：加 GROQ_API_KEY，系統會自動優先用 Groq。"
+        : primary
+          ? `而家用 ${primary.label}`
+          : "未設定 AI key；建議加免費 GROQ_API_KEY",
   };
 }

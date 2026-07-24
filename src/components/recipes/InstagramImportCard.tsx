@@ -30,12 +30,16 @@ export function InstagramImportCard({ onApplyDraft }: InstagramImportCardProps) 
         };
         if (cancelled) return;
         if (json.ai?.hasApiKey) {
+          const tip =
+            json.ai.provider === "ai-gateway"
+              ? "（Gateway 要綁卡；想免費可加 GROQ_API_KEY）"
+              : "";
           setAiStatus(
-            `AI 已就緒（${json.ai.provider}${json.ai.model ? ` / ${json.ai.model}` : ""}）`
+            `AI 已就緒（${json.ai.provider}${json.ai.model ? ` / ${json.ai.model}` : ""}）${tip}`
           );
         } else {
           setAiStatus(
-            "伺服器未偵測到 AI key。Vercel 加完 env 後要 Redeploy；本機要有 .env.local 並重開 dev。"
+            "伺服器未偵測到 AI key。免費方案：加 GROQ_API_KEY（console.groq.com），Vercel Redeploy／本機 .env.local 後重開。"
           );
         }
       } catch {

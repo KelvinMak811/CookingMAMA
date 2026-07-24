@@ -34,7 +34,7 @@ function resolveActiveCuisine(pathname: string): CuisineFilter {
 export function CuisineNav() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const searchQuery = searchParams.get("q");
+  const preservedQuery = searchParams.toString();
   const active = resolveActiveCuisine(pathname);
   const { recipes: customRecipes } = useCustomRecipes();
   const fridgeItems = useFridgeStore((s) => s.items);
@@ -59,22 +59,24 @@ export function CuisineNav() {
   return (
     <nav className="cuisine-nav-sticky border-bottom py-1 mb-0" aria-label="菜式類別">
       <div className="date-nav-scroll">
-        <Nav variant="pills" className="flex-nowrap gap-2">
+        <Nav variant="pills" className="flex-nowrap gap-1">
           {navItems.map((item) => {
             const isActive = active === item.value;
             return (
               <Nav.Item key={item.value}>
                 <AppLink
                   href={
-                    searchQuery
-                      ? `${item.href}?q=${encodeURIComponent(searchQuery)}`
-                      : item.href
+                    preservedQuery ? `${item.href}?${preservedQuery}` : item.href
                   }
-                  className={`nav-link rounded-3 d-flex align-items-center gap-1 px-3 ${isActive ? "active" : ""}`}
+                  className={`nav-link cuisine-nav-btn rounded-2 d-flex align-items-center gap-1 ${isActive ? "active" : ""}`}
                 >
-                  <span>{item.icon}</span>
-                  <span>{item.label}</span>
-                  <span className={`badge rounded-pill ${isActive ? "bg-light text-primary" : "bg-secondary-subtle text-secondary"}`}>
+                  <span className="cuisine-nav-btn-icon">{item.icon}</span>
+                  <span className="cuisine-nav-btn-label">{item.label}</span>
+                  <span
+                    className={`badge rounded-pill cuisine-nav-btn-count ${
+                      isActive ? "bg-light text-primary" : "bg-secondary-subtle text-secondary"
+                    }`}
+                  >
                     {item.count}
                   </span>
                 </AppLink>

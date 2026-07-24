@@ -15,7 +15,7 @@ export function RecipeGrid({ recipes, fridgeMatches }: RecipeGridProps) {
   );
 
   return (
-    <Row xs={1} sm={2} lg={3} className="g-3">
+    <Row xs={2} className="g-2">
       {recipes.map((recipe) => (
         <Col key={recipe.id}>
           <RecipeCard recipe={recipe} fridgeMatch={matchMap.get(recipe.id)} />
