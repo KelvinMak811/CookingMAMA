@@ -77,18 +77,19 @@ function head(title, description) {
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-<link href="${asset("assets/css/style.css?v=20260704")}" rel="stylesheet">
+<link href="${asset("assets/css/style.css?v=20260727")}" rel="stylesheet">
 </head>`;
 }
 
-function header({ showBack = false, title = "", backHref = page("recipes/"), recipesActive = false, current = "" }) {
+function header({ showBack = false, title = "", backHref = page("recipes/"), recipesActive = false, fitnessActive = false, current = "" }) {
+  const modeActive = current === "mode";
   return `<header class="navbar navbar-light bg-white border-bottom sticky-top shadow-sm app-navbar">
   <div class="container app-main px-3 py-0">
     <div class="d-flex align-items-center w-100 gap-2 app-navbar-inner">
       ${showBack
         ? `<a href="${h(backHref)}" class="btn btn-light btn-sm rounded-3 flex-shrink-0" aria-label="返回">←</a>
            ${title ? `<span class="mb-0 fw-bold text-truncate flex-grow-1 min-w-0">${h(title)}</span>` : ""}`
-        : `<a href="${page("recipes/")}" class="d-flex align-items-center gap-2 text-decoration-none min-w-0 flex-grow-1">
+        : `<a href="${page("")}" class="d-flex align-items-center gap-2 text-decoration-none min-w-0 flex-grow-1">
              <span class="app-navbar-icon">🍳</span>
              ${title ? `<span class="fw-bold text-dark text-truncate">${h(title)}</span>` : `<span class="fw-bold text-primary">SmartCook</span>`}
            </a>`}
@@ -100,12 +101,15 @@ function header({ showBack = false, title = "", backHref = page("recipes/"), rec
           <ul class="dropdown-menu dropdown-menu-end shadow-sm">
             <li><a class="dropdown-item" href="${page("history/")}">📅 煮食日曆</a></li>
             <li><a class="dropdown-item" href="${page("shopping-list/")}">🛒 買餸清單</a></li>
+            <li><a class="dropdown-item" href="${page("fitness/")}">🏃 運動計劃</a></li>
             <li><hr class="dropdown-divider"></li>
             <li><a class="dropdown-item" href="${page("account/")}">🔄 切換帳戶</a></li>
           </ul>
         </div>
         <nav class="d-none d-md-flex gap-1">
+        <a href="${page("")}" class="nav-link rounded-3 px-3 py-2 ${modeActive ? "bg-primary-subtle text-primary fw-semibold" : "text-secondary"}">模式</a>
         <a href="${page("recipes/")}" class="nav-link rounded-3 px-3 py-2 ${recipesActive ? "bg-primary-subtle text-primary fw-semibold" : "text-secondary"}">菜式庫</a>
+        <a href="${page("fitness/")}" class="nav-link rounded-3 px-3 py-2 ${fitnessActive ? "bg-primary-subtle text-primary fw-semibold" : "text-secondary"}">運動計劃</a>
         <a href="${page("shopping-list/")}" class="nav-link rounded-3 px-3 py-2 ${current === "shopping" ? "bg-primary-subtle text-primary fw-semibold" : "text-secondary"}">買餸清單</a>
         <a href="${page("history/")}" class="nav-link rounded-3 px-3 py-2 ${current === "history" ? "bg-primary-subtle text-primary fw-semibold" : "text-secondary"}">煮食日曆</a>
         <a href="${page("expenses/")}" class="nav-link rounded-3 px-3 py-2 ${current === "expenses" ? "bg-primary-subtle text-primary fw-semibold" : "text-secondary"}">開支紀錄</a>
@@ -116,7 +120,9 @@ function header({ showBack = false, title = "", backHref = page("recipes/"), rec
 </header>
 <nav class="fixed-bottom bg-white border-top d-md-none bottom-nav safe-area-bottom" aria-label="主要導航">
   <div class="d-flex justify-content-around">
+    <a href="${page("")}" class="bottom-nav-link ${modeActive ? "active" : ""}"><span class="fs-5">🧭</span><small>模式</small></a>
     <a href="${page("recipes/")}" class="bottom-nav-link ${recipesActive ? "active" : ""}"><span class="fs-5">📖</span><small>菜式</small></a>
+    <a href="${page("fitness/")}" class="bottom-nav-link ${fitnessActive ? "active" : ""}"><span class="fs-5">🏃</span><small>運動</small></a>
     <a href="${page("shopping-list/")}" class="bottom-nav-link ${current === "shopping" ? "active" : ""}"><span class="fs-5">🛒</span><small>買餸</small></a>
     <a href="${page("history/")}" class="bottom-nav-link ${current === "history" ? "active" : ""}"><span class="fs-5">📅</span><small>日曆</small></a>
     <a href="${page("expenses/")}" class="bottom-nav-link ${current === "expenses" ? "active" : ""}"><span class="fs-5">💰</span><small>開支</small></a>
@@ -271,7 +277,77 @@ ${header({ showBack: true, title: "自訂菜式", backHref: page("recipes/"), re
 <main class="container app-main flex-grow-1 px-3 py-2"><div id="recipe-custom-app"></div></main>
 ${footer([asset("assets/js/recipe-detail.js?v=20260704"), asset("assets/js/recipe-custom-view.js?v=20260704")])}</body></html>`);
 
-writeOut("index.html", `<!DOCTYPE html><html lang="zh-HK"><head><meta charset="utf-8"><title>SmartCook</title><script>(function(){var base=${JSON.stringify(BASE)};var user=localStorage.getItem("smartcook_current_user");location.replace(user?base+"/recipes/":base+"/account/");})();</script></head><body></body></html>`);
+writeOut(
+  "index.html",
+  `<!DOCTYPE html><html lang="zh-HK">${head("SmartCook & SmartFit — 揀煮野食定做運動", "一站式生活助手：煮食菜式庫加上新手友善運動計劃。")}
+<body class="landing-page">
+<main class="container app-main px-3 py-4 py-md-5">
+  <section class="mode-hero">
+    <span class="mode-hero-badge">SmartCook + SmartFit</span>
+    <h1 class="display-6 fw-bold mb-3">今日想照顧自己邊一面？</h1>
+    <p class="lead text-secondary mb-4">
+      同一個 CookingMAMA 框架，延伸到煮食同運動。你可以繼續揀菜式、記錄買餸，
+      亦可以根據身體質素、可用時間、器材、傷患同目標，生成一份新手友善訓練計劃。
+    </p>
+    <div class="mode-hero-actions">
+      <a href="${page("recipes/")}" class="btn btn-primary btn-lg">去煮野食</a>
+      <a href="${page("fitness/")}" class="btn btn-outline-primary btn-lg">去做運動</a>
+    </div>
+  </section>
+  <section class="row g-3 mt-1">
+    <div class="col-12 col-md-6">
+      <a href="${page("recipes/")}" class="mode-card text-decoration-none text-dark d-block h-100">
+        <div class="d-flex align-items-start justify-content-between gap-3 mb-3">
+          <div>
+            <div class="mode-card-kicker">Cooking</div>
+            <h2 class="h4 fw-bold mb-2">SmartCook 菜式模式</h2>
+          </div>
+          <div class="mode-card-icon" aria-hidden="true">🍳</div>
+        </div>
+        <p class="text-secondary mb-3">進入現有菜式庫、買餸清單、煮食日曆同自訂食譜流程，照舊管理每日飲食。</p>
+        <ul class="mode-feature-list mb-0"><li>按菜系搵餸</li><li>收藏與管理食材</li><li>安排煮食日程</li></ul>
+      </a>
+    </div>
+    <div class="col-12 col-md-6">
+      <a href="${page("fitness/")}" class="mode-card text-decoration-none text-dark d-block h-100">
+        <div class="d-flex align-items-start justify-content-between gap-3 mb-3">
+          <div>
+            <div class="mode-card-kicker">Fitness</div>
+            <h2 class="h4 fw-bold mb-2">SmartFit 運動模式</h2>
+          </div>
+          <div class="mode-card-icon" aria-hidden="true">🏃</div>
+        </div>
+        <p class="text-secondary mb-3">填得越詳細，分析越準。系統會按你嘅目標、體能、時間、睡眠、壓力、器材同傷患，整理出一份新手訓練週計劃。</p>
+        <ul class="mode-feature-list mb-0"><li>超詳細身體資料表</li><li>新手安全漸進編排</li><li>附官方動作參考來源</li></ul>
+      </a>
+    </div>
+  </section>
+  <section class="mode-summary mt-4">
+    <div class="row g-3">
+      <div class="col-12 col-lg-4"><div class="mode-summary-card h-100"><h3 class="h6 fw-bold">1. 詳盡評估</h3><p class="small text-secondary mb-0">年齡、身高體重、日常活動量、睡眠、壓力、久坐程度、傷患、設備、偏好同禁忌都可以記錄。</p></div></div>
+      <div class="col-12 col-lg-4"><div class="mode-summary-card h-100"><h3 class="h6 fw-bold">2. 初學者友善</h3><p class="small text-secondary mb-0">先建立習慣、活動度、關節控制同基本力量，再慢慢加量，避免一開始過度操練。</p></div></div>
+      <div class="col-12 col-lg-4"><div class="mode-summary-card h-100"><h3 class="h6 fw-bold">3. 可跟住做</h3><p class="small text-secondary mb-0">每星期會有具體日程、RPE 強度提示、進度建議、恢復提醒，同埋動作參考連結。</p></div></div>
+    </div>
+  </section>
+</main>
+<script>window.SMARTCOOK_BASE=${JSON.stringify(BASE)};window.SMARTCOOK_STATIC=true;window.SMARTCOOK_API_BASE=${JSON.stringify(readSyncApiUrl())};</script>
+</body></html>`
+);
+
+const fitnessPhp = readFileSync(join(PHP_SITE, "fitness.php"), "utf8");
+const fitnessMainMatch = fitnessPhp.match(/<main[\s\S]*?<\/main>/);
+if (!fitnessMainMatch) {
+  throw new Error("Could not extract <main> from php-site/fitness.php");
+}
+writeOut(
+  "fitness/index.html",
+  `<!DOCTYPE html><html lang="zh-HK">${head("運動計劃 — SmartFit", "按身體質素、時間、目標、器材同傷患，生成新手友善運動訓練計劃。")}
+<body class="d-flex flex-column min-vh-100">
+${header({ title: "運動計劃", fitnessActive: true, current: "fitness" })}
+${fitnessMainMatch[0]}
+${footer([asset("assets/js/workout-planner.js?v=20260727")])}</body></html>`
+);
+
 cpSync(join(OUT, "recipes/index.html"), join(OUT, "404.html"));
 
-console.log(`Done — ${recipes.length} recipe pages in ${OUT}`);
+console.log(`Done — ${recipes.length} recipe pages + fitness landing in ${OUT}`);
