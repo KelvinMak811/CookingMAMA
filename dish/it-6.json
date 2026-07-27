@@ -1,0 +1,45 @@
+{
+  "id": "it-6",
+  "name": "肉丸番茄意粉",
+  "cuisine": "italian",
+  "baseServings": 3,
+  "description": "意式肉丸面，易洁锅煎肉丸再煮酱，小朋友都爱吃。",
+  "difficulty": 2,
+  "prepTime": 35,
+  "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/73/Spaghetti_and_meatballs.jpg/960px-Spaghetti_and_meatballs.jpg",
+  "ingredients": [
+    {
+      "id": "it6-1",
+      "name": "意粉",
+      "amount": "300g"
+    },
+    {
+      "id": "it6-2",
+      "name": "免治牛肉",
+      "amount": "300g"
+    },
+    {
+      "id": "it6-3",
+      "name": "番茄罐头",
+      "amount": "1罐"
+    },
+    {
+      "id": "it6-4",
+      "name": "面包糠",
+      "amount": "2汤匙"
+    },
+    {
+      "id": "it6-5",
+      "name": "鸡蛋",
+      "amount": "1只"
+    }
+  ],
+  "steps": [
+    "免治牛肉、面包糠、1隻蛋加少許鹽同黑胡椒拌勻，搓成約3厘米直徑肉丸（約12至15粒）。",
+    "意粉按包裝時間煮好瀝乾備用。",
+    "易潔鑊中火加少許油，下肉丸煎至四面金黃，約每面2至3分鐘，盛起。",
+    "同一鑊倒入番茄罐頭連汁煮滾，轉中小火燜5分鐘。",
+    "放回肉丸，蓋蓋燜煮約10至12分鐘，至肉丸熟透、醬汁收濃。",
+    "拌入意粉兜勻，或將肉丸同醬汁淋在麵上即可。"
+  ]
+}

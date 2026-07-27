@@ -1,0 +1,45 @@
+{
+  "id": "j-7",
+  "name": "姜烧猪肉",
+  "cuisine": "japanese",
+  "baseServings": 2,
+  "description": "日式姜烧猪肉，易洁锅煎炒，酸甜开胃。",
+  "difficulty": 1,
+  "prepTime": 20,
+  "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/6/65/Shogayaki.jpg",
+  "ingredients": [
+    {
+      "id": "j7-1",
+      "name": "猪肉片",
+      "amount": "300g"
+    },
+    {
+      "id": "j7-2",
+      "name": "生姜",
+      "amount": "1块"
+    },
+    {
+      "id": "j7-3",
+      "name": "日式酱油",
+      "amount": "2汤匙"
+    },
+    {
+      "id": "j7-4",
+      "name": "味醂",
+      "amount": "2汤匙"
+    },
+    {
+      "id": "j7-5",
+      "name": "洋葱",
+      "amount": "半个"
+    }
+  ],
+  "steps": [
+    "生薑磨蓉取汁；半個洋蔥切半厘米幼絲；日式醬油、味醂、姜汁加2湯匙水調成姜燒汁。",
+    "豬肉片放入一半姜燒汁醃約10分鐘。",
+    "易潔鑊中火少油，下洋蔥絲炒2分鐘至軟身、略透明。",
+    "鋪入豬肉片，大火快炒約2至3分鐘至肉變色、剛熟。",
+    "倒入剩餘姜燒汁，煮滾後轉中火收汁約1至2分鐘，汁掛肉、略帶光澤。",
+    "起鑊配白飯或蔬菜同食。"
+  ]
+}
