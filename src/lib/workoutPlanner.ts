@@ -25,6 +25,18 @@ export type PrimaryGoal =
   | "posture"
   | "cardio";
 
+export type ActivityInterestId =
+  | "gym"
+  | "football"
+  | "swimming"
+  | "running"
+  | "basketball"
+  | "badminton"
+  | "cycling"
+  | "yoga"
+  | "hiking"
+  | "other";
+
 export interface WorkoutProfile {
   nickname: string;
   age: number;
@@ -51,6 +63,7 @@ export interface WorkoutProfile {
   equipment: EquipmentId[];
   locationPreference: "home" | "gym" | "outdoor" | "mixed";
   trainingPreference: "balanced" | "strength" | "cardio" | "mobility";
+  interests: ActivityInterestId[];
   notes: string;
 }
 
@@ -231,6 +244,7 @@ export const DEFAULT_PROFILE: WorkoutProfile = {
   equipment: ["none"],
   locationPreference: "home",
   trainingPreference: "balanced",
+  interests: ["gym"],
   notes: "",
 };
 
@@ -260,6 +274,7 @@ export const SAMPLE_PROFILE: WorkoutProfile = {
   equipment: ["mat", "bands", "bench"],
   locationPreference: "home",
   trainingPreference: "balanced",
+  interests: ["gym", "football"],
   notes: "平日晚飯前做最好，星期六可以行耐啲。",
 };
 

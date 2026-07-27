@@ -1,16 +1,17 @@
 "use client";
 
 import { AppLink } from "@/components/layout/AppLink";
-import { mainNavItems } from "@/components/layout/navItems";
+import { navItemsForPath } from "@/components/layout/navItems";
 import { usePathname } from "next/navigation";
 
 export function BottomNav() {
   const pathname = usePathname();
+  const items = navItemsForPath(pathname);
 
   return (
     <footer className="app-bottom-nav-shell" aria-label="主要導航">
       <nav className="app-bottom-nav">
-        {mainNavItems.map((item) => {
+        {items.map((item) => {
           const exact = "exact" in item && item.exact;
           const isActive = exact
             ? pathname === item.href

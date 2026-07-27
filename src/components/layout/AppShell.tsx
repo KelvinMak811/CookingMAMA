@@ -1,7 +1,11 @@
+"use client";
+
 import { Header } from "./Header";
 import { BottomNav } from "./BottomNav";
 import { ShoppingBubble } from "@/components/shopping/ShoppingBubble";
 import { CuisineNavSlot } from "@/components/recipes/CuisineNavSlot";
+import { resolveNavMode } from "@/components/layout/navItems";
+import { usePathname } from "next/navigation";
 
 interface AppShellProps {
   children: React.ReactNode;
@@ -16,12 +20,18 @@ export function AppShell({
   showBack,
   backHref,
 }: AppShellProps) {
+  const pathname = usePathname();
+  const navMode = resolveNavMode(pathname);
+  const showCuisineNav = navMode === "cook";
+
   return (
     <div className="d-flex flex-column app-shell">
       <Header title={title} showBack={showBack} backHref={backHref} />
-      <div className="container app-main px-3">
-        <CuisineNavSlot />
-      </div>
+      {showCuisineNav ? (
+        <div className="container app-main px-3">
+          <CuisineNavSlot />
+        </div>
+      ) : null}
       <main className="container app-main flex-grow-1 px-3 py-2">
         {children}
       </main>

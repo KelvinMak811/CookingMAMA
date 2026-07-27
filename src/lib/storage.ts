@@ -11,6 +11,7 @@ export const STORAGE_KEYS = {
   MEAL_PLAN: "smartcook_meal_plan",
   FRIDGE: "smartcook_fridge",
   CUSTOM_RECIPES: "smartcook_custom_recipes",
+  NUTRITION: "smartcook_nutrition",
 } as const;
 
 export type StorageKey = (typeof STORAGE_KEYS)[keyof typeof STORAGE_KEYS];

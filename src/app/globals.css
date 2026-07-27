@@ -624,3 +624,73 @@ body {
   }
 }
 
+.fitness-calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 0.5rem;
+}
+
+@media (max-width: 767.98px) {
+  .fitness-calendar-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.fitness-calendar-cell {
+  border: 1px solid #e5e7eb;
+  border-radius: 0.75rem;
+  padding: 0.55rem;
+  min-height: 5.5rem;
+  background: #fafafa;
+}
+
+.fitness-calendar-cell.has-session {
+  background: #fff7ed;
+  border-color: #fed7aa;
+}
+
+.fitness-calendar-weekday {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #9a3412;
+  margin-bottom: 0.35rem;
+}
+
+.fitness-calendar-link {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+}
+
+.fitness-schedule-timeline {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.fitness-schedule-timeline li {
+  display: flex;
+  gap: 0.75rem;
+  padding: 0.45rem 0;
+  border-bottom: 1px dashed #e5e7eb;
+}
+
+.fitness-schedule-time {
+  font-weight: 700;
+  color: #ea580c;
+  min-width: 3.2rem;
+}
+
+.activity-suggestion-card {
+  border: 1px solid #e5e7eb;
+  border-radius: 0.9rem;
+  padding: 1rem;
+  background: #fff;
+}
+
+.nutrition-photo-preview {
+  width: 100%;
+  max-height: 220px;
+  object-fit: cover;
+}
+

@@ -1,15 +1,20 @@
 "use client";
 
 import { FormEvent, useEffect, useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
 import {
   DEFAULT_PROFILE,
   EQUIPMENT_OPTIONS,
   SAMPLE_PROFILE,
   generateWorkoutPlan,
+  type ActivityInterestId,
   type EquipmentId,
   type GeneratedPlan,
   type WorkoutProfile,
 } from "@/lib/workoutPlanner";
+import { ACTIVITY_OPTIONS } from "@/lib/activityPlans";
+import { saveFitnessPlan } from "@/lib/fitnessPlanStorage";
+import { AppLink } from "@/components/layout/AppLink";
 import { getAccountName } from "@/lib/accounts";
 import { useAccountStore } from "@/stores/accountStore";
 
@@ -54,6 +59,7 @@ function toggleEquipment(
 }
 
 export function FitnessPlannerClient() {
+  const router = useRouter();
   const currentUserId = useAccountStore((s) => s.currentUserId);
   const userKey = currentUserId || "guest";
   const fallbackName = currentUserId ? getAccountName(currentUserId) : "你";
@@ -64,7 +70,7 @@ export function FitnessPlannerClient() {
   useEffect(() => {
     const existing = loadStoredProfile(userKey);
     if (existing) {
-      setProfile({ ...DEFAULT_PROFILE, ...existing });
+      setProfile({ ...DEFAULT_PROFILE, ...existing, interests: existing.interests?.length ? existing.interests : ["gym"] });
       setPlan(generateWorkoutPlan(existing, fallbackName));
     }
     setHydrated(true);
@@ -84,16 +90,30 @@ export function FitnessPlannerClient() {
 
   function onSubmit(event: FormEvent) {
     event.preventDefault();
-    const nextPlan = generateWorkoutPlan(profile, fallbackName);
-    setPlan(nextPlan);
     saveStoredProfile(userKey, profile);
+    saveFitnessPlan(userKey, profile, fallbackName);
+    router.push("/fitness/plan");
   }
 
   function loadSample() {
     setProfile(SAMPLE_PROFILE);
-    const nextPlan = generateWorkoutPlan(SAMPLE_PROFILE, fallbackName);
-    setPlan(nextPlan);
     saveStoredProfile(userKey, SAMPLE_PROFILE);
+    saveFitnessPlan(userKey, SAMPLE_PROFILE, fallbackName);
+    router.push("/fitness/plan");
+  }
+
+  function toggleInterest(id: ActivityInterestId) {
+    setProfile((prev) => {
+      const current: ActivityInterestId[] = prev.interests?.length
+        ? prev.interests
+        : ["gym"];
+      const has = current.includes(id);
+      let next: ActivityInterestId[] = has
+        ? current.filter((x) => x !== id)
+        : [...current, id];
+      if (!next.length) next = ["gym"];
+      return { ...prev, interests: next };
+    });
   }
 
   if (!hydrated) {
@@ -459,6 +479,29 @@ export function FitnessPlannerClient() {
                 </select>
               </div>
               <div className="col-12">
+                <label className="form-label d-block">運動興趣（可多選）</label>
+                <p className="small text-secondary mb-2">
+                  會喺日程頁一次過顯示健身、足球、游泳等建議。
+                </p>
+                <div className="chip-check-grid">
+                  {ACTIVITY_OPTIONS.map((option) => {
+                    const checked = (profile.interests || ["gym"]).includes(option.id);
+                    return (
+                      <label key={option.id} className="chip-check">
+                        <input
+                          type="checkbox"
+                          checked={checked}
+                          onChange={() => toggleInterest(option.id)}
+                        />
+                        <span>
+                          {option.emoji} {option.label}
+                        </span>
+                      </label>
+                    );
+                  })}
+                </div>
+              </div>
+              <div className="col-12">
                 <label className="form-label">額外備註</label>
                 <textarea
                   className="form-control"
@@ -491,7 +534,7 @@ export function FitnessPlannerClient() {
                   <div>
                     <h2 className="h5 fw-bold mb-1">你的訓練計劃</h2>
                     <p className="small text-secondary mb-0">
-                      提交表單後，系統會即時生成分析與週計劃。
+                      提交後會開啟新頁面：時間表、日曆、每日影片教學。
                     </p>
                   </div>
                   <span className="badge text-bg-light">4 週入門版</span>
@@ -510,13 +553,16 @@ export function FitnessPlannerClient() {
               <>
                 <div className="d-flex justify-content-between align-items-start gap-2 mb-3">
                   <div>
-                    <h2 className="h5 fw-bold mb-1">{plan.displayName} 的 4 星期入門計劃</h2>
+                    <h2 className="h5 fw-bold mb-1">已儲存計劃預覽</h2>
                     <p className="small text-secondary mb-0">
-                      以新手安全、穩定習慣同逐步進展為核心。
+                      完整時間表、日曆同 YouTube 教學請睇日程頁。
                     </p>
                   </div>
                   <span className="badge text-bg-primary">{plan.goalLabel}</span>
                 </div>
+                <AppLink href="/fitness/plan" className="btn btn-primary w-100 mb-3">
+                  打開訓練日程
+                </AppLink>
 
                 <div className="planner-summary-grid mb-3">
                   {plan.cards.map((card) => (
