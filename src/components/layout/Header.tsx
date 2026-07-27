@@ -31,7 +31,7 @@ export function Header({ title, showBack, backHref = "/recipes" }: HeaderProps) 
             </>
           ) : (
             <AppLink
-              href="/recipes"
+              href="/"
               className="d-flex align-items-center gap-2 text-decoration-none min-w-0 flex-grow-1"
             >
               <span className="app-navbar-icon">🍳</span>

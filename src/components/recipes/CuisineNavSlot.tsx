@@ -8,7 +8,7 @@ import { RecipeFilterChips } from "./RecipeFilterChips";
 
 function CuisineNavSlotInner() {
   const pathname = usePathname();
-  if (!pathname.startsWith("/recipes") && pathname !== "/") return null;
+  if (!pathname.startsWith("/recipes")) return null;
 
   return (
     <>

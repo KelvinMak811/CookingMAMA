@@ -65,6 +65,6 @@ export function getActiveCuisineFromPath(pathname: string): CuisineFilter {
   if (pathname.startsWith("/recipes/fridge")) return "fridge";
   const match = pathname.match(/^\/recipes\/cuisine\/([^/]+)/);
   if (match && isValidCuisine(match[1])) return match[1];
-  if (pathname === "/" || pathname === "/recipes" || pathname.startsWith("/recipes/")) return "all";
+  if (pathname === "/recipes" || pathname.startsWith("/recipes/")) return "all";
   return "all";
 }

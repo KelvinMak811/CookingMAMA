@@ -11,8 +11,10 @@ export function BottomNav() {
     <footer className="app-bottom-nav-shell" aria-label="主要導航">
       <nav className="app-bottom-nav">
         {mainNavItems.map((item) => {
-          const isActive =
-            pathname === item.href || pathname.startsWith(item.href + "/");
+          const exact = "exact" in item && item.exact;
+          const isActive = exact
+            ? pathname === item.href
+            : pathname === item.href || pathname.startsWith(item.href + "/");
           return (
             <div key={item.href} className="app-bottom-nav-item">
               <AppLink
