@@ -4,6 +4,7 @@ $headerTitle = $headerTitle ?? '';
 $backHref = $backHref ?? page_url('recipes.php');
 $current = current_page();
 $recipesActive = in_array($current, ['recipes.php', 'recipes-cuisine.php', 'recipe.php'], true);
+$fitnessActive = $current === 'fitness.php';
 ?>
 <header class="navbar navbar-light bg-white border-bottom sticky-top shadow-sm app-navbar">
   <div class="container app-main px-3 py-0">
@@ -38,7 +39,9 @@ $recipesActive = in_array($current, ['recipes.php', 'recipes-cuisine.php', 'reci
         </div>
 
         <nav class="d-none d-md-flex gap-1">
+        <a href="<?php echo h(page_url('index.php')); ?>" class="nav-link rounded-3 px-3 py-2 <?php echo $current === 'index.php' ? 'bg-primary-subtle text-primary fw-semibold' : 'text-secondary'; ?>">模式</a>
         <a href="<?php echo h(page_url('recipes.php')); ?>" class="nav-link rounded-3 px-3 py-2 <?php echo $recipesActive ? 'bg-primary-subtle text-primary fw-semibold' : 'text-secondary'; ?>">菜式庫</a>
+        <a href="<?php echo h(page_url('fitness.php')); ?>" class="nav-link rounded-3 px-3 py-2 <?php echo $fitnessActive ? 'bg-primary-subtle text-primary fw-semibold' : 'text-secondary'; ?>">運動計劃</a>
         <a href="<?php echo h(page_url('shopping-list.php')); ?>" class="nav-link rounded-3 px-3 py-2 <?php echo $current === 'shopping-list.php' ? 'bg-primary-subtle text-primary fw-semibold' : 'text-secondary'; ?>">買餸清單</a>
         <a href="<?php echo h(page_url('history.php')); ?>" class="nav-link rounded-3 px-3 py-2 <?php echo $current === 'history.php' ? 'bg-primary-subtle text-primary fw-semibold' : 'text-secondary'; ?>">煮食日曆</a>
         <a href="<?php echo h(page_url('expenses.php')); ?>" class="nav-link rounded-3 px-3 py-2 <?php echo $current === 'expenses.php' ? 'bg-primary-subtle text-primary fw-semibold' : 'text-secondary'; ?>">開支紀錄</a>
@@ -50,8 +53,14 @@ $recipesActive = in_array($current, ['recipes.php', 'recipes-cuisine.php', 'reci
 
 <nav class="fixed-bottom bg-white border-top d-md-none bottom-nav safe-area-bottom" aria-label="主要導航">
   <div class="d-flex justify-content-around">
+    <a href="<?php echo h(page_url('index.php')); ?>" class="bottom-nav-link <?php echo $current === 'index.php' ? 'active' : ''; ?>">
+      <span class="fs-5">🧭</span><small>模式</small>
+    </a>
     <a href="<?php echo h(page_url('recipes.php')); ?>" class="bottom-nav-link <?php echo $recipesActive ? 'active' : ''; ?>">
       <span class="fs-5">📖</span><small>菜式</small>
+    </a>
+    <a href="<?php echo h(page_url('fitness.php')); ?>" class="bottom-nav-link <?php echo $fitnessActive ? 'active' : ''; ?>">
+      <span class="fs-5">🏃</span><small>運動</small>
     </a>
     <a href="<?php echo h(page_url('shopping-list.php')); ?>" class="bottom-nav-link <?php echo $current === 'shopping-list.php' ? 'active' : ''; ?>">
       <span class="fs-5">🛒</span><small>買餸</small>

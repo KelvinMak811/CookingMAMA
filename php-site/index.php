@@ -1,22 +1,90 @@
 <?php
 require_once __DIR__ . '/includes/bootstrap.php';
-$base = base_path();
+$pageTitle = 'SmartCook & SmartFit — 揀煮野食定做運動';
+$pageDescription = '一站式生活助手：煮食菜式庫加上新手友善運動計劃，按你嘅身體質素同時間表去安排。';
 ?>
 <!DOCTYPE html>
 <html lang="zh-HK">
-<head>
-  <meta charset="utf-8">
-  <title>SmartCook</title>
-  <script>
-    (function () {
-      var base = <?php echo json_encode($base !== '' ? $base : ''); ?>;
-      var user = localStorage.getItem('smartcook_current_user');
-      var target = user
-        ? (base ? base + '/recipes.php' : 'recipes.php')
-        : (base ? base + '/account.php' : 'account.php');
-      location.replace(target);
-    })();
-  </script>
-</head>
-<body></body>
+<?php include __DIR__ . '/head.html'; ?>
+<body class="landing-page">
+<main class="container app-main px-3 py-4 py-md-5">
+  <section class="mode-hero">
+    <span class="mode-hero-badge">SmartCook + SmartFit</span>
+    <h1 class="display-6 fw-bold mb-3">今日想照顧自己邊一面？</h1>
+    <p class="lead text-secondary mb-4">
+      同一個 CookingMAMA 框架，延伸到煮食同運動。你可以繼續揀菜式、記錄買餸，
+      亦可以根據身體質素、可用時間、器材、傷患同目標，生成一份新手友善訓練計劃。
+    </p>
+    <div class="mode-hero-actions">
+      <a href="<?php echo h(page_url('recipes.php')); ?>" class="btn btn-primary btn-lg">去煮野食</a>
+      <a href="<?php echo h(page_url('fitness.php')); ?>" class="btn btn-outline-primary btn-lg">去做運動</a>
+    </div>
+  </section>
+
+  <section class="row g-3 mt-1">
+    <div class="col-12 col-md-6">
+      <a href="<?php echo h(page_url('recipes.php')); ?>" class="mode-card text-decoration-none text-dark d-block h-100">
+        <div class="d-flex align-items-start justify-content-between gap-3 mb-3">
+          <div>
+            <div class="mode-card-kicker">Cooking</div>
+            <h2 class="h4 fw-bold mb-2">SmartCook 菜式模式</h2>
+          </div>
+          <div class="mode-card-icon" aria-hidden="true">🍳</div>
+        </div>
+        <p class="text-secondary mb-3">
+          進入現有菜式庫、買餸清單、煮食日曆同自訂食譜流程，照舊管理每日飲食。
+        </p>
+        <ul class="mode-feature-list mb-0">
+          <li>按菜系搵餸</li>
+          <li>收藏與管理食材</li>
+          <li>安排煮食日程</li>
+        </ul>
+      </a>
+    </div>
+
+    <div class="col-12 col-md-6">
+      <a href="<?php echo h(page_url('fitness.php')); ?>" class="mode-card text-decoration-none text-dark d-block h-100">
+        <div class="d-flex align-items-start justify-content-between gap-3 mb-3">
+          <div>
+            <div class="mode-card-kicker">Fitness</div>
+            <h2 class="h4 fw-bold mb-2">SmartFit 運動模式</h2>
+          </div>
+          <div class="mode-card-icon" aria-hidden="true">🏃</div>
+        </div>
+        <p class="text-secondary mb-3">
+          填得越詳細，分析越準。系統會按你嘅目標、體能、時間、睡眠、壓力、器材同傷患，整理出一份新手訓練週計劃。
+        </p>
+        <ul class="mode-feature-list mb-0">
+          <li>超詳細身體資料表</li>
+          <li>新手安全漸進編排</li>
+          <li>附官方動作參考來源</li>
+        </ul>
+      </a>
+    </div>
+  </section>
+
+  <section class="mode-summary mt-4">
+    <div class="row g-3">
+      <div class="col-12 col-lg-4">
+        <div class="mode-summary-card h-100">
+          <h3 class="h6 fw-bold">1. 詳盡評估</h3>
+          <p class="small text-secondary mb-0">年齡、身高體重、日常活動量、睡眠、壓力、久坐程度、傷患、設備、偏好同禁忌都可以記錄。</p>
+        </div>
+      </div>
+      <div class="col-12 col-lg-4">
+        <div class="mode-summary-card h-100">
+          <h3 class="h6 fw-bold">2. 初學者友善</h3>
+          <p class="small text-secondary mb-0">先建立習慣、活動度、關節控制同基本力量，再慢慢加量，避免一開始過度操練。</p>
+        </div>
+      </div>
+      <div class="col-12 col-lg-4">
+        <div class="mode-summary-card h-100">
+          <h3 class="h6 fw-bold">3. 可跟住做</h3>
+          <p class="small text-secondary mb-0">每星期會有具體日程、RPE 強度提示、進度建議、恢復提醒，同埋動作參考連結。</p>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+</body>
 </html>

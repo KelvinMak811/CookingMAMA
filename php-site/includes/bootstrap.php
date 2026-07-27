@@ -38,7 +38,9 @@ function page_url(string $path): string
     $base = base_path();
     if (is_static_export()) {
         $map = [
+            'index.php' => '',
             'recipes.php' => 'recipes/',
+            'fitness.php' => 'fitness/',
             'shopping-list.php' => 'shopping-list/',
             'history.php' => 'history/',
             'expenses.php' => 'expenses/',
@@ -86,7 +88,8 @@ function h(string $value): string
 
 function current_page(): string
 {
-    return basename($_SERVER['PHP_SELF'] ?? '');
+    $page = basename($_SERVER['PHP_SELF'] ?? '');
+    return $page !== '' ? $page : 'index.php';
 }
 
 function dish_dir(): string
