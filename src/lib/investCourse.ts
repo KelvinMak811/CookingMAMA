@@ -2,6 +2,17 @@
  * SmartInvest — 港股／美股入門課程與學習日程產生器
  */
 
+import {
+  LESSON_CONTENT,
+  type InvestLessonContent,
+} from "@/lib/investLessonContent";
+
+export type {
+  InvestLessonContent,
+  InvestLessonExample,
+  InvestQuizItem,
+} from "@/lib/investLessonContent";
+
 export type InvestTrackId = "hk_basics" | "us_basics";
 
 export type InvestLessonFocus =
@@ -19,6 +30,7 @@ export interface InvestLesson {
   minutes: number;
   summaryZh: string;
   checklist: string[];
+  content: InvestLessonContent;
 }
 
 export interface InvestUnit {
@@ -102,6 +114,13 @@ export const SAMPLE_INVEST_PREFERENCES: InvestStudyPreferences = {
   riskPctPerIdea: 1,
 };
 
+const EMPTY_CONTENT: InvestLessonContent = {
+  conceptsZh: [],
+  examples: [],
+  riskNotesZh: [],
+  quiz: [],
+};
+
 function L(
   id: string,
   titleZh: string,
@@ -110,7 +129,15 @@ function L(
   summaryZh: string,
   checklist: string[]
 ): InvestLesson {
-  return { id, titleZh, focus, minutes, summaryZh, checklist };
+  return {
+    id,
+    titleZh,
+    focus,
+    minutes,
+    summaryZh,
+    checklist,
+    content: LESSON_CONTENT[id] ?? EMPTY_CONTENT,
+  };
 }
 
 function U(id: string, titleZh: string, lessons: InvestLesson[]): InvestUnit {
@@ -279,6 +306,29 @@ export function findLesson(
     }
   }
   return null;
+}
+
+/** Flat lesson order within a track (for prev/next navigation). */
+export function listTrackLessonIds(trackId: InvestTrackId): string[] {
+  return getTrack(trackId).units.flatMap((u) => u.lessons.map((l) => l.id));
+}
+
+export function adjacentLessons(lessonId: string): {
+  prevId: string | null;
+  nextId: string | null;
+  track: InvestTrack;
+  unit: InvestUnit;
+  lesson: InvestLesson;
+} | null {
+  const found = findLesson(lessonId);
+  if (!found) return null;
+  const ids = listTrackLessonIds(found.track.id);
+  const idx = ids.indexOf(lessonId);
+  return {
+    ...found,
+    prevId: idx > 0 ? ids[idx - 1] : null,
+    nextId: idx >= 0 && idx < ids.length - 1 ? ids[idx + 1] : null,
+  };
 }
 
 export function trackProgress(

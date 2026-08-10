@@ -279,16 +279,24 @@ export function InvestLearnClient() {
                             }}
                           />
                           <div>
-                            <div className="fw-semibold small">{lesson.titleZh}</div>
+                            <div className="fw-semibold small">
+                              <Link
+                                href={`/invest/lesson/${lesson.id}`}
+                                className="text-decoration-none"
+                              >
+                                {lesson.titleZh}
+                              </Link>
+                            </div>
                             <div className="text-secondary" style={{ fontSize: "0.8rem" }}>
                               {FOCUS_LABELS[lesson.focus]} · {lesson.minutes} 分鐘
                             </div>
                             <p className="small mb-1 mt-1">{lesson.summaryZh}</p>
-                            <ul className="small text-secondary mb-0 ps-3">
-                              {lesson.checklist.map((c) => (
-                                <li key={c}>{c}</li>
-                              ))}
-                            </ul>
+                            <Link
+                              href={`/invest/lesson/${lesson.id}`}
+                              className="btn btn-link btn-sm px-0"
+                            >
+                              開啟完整課堂 →
+                            </Link>
                           </div>
                         </li>
                       );

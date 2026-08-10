@@ -312,7 +312,7 @@ export function JapanesePlannerClient() {
           <div className="planner-hero-badge">Curriculum</div>
           <h2 className="h4 fw-bold mb-2">完整課程大綱</h2>
           <p className="text-secondary mb-0">
-            展開每個程度睇單元同課堂；可以勾選完成，亦可點開課堂睇 checklist 同例句。
+            展開每個程度睇單元同課堂；勾選完成會同步帳戶，撳課堂即可打開讀法同完整學習內容。
           </p>
         </section>
         <JapaneseCourseView

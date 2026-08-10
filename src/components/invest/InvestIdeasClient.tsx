@@ -101,8 +101,8 @@ export function InvestIdeasClient() {
               {m === "ALL" ? "全部" : m === "HK" ? "港股" : "美股"}
             </button>
           ))}
-          <Link href="/invest/watchlist" className="btn btn-sm btn-outline-primary">
-            去紙上組合
+          <Link href="/invest/simulate" className="btn btn-sm btn-outline-primary">
+            去模擬投資
           </Link>
         </div>
       </section>

@@ -19,6 +19,35 @@ export type LessonFocus =
   | "speaking"
   | "writing";
 
+/** 詞彙一項：漢字／假名表面形 + 讀法 + 意思 */
+export interface JapaneseVocabItem {
+  /** 日文表面形（漢字或假名） */
+  ja: string;
+  /** 讀法（ひらがな／カタカナ，按程度） */
+  reading: string;
+  /** 粵語／繁中意思 */
+  meaningZh: string;
+  /** 可選羅馬字（入門較常用） */
+  romaji?: string;
+}
+
+/** 例句：日文 + 讀法 + 意思 */
+export interface JapaneseExample {
+  ja: string;
+  reading: string;
+  meaningZh: string;
+}
+
+/** 課堂完整學習內容（唔只係日程／checklist） */
+export interface LessonStudyContent {
+  vocab: JapaneseVocabItem[];
+  examples: JapaneseExample[];
+  /** 文法／用法短講解 */
+  tipsZh: string[];
+  /** 簡單練習提示 */
+  practiceZh: string[];
+}
+
 export interface JapaneseLesson {
   id: string;
   titleZh: string;
@@ -647,6 +676,40 @@ export function findLesson(
     }
   }
   return null;
+}
+
+/** 全部課堂（課程順序），方便上一課／下一課 */
+export function getAllLessonsFlat(): {
+  level: JapaneseLevel;
+  unit: JapaneseUnit;
+  lesson: JapaneseLesson;
+}[] {
+  const out: {
+    level: JapaneseLevel;
+    unit: JapaneseUnit;
+    lesson: JapaneseLesson;
+  }[] = [];
+  for (const level of JAPANESE_COURSE) {
+    for (const unit of level.units) {
+      for (const lesson of unit.lessons) {
+        out.push({ level, unit, lesson });
+      }
+    }
+  }
+  return out;
+}
+
+export function getAdjacentLessons(lessonId: string): {
+  prev: JapaneseLesson | null;
+  next: JapaneseLesson | null;
+} {
+  const all = getAllLessonsFlat();
+  const idx = all.findIndex((item) => item.lesson.id === lessonId);
+  if (idx < 0) return { prev: null, next: null };
+  return {
+    prev: idx > 0 ? all[idx - 1].lesson : null,
+    next: idx < all.length - 1 ? all[idx + 1].lesson : null,
+  };
 }
 
 export function countLessons(levelId?: JapaneseLevelId): number {

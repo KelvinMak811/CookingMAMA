@@ -10,8 +10,8 @@ export default function JapanesePage() {
           <div>
             <h1 className="h3 fw-bold mb-2">由零基礎到 JLPT N1 嘅完整課程</h1>
             <p className="text-secondary mb-0">
-              揀好程度、每週可學日數同每日時間，系統會排出學習日程，並將進度儲存到你嘅帳戶。
-              介面用廣東話，課堂例句同標題保留日文。
+              揀好程度、每週可學日數同每日時間，系統會排出學習日程；每課都有詞彙、讀法、例句同練習。
+              介面用廣東話，課堂日文保留原文。進度會儲存到你嘅帳戶。
             </p>
           </div>
           <div className="planner-hero-note">

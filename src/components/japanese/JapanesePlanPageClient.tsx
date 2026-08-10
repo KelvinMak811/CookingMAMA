@@ -68,7 +68,7 @@ export function JapanesePlanPageClient() {
           <div>
             <h1 className="h3 fw-bold mb-2">帳戶已儲存嘅學習日程</h1>
             <p className="text-secondary mb-0">
-              跟住每日課表推進；完成後剔低，進度會同步到你嘅帳戶。
+              跟住每日課表推進；撳課堂打開詞彙、讀法同練習。完成後剔低，進度會同步到你嘅帳戶。
             </p>
           </div>
           <Link href="/japanese" className="btn btn-outline-primary">
@@ -102,11 +102,17 @@ export function JapanesePlanPageClient() {
               ) : null}
             </div>
           ) : null}
-          <ul className="small mb-0 ps-3">
+          <ul className="small mb-3 ps-3">
             {spotlightLesson.lesson.checklist.map((item) => (
               <li key={item}>{item}</li>
             ))}
           </ul>
+          <Link
+            href={`/japanese/lesson/${spotlightLesson.lesson.id}`}
+            className="btn btn-primary"
+          >
+            打開課堂 · 開始學習
+          </Link>
         </section>
       ) : null}
 

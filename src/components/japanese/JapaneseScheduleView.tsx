@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import {
   FOCUS_LABELS,
   type GeneratedStudySchedule,
@@ -56,7 +57,10 @@ export function JapaneseScheduleView({
             <h3 className="h6 fw-bold mb-2">第 {week.weekNumber} 週</h3>
             <div className="row g-2">
               {week.days.map((day) => (
-                <div key={`${week.weekNumber}-${day.weekday}`} className="col-12 col-md-6 col-xl-4">
+                <div
+                  key={`${week.weekNumber}-${day.weekday}`}
+                  className="col-12 col-md-6 col-xl-4"
+                >
                   <div
                     className={`jp-day-card ${day.isRest ? "jp-day-rest" : ""}`}
                   >
@@ -67,25 +71,36 @@ export function JapaneseScheduleView({
                       </span>
                     </div>
                     {day.isRest ? (
-                      <p className="small text-secondary mb-0">今日休息，溫習舊課都得。</p>
+                      <p className="small text-secondary mb-0">
+                        今日休息，溫習舊課都得。
+                      </p>
                     ) : (
                       <ul className="list-unstyled mb-0 d-flex flex-column gap-2">
                         {day.blocks.map((block) => {
                           const done = completedSet.has(block.lessonId);
                           return (
                             <li key={block.lessonId} className="jp-block-row">
-                              <label className="d-flex gap-2 align-items-start mb-0">
+                              <div className="d-flex gap-2 align-items-start">
                                 {onToggleLesson ? (
                                   <input
                                     type="checkbox"
                                     className="form-check-input mt-1"
                                     checked={done}
                                     onChange={(e) =>
-                                      onToggleLesson(block.lessonId, e.target.checked)
+                                      onToggleLesson(
+                                        block.lessonId,
+                                        e.target.checked
+                                      )
                                     }
+                                    aria-label={`完成 ${block.titleZh}`}
                                   />
                                 ) : null}
-                                <span className={done ? "text-decoration-line-through text-secondary" : ""}>
+                                <Link
+                                  href={`/japanese/lesson/${block.lessonId}`}
+                                  className={`flex-grow-1 text-decoration-none ${
+                                    done ? "jp-block-done" : "text-dark"
+                                  }`}
+                                >
                                   <span className="d-block fw-semibold small">
                                     {block.titleZh}
                                   </span>
@@ -93,8 +108,11 @@ export function JapaneseScheduleView({
                                     {block.titleJa} · {block.minutes} 分
                                   </span>
                                   <FocusBadge focus={block.focus} />
-                                </span>
-                              </label>
+                                  <span className="jp-open-lesson d-block mt-1">
+                                    學習內容 →
+                                  </span>
+                                </Link>
+                              </div>
                             </li>
                           );
                         })}

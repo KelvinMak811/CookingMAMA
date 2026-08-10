@@ -57,6 +57,25 @@ export interface MarketSnapshot {
   names: MarketQuote[];
 }
 
+export type MarketLoadMode =
+  | "demo_json"
+  | "embedded"
+  | "live_partial"
+  | "error";
+
+export function marketModeBadge(mode: MarketLoadMode | string): {
+  text: string;
+  tone: "warning" | "success" | "secondary";
+} {
+  if (mode === "live_partial") {
+    return { text: "部分即時", tone: "success" };
+  }
+  if (mode === "demo_json" || mode === "embedded") {
+    return { text: "示範資料", tone: "warning" };
+  }
+  return { text: "示範資料", tone: "secondary" };
+}
+
 export interface InvestIdea {
   id: string;
   quoteId: string;
@@ -332,12 +351,41 @@ export function getEmbeddedSnapshot(): MarketSnapshot {
   return EMBEDDED_SNAPSHOT;
 }
 
-/** Prefer public JSON; fall back to embedded demo. */
+/** Prefer public JSON / API; fall back to embedded demo. */
 export async function loadMarketSnapshot(): Promise<{
   snapshot: MarketSnapshot;
-  mode: "demo_json" | "embedded" | "error";
+  mode: MarketLoadMode;
+  isDemo: boolean;
+  fetchedAt?: string;
+  liveCount?: number;
   error?: string;
 }> {
+  try {
+    const apiRes = await fetch("/api/invest/markets", { cache: "no-store" });
+    if (apiRes.ok) {
+      const json = (await apiRes.json()) as {
+        ok?: boolean;
+        mode?: MarketLoadMode;
+        isDemo?: boolean;
+        fetchedAt?: string;
+        liveCount?: number;
+        snapshot?: unknown;
+      };
+      if (json.ok && isSnapshot(json.snapshot)) {
+        const mode = json.mode ?? "demo_json";
+        return {
+          snapshot: json.snapshot,
+          mode,
+          isDemo: json.isDemo ?? mode !== "live_partial",
+          fetchedAt: json.fetchedAt,
+          liveCount: json.liveCount,
+        };
+      }
+    }
+  } catch {
+    /* fall through to static file */
+  }
+
   try {
     const res = await fetch("/data/invest-market-snapshot.json", {
       cache: "no-store",
@@ -346,6 +394,7 @@ export async function loadMarketSnapshot(): Promise<{
       return {
         snapshot: EMBEDDED_SNAPSHOT,
         mode: "embedded",
+        isDemo: true,
         error: `快照載入失敗（HTTP ${res.status}），已改用內建示範資料。`,
       };
     }
@@ -354,14 +403,16 @@ export async function loadMarketSnapshot(): Promise<{
       return {
         snapshot: EMBEDDED_SNAPSHOT,
         mode: "embedded",
+        isDemo: true,
         error: "快照格式無效，已改用內建示範資料。",
       };
     }
-    return { snapshot: json, mode: "demo_json" };
+    return { snapshot: json, mode: "demo_json", isDemo: true };
   } catch (e) {
     return {
       snapshot: EMBEDDED_SNAPSHOT,
       mode: "error",
+      isDemo: true,
       error:
         e instanceof Error
           ? e.message

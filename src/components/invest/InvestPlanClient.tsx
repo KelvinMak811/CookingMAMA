@@ -114,9 +114,12 @@ export function InvestPlanClient() {
                                 }}
                               />
                               <span>
-                                <span className="fw-semibold d-block">
+                                <Link
+                                  href={`/invest/lesson/${block.lessonId}`}
+                                  className="fw-semibold d-block text-decoration-none"
+                                >
                                   {block.titleZh}
-                                </span>
+                                </Link>
                                 <span className="text-secondary">
                                   {FOCUS_LABELS[block.focus]} · {block.minutes} 分
                                 </span>
@@ -125,6 +128,12 @@ export function InvestPlanClient() {
                                     {detail.lesson.summaryZh}
                                   </span>
                                 )}
+                                <Link
+                                  href={`/invest/lesson/${block.lessonId}`}
+                                  className="d-inline-block mt-1"
+                                >
+                                  開啟課堂 →
+                                </Link>
                               </span>
                             </label>
                           </li>

@@ -12,6 +12,8 @@
   --safe-area-right: env(safe-area-inset-right, 0px);
   --app-header-content: 2.75rem;
   --app-bottom-nav-content: 4rem;
+  /* Phone/narrow shell; widened from md up (see media query below). */
+  --app-shell-max-width: 48rem;
   --safe-area-top-effective: var(--safe-area-top);
   --safe-area-bottom-effective: var(--safe-area-bottom);
   --app-header-height: calc(var(--app-header-content) + var(--safe-area-top-effective));
@@ -24,6 +26,13 @@
     --safe-area-bottom-effective: max(var(--safe-area-bottom), 0.625rem);
     --app-header-height: calc(var(--app-header-content) + var(--safe-area-top-effective));
     --app-bottom-nav-height: calc(var(--app-bottom-nav-content) + var(--safe-area-bottom-effective));
+  }
+}
+
+/* Desktop: widen shell (~Bootstrap xl / 1140px) so layout is less phone-narrow. */
+@media (min-width: 768px) {
+  :root {
+    --app-shell-max-width: 72rem;
   }
 }
 
@@ -105,7 +114,7 @@ body {
 }
 
 .app-main {
-  max-width: 48rem;
+  max-width: var(--app-shell-max-width);
   padding-bottom: 0.5rem;
 }
 
@@ -132,7 +141,7 @@ body {
   align-items: stretch;
   justify-content: space-around;
   min-height: var(--app-bottom-nav-content);
-  max-width: 48rem;
+  max-width: var(--app-shell-max-width);
   margin: 0 auto;
 }
 
@@ -353,10 +362,11 @@ body {
 }
 
 @media (min-width: 768px) {
+  /* Align FAB to the right edge of the centered shell (half of --app-shell-max-width). */
   .shopping-fab {
     right: max(
       calc(1rem + var(--safe-area-right)),
-      calc(50% - 24rem + 1rem + var(--safe-area-right))
+      calc(50% - (var(--app-shell-max-width) / 2) + 1rem + var(--safe-area-right))
     );
   }
 }
@@ -835,6 +845,106 @@ body {
   flex-shrink: 0;
 }
 
+.jp-open-lesson {
+  color: #c2410c;
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+.jp-block-done {
+  color: #6b7280;
+}
+
+.jp-block-done .fw-semibold,
+.jp-block-done .small:not(.jp-open-lesson) {
+  text-decoration: line-through;
+}
+
+.jp-vocab-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.jp-vocab-item {
+  padding: 0.75rem 0.85rem;
+  border-radius: 0.85rem;
+  border: 1px solid #fed7aa;
+  background: linear-gradient(180deg, #fffbeb 0%, #fff 100%);
+}
+
+.jp-example-card {
+  padding: 0.85rem 0.9rem;
+  border-radius: 0.85rem;
+  border: 1px solid #fde68a;
+  background: #fffbeb;
+}
+
+.jp-reading-block .jp-ja {
+  font-size: 1.2rem;
+  font-weight: 700;
+  line-height: 1.45;
+  color: #1f2937;
+}
+
+.jp-yomi {
+  margin-top: 0.25rem;
+  font-size: 0.95rem;
+  color: #9a3412;
+  line-height: 1.4;
+}
+
+.jp-yomi-label {
+  display: inline-block;
+  margin-right: 0.4rem;
+  padding: 0.05rem 0.4rem;
+  border-radius: 999px;
+  border: 1px solid #fdba74;
+  background: #ffedd5;
+  color: #c2410c;
+  font-size: 0.68rem;
+  font-weight: 700;
+  vertical-align: 0.1em;
+}
+
+.jp-romaji {
+  margin-top: 0.15rem;
+  font-size: 0.82rem;
+  color: #78716c;
+  letter-spacing: 0.02em;
+}
+
+.jp-meaning {
+  margin-top: 0.35rem;
+  font-size: 0.92rem;
+  color: #4b5563;
+}
+
+.jp-complete-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.35rem 0.7rem;
+  border-radius: 999px;
+  border: 1px solid #fed7aa;
+  background: #fff7ed;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #9a3412;
+  cursor: pointer;
+}
+
+@media (max-width: 575.98px) {
+  .jp-reading-block .jp-ja {
+    font-size: 1.1rem;
+  }
+
+  .jp-vocab-item,
+  .jp-example-card {
+    padding: 0.7rem 0.75rem;
+  }
+}
+
 .invest-disclaimer {
   border: 1px solid #fcd34d;
   background: linear-gradient(135deg, #fffbeb, #fff7ed);
@@ -857,6 +967,27 @@ body {
   color: #78716c;
   font-size: 0.82rem;
   line-height: 1.45;
+}
+
+.invest-lesson-tip {
+  background: linear-gradient(135deg, #ecfdf5, #f0fdf4);
+  border: 1px solid #a7f3d0;
+  border-radius: 0.75rem;
+  padding: 0.65rem 0.85rem;
+  font-size: 0.9rem;
+  color: #065f46;
+}
+
+.invest-lesson-example {
+  border-left: 3px solid #94a3b8;
+  padding-left: 0.85rem;
+}
+
+.invest-lesson-quiz {
+  border: 1px solid #e7e5e4;
+  border-radius: 0.75rem;
+  padding: 0.75rem 0.85rem;
+  background: #fafaf9;
 }
 
 .text-truncate-2 {

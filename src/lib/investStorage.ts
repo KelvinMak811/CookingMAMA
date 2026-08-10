@@ -52,6 +52,27 @@ export interface PaperPortfolio {
   trades: PaperTrade[];
 }
 
+export interface PaperHolding {
+  quoteId: string;
+  symbol: string;
+  nameZh: string;
+  currency: "HKD" | "USD";
+  shares: number;
+  avgCost: number;
+  costBasis: number;
+}
+
+export interface MarkedHolding extends PaperHolding {
+  last: number | null;
+  marketValue: number | null;
+  unrealizedPnl: number | null;
+  unrealizedPnlPct: number | null;
+}
+
+export type PaperTradeResult =
+  | { ok: true; data: InvestData }
+  | { ok: false; error: string; data: InvestData };
+
 export interface InvestPreferences {
   nickname: string;
   defaultTrack: InvestTrackId;
@@ -303,33 +324,157 @@ export function toggleSavedIdea(
   return next;
 }
 
-export function recordPaperTrade(
+/** Average-cost holdings from trade history (buys add, sells reduce). */
+export function computeHoldings(trades: PaperTrade[]): PaperHolding[] {
+  const map = new Map<
+    string,
+    {
+      quoteId: string;
+      symbol: string;
+      nameZh: string;
+      currency: "HKD" | "USD";
+      shares: number;
+      costBasis: number;
+    }
+  >();
+
+  // Process oldest → newest
+  const ordered = [...trades].sort(
+    (a, b) => new Date(a.at).getTime() - new Date(b.at).getTime()
+  );
+
+  for (const t of ordered) {
+    const cur = map.get(t.quoteId) ?? {
+      quoteId: t.quoteId,
+      symbol: t.symbol,
+      nameZh: t.nameZh,
+      currency: t.currency,
+      shares: 0,
+      costBasis: 0,
+    };
+    if (t.side === "buy") {
+      cur.shares += t.shares;
+      cur.costBasis += t.shares * t.price;
+    } else {
+      if (cur.shares <= 0) continue;
+      const sellShares = Math.min(t.shares, cur.shares);
+      const avg = cur.shares > 0 ? cur.costBasis / cur.shares : 0;
+      cur.shares -= sellShares;
+      cur.costBasis = Math.max(0, cur.costBasis - avg * sellShares);
+    }
+    cur.symbol = t.symbol;
+    cur.nameZh = t.nameZh;
+    cur.currency = t.currency;
+    map.set(t.quoteId, cur);
+  }
+
+  return [...map.values()]
+    .filter((h) => h.shares > 1e-9)
+    .map((h) => ({
+      quoteId: h.quoteId,
+      symbol: h.symbol,
+      nameZh: h.nameZh,
+      currency: h.currency,
+      shares: +h.shares.toFixed(4),
+      avgCost: h.shares > 0 ? h.costBasis / h.shares : 0,
+      costBasis: h.costBasis,
+    }));
+}
+
+export function markHoldingsToMarket(
+  holdings: PaperHolding[],
+  quotes: { id: string; last: number }[]
+): MarkedHolding[] {
+  const qmap = new Map(quotes.map((q) => [q.id, q.last]));
+  return holdings.map((h) => {
+    const last = qmap.get(h.quoteId) ?? null;
+    if (last == null) {
+      return {
+        ...h,
+        last: null,
+        marketValue: null,
+        unrealizedPnl: null,
+        unrealizedPnlPct: null,
+      };
+    }
+    const marketValue = last * h.shares;
+    const unrealizedPnl = marketValue - h.costBasis;
+    const unrealizedPnlPct =
+      h.costBasis > 0 ? (unrealizedPnl / h.costBasis) * 100 : null;
+    return {
+      ...h,
+      last,
+      marketValue,
+      unrealizedPnl,
+      unrealizedPnlPct,
+    };
+  });
+}
+
+/**
+ * Record a simulated trade with cash / holdings checks.
+ * Labels should mark 模擬／學習用 at the UI layer.
+ */
+export function tryRecordPaperTrade(
   accountId: string,
   trade: Omit<PaperTrade, "id" | "at"> & { id?: string; at?: string }
-): InvestData {
+): PaperTradeResult {
   const existing = loadInvestData(accountId);
+  if (!(trade.shares > 0) || !(trade.price > 0)) {
+    return { ok: false, error: "股數同價格要大於 0。", data: existing };
+  }
+
   const full: PaperTrade = {
     ...trade,
     id: trade.id ?? `t-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
     at: trade.at ?? new Date().toISOString(),
   };
-  const portfolio = { ...existing.paperPortfolio };
   const notional = full.shares * full.price;
-  if (full.currency === "HKD") {
-    portfolio.cashHkd =
-      full.side === "buy"
-        ? portfolio.cashHkd - notional
-        : portfolio.cashHkd + notional;
+  const portfolio = {
+    ...existing.paperPortfolio,
+    trades: [...existing.paperPortfolio.trades],
+  };
+
+  if (full.side === "buy") {
+    const cash =
+      full.currency === "HKD" ? portfolio.cashHkd : portfolio.cashUsd;
+    if (cash + 1e-9 < notional) {
+      return {
+        ok: false,
+        error: `虛擬${full.currency}現金不足（需要 ${notional.toFixed(2)}）。`,
+        data: existing,
+      };
+    }
+    if (full.currency === "HKD") portfolio.cashHkd -= notional;
+    else portfolio.cashUsd -= notional;
   } else {
-    portfolio.cashUsd =
-      full.side === "buy"
-        ? portfolio.cashUsd - notional
-        : portfolio.cashUsd + notional;
+    const held =
+      computeHoldings(portfolio.trades).find((h) => h.quoteId === full.quoteId)
+        ?.shares ?? 0;
+    if (held + 1e-9 < full.shares) {
+      return {
+        ok: false,
+        error: `持倉不足（現有 ${held}，想賣 ${full.shares}）。`,
+        data: existing,
+      };
+    }
+    if (full.currency === "HKD") portfolio.cashHkd += notional;
+    else portfolio.cashUsd += notional;
   }
+
   portfolio.trades = [full, ...portfolio.trades].slice(0, 200);
   const next: InvestData = { ...existing, paperPortfolio: portfolio };
   saveInvestData(accountId, next);
-  return next;
+  return { ok: true, data: next };
+}
+
+/** @deprecated Prefer tryRecordPaperTrade for validation; kept for simple callers. */
+export function recordPaperTrade(
+  accountId: string,
+  trade: Omit<PaperTrade, "id" | "at"> & { id?: string; at?: string }
+): InvestData {
+  const result = tryRecordPaperTrade(accountId, trade);
+  return result.data;
 }
 
 export function resetPaperPortfolio(

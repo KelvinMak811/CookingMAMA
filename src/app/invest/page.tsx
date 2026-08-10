@@ -10,7 +10,7 @@ export default function InvestPage() {
           <div>
             <h1 className="h3 fw-bold mb-2">港股＋美股入門學習模式</h1>
             <p className="text-secondary mb-0">
-              課程、示範市況、學習想法、觀察名單同紙上組合——全部跟 Kelvin／YuetSum
+              完整課堂、實際市場追蹤、模擬投資、學習想法——全部跟 Kelvin／YuetSum
               帳戶分開同步。呢度係教育工具，唔係持牌投資意見。
             </p>
           </div>

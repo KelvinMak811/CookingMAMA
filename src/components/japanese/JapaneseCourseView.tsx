@@ -1,6 +1,7 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useState } from "react";
+import Link from "next/link";
 import {
   FOCUS_LABELS,
   JAPANESE_COURSE,
@@ -18,8 +19,6 @@ function LessonCard({
   completed: boolean;
   onToggle: (id: string, next: boolean) => void;
 }) {
-  const [open, setOpen] = useState(false);
-
   return (
     <div className={`jp-lesson-card ${completed ? "jp-lesson-done" : ""}`}>
       <div className="d-flex gap-2 align-items-start">
@@ -31,14 +30,13 @@ function LessonCard({
           aria-label={`完成 ${lesson.titleZh}`}
         />
         <div className="flex-grow-1">
-          <button
-            type="button"
-            className="btn btn-link text-decoration-none text-start p-0 w-100"
-            onClick={() => setOpen((v) => !v)}
+          <Link
+            href={`/japanese/lesson/${lesson.id}`}
+            className="text-decoration-none text-dark d-block"
           >
             <div className="d-flex justify-content-between gap-2">
               <div>
-                <div className="fw-semibold text-dark">{lesson.titleZh}</div>
+                <div className="fw-semibold">{lesson.titleZh}</div>
                 <div className="small text-secondary">{lesson.titleJa}</div>
               </div>
               <div className="text-end small text-secondary text-nowrap">
@@ -46,26 +44,9 @@ function LessonCard({
                 <div>{lesson.minutes} 分</div>
               </div>
             </div>
-          </button>
-          {open ? (
-            <div className="mt-2 small">
-              <p className="mb-2 text-secondary">{lesson.summaryZh}</p>
-              {lesson.sampleJa ? (
-                <div className="jp-sample mb-2">
-                  <div className="fw-semibold">{lesson.sampleJa}</div>
-                  {lesson.sampleZh ? (
-                    <div className="text-secondary">{lesson.sampleZh}</div>
-                  ) : null}
-                </div>
-              ) : null}
-              <div className="fw-semibold mb-1">今日 checklist</div>
-              <ul className="mb-0 ps-3">
-                {lesson.checklist.map((item) => (
-                  <li key={item}>{item}</li>
-                ))}
-              </ul>
-            </div>
-          ) : null}
+            <p className="small text-secondary mb-1 mt-2">{lesson.summaryZh}</p>
+            <span className="jp-open-lesson">打開課堂 · 睇讀法同內容 →</span>
+          </Link>
         </div>
       </div>
     </div>
@@ -82,10 +63,7 @@ export function JapaneseCourseView({
   onToggleLesson: (lessonId: string, completed: boolean) => void;
 }) {
   const [expanded, setExpanded] = useState<JapaneseLevelId | null>(currentLevel);
-  const completedSet = useMemo(
-    () => new Set(completedLessonIds),
-    [completedLessonIds]
-  );
+  const completedSet = new Set(completedLessonIds);
 
   return (
     <div className="d-flex flex-column gap-3">

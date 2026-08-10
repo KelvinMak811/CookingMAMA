@@ -13,13 +13,19 @@ const HUB_LINKS = [
     href: "/invest/learn",
     kicker: "Learn",
     title: "港股／美股入門",
-    desc: "市場結構、落盤基礎、費用意識同風險框架。",
+    desc: "完整課堂：概念、例子、風險、小測驗；可開課堂詳情頁。",
   },
   {
     href: "/invest/markets",
     kicker: "Markets",
-    title: "港股＋美股走勢",
-    desc: "指數同代表性股份嘅示範快照，附分類說明。",
+    title: "實際市場追蹤",
+    desc: "指數同觀察標的報價；有 API 就盡量即時，否則標示示範資料。",
+  },
+  {
+    href: "/invest/simulate",
+    kicker: "Simulate",
+    title: "模擬投資",
+    desc: "虛擬現金買賣、持倉盈虧、成交紀錄——清楚標示模擬／學習用。",
   },
   {
     href: "/invest/ideas",
@@ -29,15 +35,15 @@ const HUB_LINKS = [
   },
   {
     href: "/invest/watchlist",
-    kicker: "Practice",
-    title: "觀察名單＋紙上組合",
-    desc: "虛擬現金練習買賣，資料跟帳戶分開儲存。",
+    kicker: "Watch",
+    title: "觀察名單",
+    desc: "追蹤想跟進嘅標的；買賣請去模擬投資頁。",
   },
   {
     href: "/invest/plan",
     kicker: "Plan",
     title: "學習日程",
-    desc: "按每週日數同每日分鐘數生成溫習表。",
+    desc: "按每週日數同每日分鐘數生成溫習表，連去課堂。",
   },
 ] as const;
 
