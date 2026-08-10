@@ -1,0 +1,167 @@
+{
+  "version": 1,
+  "label": "示範／學習用",
+  "source": "CookingMAMA educational sample snapshot (not a live exchange feed)",
+  "asOf": "2026-08-10T16:00:00+08:00",
+  "disclaimerZh": "投資有風險，內容僅供學習。以下為示範市場快照，唔係實時報價，亦唔構成買賣建議。",
+  "indices": [
+    {
+      "id": "hsi",
+      "market": "HK",
+      "symbol": "HSI",
+      "nameZh": "恒生指數",
+      "last": 17520.4,
+      "changePct": 0.85,
+      "trendNoteZh": "近一週區間震盪偏穩，教學上適合觀察藍籌同成交量關係。"
+    },
+    {
+      "id": "hstech",
+      "market": "HK",
+      "symbol": "HSTECH",
+      "nameZh": "恒生科技指數",
+      "last": 3820.1,
+      "changePct": 1.42,
+      "trendNoteZh": "科技板塊波動較大，適合學「波動率」同倉位控制。"
+    },
+    {
+      "id": "spx",
+      "market": "US",
+      "symbol": "SPX",
+      "nameZh": "標普 500",
+      "last": 5480.2,
+      "changePct": 0.38,
+      "trendNoteZh": "廣基指數，教學上常用嚟對照單一股票風險。"
+    },
+    {
+      "id": "ndx",
+      "market": "US",
+      "symbol": "NDX",
+      "nameZh": "納斯達克 100",
+      "last": 19210.5,
+      "changePct": 0.91,
+      "trendNoteZh": "科技權重高，示範「集中度風險」。"
+    }
+  ],
+  "names": [
+    {
+      "id": "0700.HK",
+      "market": "HK",
+      "symbol": "0700.HK",
+      "nameZh": "騰訊控股",
+      "category": "tech",
+      "last": 382.4,
+      "changePct": 1.1,
+      "currency": "HKD",
+      "riskLevel": "medium",
+      "blurbZh": "港股大型科技代表，流動性高，適合學藍籌／科技分類。"
+    },
+    {
+      "id": "9988.HK",
+      "market": "HK",
+      "symbol": "9988.HK",
+      "nameZh": "阿里巴巴－Ｗ",
+      "category": "tech",
+      "last": 88.5,
+      "changePct": 0.6,
+      "currency": "HKD",
+      "riskLevel": "medium",
+      "blurbZh": "大型新經濟股，適合對照 ADR／港股雙重上市概念。"
+    },
+    {
+      "id": "0005.HK",
+      "market": "HK",
+      "symbol": "0005.HK",
+      "nameZh": "匯豐控股",
+      "category": "finance",
+      "last": 68.2,
+      "changePct": -0.3,
+      "currency": "HKD",
+      "riskLevel": "medium",
+      "blurbZh": "金融藍籌，教學上常睇息率同利率環境（示範）。"
+    },
+    {
+      "id": "2800.HK",
+      "market": "HK",
+      "symbol": "2800.HK",
+      "nameZh": "盈富基金",
+      "category": "etf",
+      "last": 18.9,
+      "changePct": 0.5,
+      "currency": "HKD",
+      "riskLevel": "low",
+      "blurbZh": "追蹤恒指嘅 ETF，適合學分散同「唔好單押一隻股」。"
+    },
+    {
+      "id": "demo-penny.HK",
+      "market": "HK",
+      "symbol": "DEMO.PENNY",
+      "nameZh": "示範仙股（虛構）",
+      "category": "penny",
+      "last": 0.082,
+      "changePct": -4.2,
+      "currency": "HKD",
+      "riskLevel": "very_high",
+      "blurbZh": "虛構低價股示範：流動性差、波動極大、資訊不對稱——新手應視為高風險教材，唔係入手對象。"
+    },
+    {
+      "id": "AAPL",
+      "market": "US",
+      "symbol": "AAPL",
+      "nameZh": "蘋果",
+      "category": "tech",
+      "last": 214.3,
+      "changePct": 0.7,
+      "currency": "USD",
+      "riskLevel": "medium",
+      "blurbZh": "美股大型科技，適合學美股報價單位同盤前／盤後概念。"
+    },
+    {
+      "id": "MSFT",
+      "market": "US",
+      "symbol": "MSFT",
+      "nameZh": "微軟",
+      "category": "tech",
+      "last": 428.1,
+      "changePct": 0.4,
+      "currency": "USD",
+      "riskLevel": "medium",
+      "blurbZh": "大型科技／軟件，教學上可對照盈利質素同估值框架。"
+    },
+    {
+      "id": "JNJ",
+      "market": "US",
+      "symbol": "JNJ",
+      "nameZh": "強生",
+      "category": "healthcare",
+      "last": 158.6,
+      "changePct": -0.2,
+      "currency": "USD",
+      "riskLevel": "low",
+      "blurbZh": "醫藥消費防禦代表，適合學防禦型板塊。"
+    },
+    {
+      "id": "VOO",
+      "market": "US",
+      "symbol": "VOO",
+      "nameZh": "Vanguard S&P 500 ETF",
+      "category": "etf",
+      "last": 512.4,
+      "changePct": 0.35,
+      "currency": "USD",
+      "riskLevel": "low",
+      "blurbZh": "廣基指數 ETF，新手學習「核心倉」常用例子。"
+    },
+    {
+      "id": "XOM",
+      "market": "US",
+      "symbol": "XOM",
+      "nameZh": "埃克森美孚",
+      "category": "energy",
+      "last": 112.8,
+      "changePct": 1.2,
+      "currency": "USD",
+      "riskLevel": "medium",
+      "blurbZh": "能源週期股示範，適合學商品價格同盈利週期。"
+    }
+  ]
+}
