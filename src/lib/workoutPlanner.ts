@@ -1178,3 +1178,245 @@ export function generateWorkoutPlan(
     references: Array.from(referenceKeys).map((key) => SOURCE_LINKS[key]),
   };
 }
+
+export interface PlanCompletionMeta {
+  completedAt: string;
+  previousGeneratedAt?: string;
+  /** Number of plans already completed (0 = first next-stage). */
+  stageIndex?: number;
+}
+
+/** Soft progression suggestions after finishing a plan; user can still tweak. */
+export function suggestNextStageProfile(profile: WorkoutProfile): WorkoutProfile {
+  const next: WorkoutProfile = {
+    ...DEFAULT_PROFILE,
+    ...profile,
+    activityFocus: profile.activityFocus || "general",
+    equipment: profile.equipment?.length ? [...profile.equipment] : ["none"],
+  };
+
+  if (next.experience === "new") next.experience = "restart";
+  else if (next.experience === "restart") next.experience = "some";
+
+  if (next.fitnessLevel === "low") next.fitnessLevel = "moderate";
+
+  next.sessionMinutes = Math.min(
+    90,
+    Math.max(15, Number(next.sessionMinutes) || 35) + 5
+  );
+
+  return next;
+}
+
+/**
+ * Build the next-stage plan from adjusted prefs + previous plan context.
+ * Slightly harder coaching / progression copy; still safety-first.
+ */
+export function generateNextPlan(
+  profile: WorkoutProfile,
+  previousPlan: GeneratedPlan | null,
+  completionMeta?: PlanCompletionMeta,
+  fallbackName = "你"
+): GeneratedPlan {
+  const base = generateWorkoutPlan(profile, fallbackName);
+  const stageNumber = (completionMeta?.stageIndex ?? 0) + 2;
+  const carryFocus = previousPlan
+    ? `承接上一份「${previousPlan.goalLabel}」計劃。`
+    : "承接上一階段訓練。";
+
+  return {
+    ...base,
+    goalLabel: `${base.goalLabel} · 第 ${stageNumber} 階段`,
+    cards: [
+      { label: "計劃階段", value: `第 ${stageNumber} 階段` },
+      ...base.cards,
+    ],
+    focusText: `${carryFocus}${base.focusText} 本階段會略為提升挑戰，但仍以可持續同動作品質為先。`,
+    flags: [
+      "呢份係上一階段完成後嘅延續計劃：若上次完成度高、無明顯痛症，可維持略高一檔強度。",
+      ...base.flags,
+    ],
+    progression: [
+      "本階段承接上一週期：先用第 1 週確認恢復同動作穩定，再按感覺加量。",
+      ...base.progression,
+    ],
+  };
+}
+
+export function sexLabel(sex: string): string {
+  return (
+    {
+      female: "女",
+      male: "男",
+      other: "其他 / 不想透露",
+    }[sex] || (sex ? sex : "未填寫")
+  );
+}
+
+export function experienceLabel(experience: WorkoutProfile["experience"]): string {
+  return (
+    {
+      new: "完全新手",
+      restart: "以前做過，停咗一段時間",
+      some: "偶爾有做，但未有系統",
+    }[experience] || "未填寫"
+  );
+}
+
+export function fitnessLevelLabel(
+  level: WorkoutProfile["fitnessLevel"]
+): string {
+  return (
+    {
+      low: "偏低，少郁動就攰",
+      moderate: "一般",
+      good: "算唔錯",
+    }[level] || "未填寫"
+  );
+}
+
+export function workStyleLabel(style: WorkoutProfile["workStyle"]): string {
+  return (
+    {
+      desk: "長時間坐",
+      mixed: "坐企混合",
+      active: "需要經常走動",
+      manual: "勞動 / 搬運為主",
+    }[style] || "未填寫"
+  );
+}
+
+export function locationLabel(
+  loc: WorkoutProfile["locationPreference"]
+): string {
+  return (
+    {
+      home: "屋企為主",
+      gym: "健身室為主",
+      outdoor: "戶外為主",
+      pool: "泳池為主",
+      court: "球場／羽球場為主",
+      mixed: "都可以",
+    }[loc] || "未填寫"
+  );
+}
+
+export function trainingPreferenceLabel(
+  pref: WorkoutProfile["trainingPreference"]
+): string {
+  return (
+    {
+      balanced: "平均啲，力量加心肺",
+      strength: "偏力量",
+      cardio: "偏帶氧 / 步行",
+      mobility: "偏伸展活動度",
+    }[pref] || "未填寫"
+  );
+}
+
+export function equipmentLabels(equipment: EquipmentId[]): string {
+  if (!equipment?.length) return "未填寫";
+  const labels = equipment.map(
+    (id) => EQUIPMENT_OPTIONS.find((o) => o.id === id)?.label || id
+  );
+  return labels.join("、");
+}
+
+/** Readable profile cards for plan view ("個人資料 / 計劃依據"). */
+export function buildProfileSummaryCards(
+  profile: WorkoutProfile
+): { label: string; value: string }[] {
+  const bmi = computeBmi(profile.heightCm, profile.weightKg);
+  const cards: { label: string; value: string }[] = [
+    {
+      label: "稱呼",
+      value: profile.nickname?.trim() || "未填寫",
+    },
+    {
+      label: "性別",
+      value: sexLabel(profile.sex),
+    },
+    {
+      label: "年齡",
+      value: profile.age ? `${profile.age} 歲` : "未填寫",
+    },
+    {
+      label: "身高",
+      value: profile.heightCm ? `${profile.heightCm} cm` : "未填寫",
+    },
+    {
+      label: "體重",
+      value: profile.weightKg ? `${profile.weightKg} kg` : "未填寫",
+    },
+    {
+      label: "BMI",
+      value: bmi ? `${bmi.toFixed(1)}（${bmiLabel(bmi)}）` : "未提供",
+    },
+  ];
+
+  if (profile.bodyFat) {
+    cards.push({ label: "體脂率", value: `${profile.bodyFat}%` });
+  }
+  if (profile.waistCm) {
+    cards.push({ label: "腰圍", value: `${profile.waistCm} cm` });
+  }
+  if (profile.restingHr) {
+    cards.push({ label: "安靜心跳", value: `${profile.restingHr} bpm` });
+  }
+
+  cards.push(
+    {
+      label: "訓練類型",
+      value: activityFocusLabel(profile.activityFocus),
+    },
+    {
+      label: "主要目標",
+      value: goalLabel(profile.primaryGoal),
+    },
+    {
+      label: "訓練經驗",
+      value: experienceLabel(profile.experience),
+    },
+    {
+      label: "體能自我評估",
+      value: fitnessLevelLabel(profile.fitnessLevel),
+    },
+    {
+      label: "每週訓練日數",
+      value: `${profile.trainingDays || "—"} 日`,
+    },
+    {
+      label: "每次可用時間",
+      value: `${profile.sessionMinutes || "—"} 分鐘`,
+    },
+    {
+      label: "工作型態",
+      value: workStyleLabel(profile.workStyle),
+    },
+    {
+      label: "訓練地點",
+      value: locationLabel(profile.locationPreference),
+    },
+    {
+      label: "偏好類型",
+      value: trainingPreferenceLabel(profile.trainingPreference),
+    },
+    {
+      label: "可用器材",
+      value: equipmentLabels(profile.equipment),
+    }
+  );
+
+  if (profile.dailySteps) {
+    cards.push({ label: "日常步數", value: `${profile.dailySteps}` });
+  }
+  if (profile.sleepHours) {
+    cards.push({ label: "睡眠", value: `${profile.sleepHours} 小時/晚` });
+  }
+  if (profile.stressLevel) {
+    cards.push({ label: "壓力水平", value: `${profile.stressLevel} / 5` });
+  }
+
+  return cards;
+}
+

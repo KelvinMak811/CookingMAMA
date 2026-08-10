@@ -2,10 +2,12 @@
 
 import type { GeneratedPlan } from "@/lib/workoutPlanner";
 import { enrichPlanItem } from "@/lib/workoutPlanner";
+import { MovementVideoEmbed } from "@/components/fitness/MovementVideoEmbed";
 
 interface WorkoutPlanViewProps {
   plan: GeneratedPlan;
   generatedAt?: string | null;
+  completedAt?: string | null;
   compact?: boolean;
 }
 
@@ -25,9 +27,11 @@ function formatGeneratedAt(iso?: string | null): string | null {
 export function WorkoutPlanView({
   plan,
   generatedAt,
+  completedAt,
   compact = false,
 }: WorkoutPlanViewProps) {
   const savedLabel = formatGeneratedAt(generatedAt);
+  const completedLabel = formatGeneratedAt(completedAt);
 
   return (
     <div className={compact ? undefined : "planner-plan-page"}>
@@ -37,9 +41,14 @@ export function WorkoutPlanView({
           <p className="small text-secondary mb-0">
             以新手安全、穩定習慣同逐步進展為核心。
             {savedLabel ? ` · 儲存於 ${savedLabel}` : ""}
+            {completedLabel ? ` · 完成於 ${completedLabel}` : ""}
           </p>
         </div>
-        <span className="badge text-bg-primary">{plan.goalLabel}</span>
+        <span
+          className={`badge ${completedAt ? "text-bg-success" : "text-bg-primary"}`}
+        >
+          {completedAt ? `已完成 · ${plan.goalLabel}` : plan.goalLabel}
+        </span>
       </div>
 
       <div className="planner-summary-grid mb-3">
@@ -88,16 +97,11 @@ export function WorkoutPlanView({
                       <strong>{item.label}</strong>
                       <span>{item.detail}</span>
                       {item.videoUrl ? (
-                        <a
-                          className="planner-video-link"
-                          href={item.videoUrl}
-                          target="_blank"
-                          rel="noreferrer"
-                        >
-                          ▶ 睇教學影片
-                          {item.videoOrg ? `（${item.videoOrg}）` : ""}
-                          {item.videoTitle ? ` · ${item.videoTitle}` : ""}
-                        </a>
+                        <MovementVideoEmbed
+                          url={item.videoUrl}
+                          title={item.videoTitle}
+                          org={item.videoOrg}
+                        />
                       ) : null}
                     </li>
                   );

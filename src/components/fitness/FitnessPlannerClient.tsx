@@ -1,13 +1,15 @@
 "use client";
 
-import { FormEvent, useEffect, useMemo, useState } from "react";
+import { FormEvent, Suspense, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import {
   DEFAULT_PROFILE,
   EQUIPMENT_OPTIONS,
   SAMPLE_PROFILE,
+  generateNextPlan,
   generateWorkoutPlan,
+  suggestNextStageProfile,
   type EquipmentId,
   type GeneratedPlan,
   type WorkoutProfile,
@@ -18,9 +20,11 @@ import {
   loadFitnessData,
   saveWorkoutPlanForAccount,
   type BmiHistoryEntry,
+  type SavedFitnessPlan,
 } from "@/lib/fitnessStorage";
 import { BmiHistoryChart } from "@/components/fitness/BmiHistoryChart";
 import { WorkoutPlanView } from "@/components/fitness/WorkoutPlanView";
+import { ProfileSummarySection } from "@/components/fitness/ProfileSummarySection";
 
 function toggleEquipment(
   current: EquipmentId[],
@@ -35,8 +39,10 @@ function toggleEquipment(
   return [...withoutNone, value];
 }
 
-export function FitnessPlannerClient() {
+function FitnessPlannerClientInner() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const isNextStage = searchParams.get("next") === "1";
   const currentUserId = useAccountStore((s) => s.currentUserId);
   const userKey = currentUserId || "guest";
   const fallbackName = currentUserId ? getAccountName(currentUserId) : "你";
@@ -44,22 +50,41 @@ export function FitnessPlannerClient() {
   const [plan, setPlan] = useState<GeneratedPlan | null>(null);
   const [bmiHistory, setBmiHistory] = useState<BmiHistoryEntry[]>([]);
   const [savedAt, setSavedAt] = useState<string | null>(null);
+  const [previousPlan, setPreviousPlan] = useState<SavedFitnessPlan | null>(
+    null
+  );
+  const [historyCount, setHistoryCount] = useState(0);
   const [hydrated, setHydrated] = useState(false);
 
   useEffect(() => {
     const data = loadFitnessData(userKey);
-    if (data.profile) {
-      setProfile({ ...DEFAULT_PROFILE, ...data.profile });
+    const baseProfile = data.profile
+      ? { ...DEFAULT_PROFILE, ...data.profile }
+      : DEFAULT_PROFILE;
+
+    if (isNextStage && data.profile) {
+      setProfile(suggestNextStageProfile(baseProfile));
+      setPreviousPlan(data.savedPlan);
+      setPlan(null);
+      setSavedAt(null);
+    } else {
+      setProfile(baseProfile);
+      if (data.savedPlan?.plan) {
+        setPlan(data.savedPlan.plan);
+        setSavedAt(data.savedPlan.generatedAt);
+        setPreviousPlan(data.savedPlan);
+      } else if (data.profile) {
+        setPlan(generateWorkoutPlan(data.profile, fallbackName));
+        setPreviousPlan(null);
+      } else {
+        setPreviousPlan(null);
+      }
     }
-    if (data.savedPlan?.plan) {
-      setPlan(data.savedPlan.plan);
-      setSavedAt(data.savedPlan.generatedAt);
-    } else if (data.profile) {
-      setPlan(generateWorkoutPlan(data.profile, fallbackName));
-    }
+
     setBmiHistory(data.bmiHistory);
+    setHistoryCount(data.planHistory?.length ?? 0);
     setHydrated(true);
-  }, [userKey, fallbackName]);
+  }, [userKey, fallbackName, isNextStage]);
 
   const defaultReferences = useMemo(
     () => generateWorkoutPlan(DEFAULT_PROFILE).references.slice(0, 4),
@@ -78,11 +103,25 @@ export function FitnessPlannerClient() {
     setPlan(nextPlan);
     setBmiHistory(saved.bmiHistory);
     setSavedAt(saved.savedPlan?.generatedAt ?? null);
+    setPreviousPlan(saved.savedPlan);
+    setHistoryCount(saved.planHistory?.length ?? 0);
   }
 
   function onSubmit(event: FormEvent) {
     event.preventDefault();
-    const nextPlan = generateWorkoutPlan(profile, fallbackName);
+    const nextPlan = isNextStage
+      ? generateNextPlan(
+          profile,
+          previousPlan?.plan ?? null,
+          {
+            completedAt:
+              previousPlan?.completedAt || new Date().toISOString(),
+            previousGeneratedAt: previousPlan?.generatedAt,
+            stageIndex: historyCount,
+          },
+          fallbackName
+        )
+      : generateWorkoutPlan(profile, fallbackName);
     persistPlan(profile, nextPlan);
     router.push("/fitness/plan");
   }
@@ -100,6 +139,23 @@ export function FitnessPlannerClient() {
   return (
     <div className="row g-4">
       <div className="col-12 col-xl-7">
+        {isNextStage ? (
+          <section className="planner-next-banner mb-3">
+            <div>
+              <h2 className="h6 fw-bold mb-1">下一步：訂製新階段計劃</h2>
+              <p className="small text-secondary mb-0">
+                已用上一階段資料預填，並略為調高經驗／時長建議。你可以改目標、每週日數、每次時間、運動類型（綜合／游泳／足球／羽毛球）再生成。
+                {previousPlan?.plan
+                  ? ` 上一份：${previousPlan.plan.goalLabel}。`
+                  : ""}
+              </p>
+            </div>
+            <Link href="/fitness/plan" className="btn btn-outline-secondary btn-sm">
+              返回計劃頁
+            </Link>
+          </section>
+        ) : null}
+
         <form className="planner-form" onSubmit={onSubmit}>
           <section className="planner-section">
             <div className="planner-section-title">
@@ -197,9 +253,12 @@ export function FitnessPlannerClient() {
             </div>
           </section>
 
-          <section className="planner-section">
+          <section className="planner-section" id="next-stage-prefs">
             <div className="planner-section-title">
-              <h2 className="h5 fw-bold mb-1">2. 目標與背景</h2>
+              <h2 className="h5 fw-bold mb-1">
+                2. 目標與背景
+                {isNextStage ? "（可為下一階段調整）" : ""}
+              </h2>
               <p className="small text-secondary mb-0">你想改善咩、做過啲乜、而家去到邊。</p>
             </div>
             <div className="row g-3">
@@ -221,7 +280,7 @@ export function FitnessPlannerClient() {
                   <option value="badminton">羽毛球</option>
                 </select>
                 <div className="form-text">
-                  揀運動項目後，週計劃會改成對應嘅技術、體能同恢復安排，每個動作都有教學影片連結。
+                  揀運動項目後，週計劃會改成對應嘅技術、體能同恢復安排，每個動作都有可喺站內播放嘅教學影片。
                 </div>
               </div>
               <div className="col-12">
@@ -493,11 +552,13 @@ export function FitnessPlannerClient() {
 
           <div className="d-grid d-md-flex gap-2 mt-3">
             <button type="submit" className="btn btn-primary btn-lg">
-              生成並儲存計劃
+              {isNextStage ? "生成並儲存下一階段計劃" : "生成並儲存計劃"}
             </button>
-            <button type="button" className="btn btn-outline-secondary" onClick={loadSample}>
-              載入示範資料
-            </button>
+            {!isNextStage ? (
+              <button type="button" className="btn btn-outline-secondary" onClick={loadSample}>
+                載入示範資料
+              </button>
+            ) : null}
           </div>
         </form>
       </div>
@@ -507,24 +568,34 @@ export function FitnessPlannerClient() {
           <BmiHistoryChart history={bmiHistory} />
 
           <section className="planner-output-card">
+            <ProfileSummarySection profile={profile} compact showNotes={false} />
+          </section>
+
+          <section className="planner-output-card">
             {!plan ? (
               <>
                 <div className="d-flex justify-content-between align-items-start gap-2 mb-2">
                   <div>
-                    <h2 className="h5 fw-bold mb-1">你的訓練計劃</h2>
+                    <h2 className="h5 fw-bold mb-1">
+                      {isNextStage ? "下一階段計劃預覽" : "你的訓練計劃"}
+                    </h2>
                     <p className="small text-secondary mb-0">
-                      提交表單後會儲存到帳戶，並開啟獨立計劃頁。
+                      {isNextStage
+                        ? "調整左邊資料後提交，會生成延續計劃並存入帳戶。"
+                        : "提交表單後會儲存到帳戶，並開啟獨立計劃頁。"}
                     </p>
                   </div>
-                  <span className="badge text-bg-light">4 週入門版</span>
+                  <span className="badge text-bg-light">
+                    {isNextStage ? "延續階段" : "4 週入門版"}
+                  </span>
                 </div>
                 <div className="planner-empty-state">
                   <p className="mb-2">未有計劃前，你可以預期會包含：</p>
                   <ul className="small text-secondary mb-0">
                     <li>綜合健身／游泳／足球／羽毛球專項安排</li>
-                    <li>每個動作附教學影片連結</li>
+                    <li>每個動作附站內教學影片</li>
                     <li>BMI 記錄同走勢圖</li>
-                    <li>登入帳戶後下次可直接打開</li>
+                    <li>登入帳戶後下次可直接打開個人資料同計劃</li>
                   </ul>
                 </div>
               </>
@@ -539,6 +610,7 @@ export function FitnessPlannerClient() {
                 <WorkoutPlanView
                   plan={plan}
                   generatedAt={savedAt}
+                  completedAt={previousPlan?.completedAt}
                   compact
                 />
               </>
@@ -550,7 +622,7 @@ export function FitnessPlannerClient() {
             <ul className="small text-secondary mb-0 planner-principles">
               <li>以新手安全同可持續性優先，唔追求第一週就做到好勁。</li>
               <li>綜合健身用力量、帶氧、活動度；球類／游泳則技術 + 體能 + 恢復並重。</li>
-              <li>每個動作盡量附官方或可信教學影片，方便跟住做。</li>
+              <li>每個動作盡量附官方或可信教學影片，可喺計劃入面直接播放。</li>
               <li>如果睡眠不足、壓力偏高或有傷患訊號，計劃會主動保守。</li>
             </ul>
           </section>
@@ -584,5 +656,13 @@ export function FitnessPlannerClient() {
         </div>
       </div>
     </div>
+  );
+}
+
+export function FitnessPlannerClient() {
+  return (
+    <Suspense fallback={<div className="text-secondary small py-4">載入運動計劃中…</div>}>
+      <FitnessPlannerClientInner />
+    </Suspense>
   );
 }
