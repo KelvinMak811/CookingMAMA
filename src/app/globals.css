@@ -526,6 +526,10 @@ body {
   gap: 0.65rem;
 }
 
+.planner-summary-grid .planner-stat-card:last-child:nth-child(odd) {
+  grid-column: 1 / -1;
+}
+
 .planner-stat-card {
   background: #fff7ed;
   border-radius: 0.85rem;
@@ -623,4 +627,64 @@ body {
     grid-template-columns: 1fr;
   }
 }
+
+.planner-video-link {
+  display: inline-block;
+  margin-top: 0.25rem;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #ea580c;
+  text-decoration: none;
+}
+
+.planner-video-link:hover,
+.planner-video-link:focus {
+  color: #c2410c;
+  text-decoration: underline;
+}
+
+.bmi-chart-svg {
+  width: 100%;
+  height: auto;
+  display: block;
+  background: linear-gradient(180deg, #fff7ed 0%, #ffffff 70%);
+  border-radius: 0.85rem;
+  border: 1px solid #fed7aa;
+}
+
+.bmi-chart-line {
+  stroke: #ea580c;
+  stroke-width: 2.5;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+
+.bmi-chart-dot {
+  fill: #ea580c;
+}
+
+.bmi-chart-band {
+  stroke: #fdba74;
+  stroke-width: 1;
+  stroke-dasharray: 4 4;
+}
+
+.bmi-chart-band-label {
+  fill: #9a3412;
+  font-size: 8px;
+}
+
+.bmi-chart-axis {
+  fill: #78716c;
+  font-size: 9px;
+}
+
+.bmi-history-list li + li {
+  margin-top: 0.25rem;
+}
+
+.planner-movement-list .planner-video-link {
+  display: block;
+}
+
 

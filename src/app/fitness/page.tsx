@@ -10,8 +10,8 @@ export default function FitnessPage() {
           <div>
             <h1 className="h3 fw-bold mb-2">按你身體狀況製定新手訓練計劃</h1>
             <p className="text-secondary mb-0">
-              呢頁會以初學者、安全、可持續為原則，根據你輸入嘅身體資料、生活節奏、傷患、設備同目標，
-              生成一份可立即開始嘅 4 星期入門訓練建議。
+              支援綜合健身、游泳、足球同羽毛球。填好資料後會生成 4 星期入門計劃、BMI 走勢，
+              並儲存到你嘅帳戶；每個動作都附有教學影片連結。
             </p>
           </div>
           <div className="planner-hero-note">

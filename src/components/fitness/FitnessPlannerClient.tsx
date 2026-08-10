@@ -1,6 +1,8 @@
 "use client";
 
 import { FormEvent, useEffect, useMemo, useState } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 import {
   DEFAULT_PROFILE,
   EQUIPMENT_OPTIONS,
@@ -12,33 +14,13 @@ import {
 } from "@/lib/workoutPlanner";
 import { getAccountName } from "@/lib/accounts";
 import { useAccountStore } from "@/stores/accountStore";
-
-const STORAGE_KEY = "smartcook_workout_profiles";
-
-function loadStoredProfile(userKey: string): WorkoutProfile | null {
-  try {
-    const all = JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}") as Record<
-      string,
-      WorkoutProfile
-    >;
-    return all[userKey] || null;
-  } catch {
-    return null;
-  }
-}
-
-function saveStoredProfile(userKey: string, profile: WorkoutProfile) {
-  try {
-    const all = JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}") as Record<
-      string,
-      WorkoutProfile
-    >;
-    all[userKey] = profile;
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(all));
-  } catch {
-    // ignore quota / private mode errors
-  }
-}
+import {
+  loadFitnessData,
+  saveWorkoutPlanForAccount,
+  type BmiHistoryEntry,
+} from "@/lib/fitnessStorage";
+import { BmiHistoryChart } from "@/components/fitness/BmiHistoryChart";
+import { WorkoutPlanView } from "@/components/fitness/WorkoutPlanView";
 
 function toggleEquipment(
   current: EquipmentId[],
@@ -54,19 +36,28 @@ function toggleEquipment(
 }
 
 export function FitnessPlannerClient() {
+  const router = useRouter();
   const currentUserId = useAccountStore((s) => s.currentUserId);
   const userKey = currentUserId || "guest";
   const fallbackName = currentUserId ? getAccountName(currentUserId) : "你";
   const [profile, setProfile] = useState<WorkoutProfile>(DEFAULT_PROFILE);
   const [plan, setPlan] = useState<GeneratedPlan | null>(null);
+  const [bmiHistory, setBmiHistory] = useState<BmiHistoryEntry[]>([]);
+  const [savedAt, setSavedAt] = useState<string | null>(null);
   const [hydrated, setHydrated] = useState(false);
 
   useEffect(() => {
-    const existing = loadStoredProfile(userKey);
-    if (existing) {
-      setProfile({ ...DEFAULT_PROFILE, ...existing });
-      setPlan(generateWorkoutPlan(existing, fallbackName));
+    const data = loadFitnessData(userKey);
+    if (data.profile) {
+      setProfile({ ...DEFAULT_PROFILE, ...data.profile });
     }
+    if (data.savedPlan?.plan) {
+      setPlan(data.savedPlan.plan);
+      setSavedAt(data.savedPlan.generatedAt);
+    } else if (data.profile) {
+      setPlan(generateWorkoutPlan(data.profile, fallbackName));
+    }
+    setBmiHistory(data.bmiHistory);
     setHydrated(true);
   }, [userKey, fallbackName]);
 
@@ -82,18 +73,24 @@ export function FitnessPlannerClient() {
     setProfile((prev) => ({ ...prev, [key]: value }));
   }
 
+  function persistPlan(nextProfile: WorkoutProfile, nextPlan: GeneratedPlan) {
+    const saved = saveWorkoutPlanForAccount(userKey, nextProfile, nextPlan);
+    setPlan(nextPlan);
+    setBmiHistory(saved.bmiHistory);
+    setSavedAt(saved.savedPlan?.generatedAt ?? null);
+  }
+
   function onSubmit(event: FormEvent) {
     event.preventDefault();
     const nextPlan = generateWorkoutPlan(profile, fallbackName);
-    setPlan(nextPlan);
-    saveStoredProfile(userKey, profile);
+    persistPlan(profile, nextPlan);
+    router.push("/fitness/plan");
   }
 
   function loadSample() {
     setProfile(SAMPLE_PROFILE);
     const nextPlan = generateWorkoutPlan(SAMPLE_PROFILE, fallbackName);
-    setPlan(nextPlan);
-    saveStoredProfile(userKey, SAMPLE_PROFILE);
+    persistPlan(SAMPLE_PROFILE, nextPlan);
   }
 
   if (!hydrated) {
@@ -206,6 +203,27 @@ export function FitnessPlannerClient() {
               <p className="small text-secondary mb-0">你想改善咩、做過啲乜、而家去到邊。</p>
             </div>
             <div className="row g-3">
+              <div className="col-12">
+                <label className="form-label">訓練類型 / 運動項目</label>
+                <select
+                  className="form-select"
+                  value={profile.activityFocus || "general"}
+                  onChange={(e) =>
+                    updateField(
+                      "activityFocus",
+                      e.target.value as WorkoutProfile["activityFocus"]
+                    )
+                  }
+                >
+                  <option value="general">綜合健身（力量 + 帶氧 + 活動度）</option>
+                  <option value="swimming">游泳</option>
+                  <option value="soccer">足球</option>
+                  <option value="badminton">羽毛球</option>
+                </select>
+                <div className="form-text">
+                  揀運動項目後，週計劃會改成對應嘅技術、體能同恢復安排，每個動作都有教學影片連結。
+                </div>
+              </div>
               <div className="col-12">
                 <label className="form-label">主要目標</label>
                 <select
@@ -437,6 +455,8 @@ export function FitnessPlannerClient() {
                   <option value="home">屋企為主</option>
                   <option value="gym">健身室為主</option>
                   <option value="outdoor">戶外為主</option>
+                  <option value="pool">泳池為主</option>
+                  <option value="court">球場／羽球場為主</option>
                   <option value="mixed">都可以</option>
                 </select>
               </div>
@@ -473,7 +493,7 @@ export function FitnessPlannerClient() {
 
           <div className="d-grid d-md-flex gap-2 mt-3">
             <button type="submit" className="btn btn-primary btn-lg">
-              生成我的訓練計劃
+              生成並儲存計劃
             </button>
             <button type="button" className="btn btn-outline-secondary" onClick={loadSample}>
               載入示範資料
@@ -484,6 +504,8 @@ export function FitnessPlannerClient() {
 
       <div className="col-12 col-xl-5">
         <div className="planner-side-stack">
+          <BmiHistoryChart history={bmiHistory} />
+
           <section className="planner-output-card">
             {!plan ? (
               <>
@@ -491,7 +513,7 @@ export function FitnessPlannerClient() {
                   <div>
                     <h2 className="h5 fw-bold mb-1">你的訓練計劃</h2>
                     <p className="small text-secondary mb-0">
-                      提交表單後，系統會即時生成分析與週計劃。
+                      提交表單後會儲存到帳戶，並開啟獨立計劃頁。
                     </p>
                   </div>
                   <span className="badge text-bg-light">4 週入門版</span>
@@ -499,94 +521,26 @@ export function FitnessPlannerClient() {
                 <div className="planner-empty-state">
                   <p className="mb-2">未有計劃前，你可以預期會包含：</p>
                   <ul className="small text-secondary mb-0">
-                    <li>身體與恢復狀況分析</li>
-                    <li>每週 2 至 6 日實際可做訓練安排</li>
-                    <li>按器材調整後的動作選擇</li>
-                    <li>熱身、主訓練、帶氧、收操與進度建議</li>
+                    <li>綜合健身／游泳／足球／羽毛球專項安排</li>
+                    <li>每個動作附教學影片連結</li>
+                    <li>BMI 記錄同走勢圖</li>
+                    <li>登入帳戶後下次可直接打開</li>
                   </ul>
                 </div>
               </>
             ) : (
               <>
-                <div className="d-flex justify-content-between align-items-start gap-2 mb-3">
-                  <div>
-                    <h2 className="h5 fw-bold mb-1">{plan.displayName} 的 4 星期入門計劃</h2>
-                    <p className="small text-secondary mb-0">
-                      以新手安全、穩定習慣同逐步進展為核心。
-                    </p>
-                  </div>
-                  <span className="badge text-bg-primary">{plan.goalLabel}</span>
+                <div className="d-flex justify-content-between align-items-center gap-2 mb-3">
+                  <h2 className="h5 fw-bold mb-0">已儲存預覽</h2>
+                  <Link href="/fitness/plan" className="btn btn-sm btn-primary">
+                    開啟完整計劃頁
+                  </Link>
                 </div>
-
-                <div className="planner-summary-grid mb-3">
-                  {plan.cards.map((card) => (
-                    <div key={card.label} className="planner-stat-card">
-                      <div className="planner-stat-label">{card.label}</div>
-                      <div className="planner-stat-value">{card.value}</div>
-                    </div>
-                  ))}
-                </div>
-
-                <section className="mb-3">
-                  <h3 className="h6 fw-bold mb-2">分析重點</h3>
-                  <p className="small mb-2">{plan.focusText}</p>
-                  {plan.flags.length ? (
-                    <ul className="small text-secondary mb-0">
-                      {plan.flags.map((flag) => (
-                        <li key={flag}>{flag}</li>
-                      ))}
-                    </ul>
-                  ) : (
-                    <p className="small text-secondary mb-0">
-                      目前未見明顯高風險訊號，可由保守強度開始，再觀察恢復與動作品質。
-                    </p>
-                  )}
-                </section>
-
-                <section className="mb-3">
-                  <h3 className="h6 fw-bold mb-2">每週訓練安排</h3>
-                  <div className="planner-week-list">
-                    {plan.weeklyPlan.map((day, index) => (
-                      <article key={`${day.title}-${index}`} className="planner-day-card">
-                        <div className="d-flex justify-content-between align-items-start gap-2 mb-2">
-                          <div>
-                            <div className="planner-day-label">Day {index + 1}</div>
-                            <h4 className="h6 fw-bold mb-1">{day.title}</h4>
-                            <p className="small text-secondary mb-0">{day.focus}</p>
-                          </div>
-                          <span className="badge text-bg-light">{day.duration}</span>
-                        </div>
-                        <ul className="planner-movement-list">
-                          {day.items.map((item) => (
-                            <li key={`${item.label}-${item.detail}`}>
-                              <strong>{item.label}</strong>
-                              <span>{item.detail}</span>
-                            </li>
-                          ))}
-                        </ul>
-                        <p className="small text-secondary mb-0">{day.coaching}</p>
-                      </article>
-                    ))}
-                  </div>
-                </section>
-
-                <section className="mb-3">
-                  <h3 className="h6 fw-bold mb-2">熱身與安全提醒</h3>
-                  <ul className="small text-secondary mb-0">
-                    {plan.warmup.map((item) => (
-                      <li key={item}>{item}</li>
-                    ))}
-                  </ul>
-                </section>
-
-                <section>
-                  <h3 className="h6 fw-bold mb-2">4 星期漸進方式</h3>
-                  <ul className="small text-secondary mb-0">
-                    {plan.progression.map((item) => (
-                      <li key={item}>{item}</li>
-                    ))}
-                  </ul>
-                </section>
+                <WorkoutPlanView
+                  plan={plan}
+                  generatedAt={savedAt}
+                  compact
+                />
               </>
             )}
           </section>
@@ -595,8 +549,8 @@ export function FitnessPlannerClient() {
             <h2 className="h5 fw-bold mb-2">專業設計原則</h2>
             <ul className="small text-secondary mb-0 planner-principles">
               <li>以新手安全同可持續性優先，唔追求第一週就做到好勁。</li>
-              <li>用全身訓練、步行／低衝擊帶氧、核心穩定同活動度建立底子。</li>
-              <li>以 RPE 主觀強度提示控制負荷，方便不同體能人士跟住做。</li>
+              <li>綜合健身用力量、帶氧、活動度；球類／游泳則技術 + 體能 + 恢復並重。</li>
+              <li>每個動作盡量附官方或可信教學影片，方便跟住做。</li>
               <li>如果睡眠不足、壓力偏高或有傷患訊號，計劃會主動保守。</li>
             </ul>
           </section>
@@ -604,7 +558,7 @@ export function FitnessPlannerClient() {
           <section className="planner-output-card">
             <h2 className="h5 fw-bold mb-2">參考來源</h2>
             <p className="small text-secondary mb-2">
-              優先引用官方健康機構同公共醫療資源，方便你學動作同核對安全提示。
+              優先引用官方健康機構同運動總會資源，方便你學動作同核對安全提示。
             </p>
             <div className="reference-list small">
               {(plan?.references || defaultReferences).map((source) => (
