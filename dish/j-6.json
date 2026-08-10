@@ -1,0 +1,45 @@
+{
+  "id": "j-6",
+  "name": "日式炒乌冬",
+  "cuisine": "japanese",
+  "baseServings": 2,
+  "description": "Yakisoba 风格炒乌冬，易洁锅大火炒出香气。",
+  "difficulty": 1,
+  "prepTime": 15,
+  "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5a/Yakisoba.jpg/960px-Yakisoba.jpg",
+  "ingredients": [
+    {
+      "id": "j6-1",
+      "name": "乌冬面",
+      "amount": "2包"
+    },
+    {
+      "id": "j6-2",
+      "name": "椰菜",
+      "amount": "150g"
+    },
+    {
+      "id": "j6-3",
+      "name": "日式炒面酱",
+      "amount": "3汤匙"
+    },
+    {
+      "id": "j6-4",
+      "name": "猪肉片",
+      "amount": "150g"
+    },
+    {
+      "id": "j6-5",
+      "name": "木鱼丝",
+      "amount": "适量"
+    }
+  ],
+  "steps": [
+    "烏冬面按包裝指示焯軟，過凍水瀝乾；椰菜切粗絲；豬肉片輕輕分開。",
+    "易潔鑊大火加少許油，下豬肉片快炒約1至2分鐘至變色。",
+    "加入椰菜絲，中火炒2至3分鐘至略軟、邊緣微焦出香。",
+    "下烏冬面同日式炒麵醬，轉大火快炒約2分鐘，用筷子挑散令每條麵裹上醬汁。",
+    "見麵條均勻上色、鑊氣足即可關火。",
+    "撒木魚絲起鑊，趁熱食。"
+  ]
+}

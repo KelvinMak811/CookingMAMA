@@ -1,0 +1,45 @@
+{
+  "id": "cn-12",
+  "name": "咸鱼雞粒炒飯",
+  "cuisine": "chinese",
+  "baseServings": 2,
+  "description": "咸香惹味嘅港式炒飯，易潔鑊大火快炒就得。",
+  "difficulty": 2,
+  "prepTime": 20,
+  "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/34/Fried_Rice_with_Salted_Fish_and_Chicken.jpg/960px-Fried_Rice_with_Salted_Fish_and_Chicken.jpg",
+  "ingredients": [
+    {
+      "id": "cn12-1",
+      "name": "隔夜白飯",
+      "amount": "2碗"
+    },
+    {
+      "id": "cn12-2",
+      "name": "雞胸肉",
+      "amount": "200g"
+    },
+    {
+      "id": "cn12-3",
+      "name": "咸魚粒",
+      "amount": "30g"
+    },
+    {
+      "id": "cn12-4",
+      "name": "雞蛋",
+      "amount": "1隻"
+    },
+    {
+      "id": "cn12-5",
+      "name": "蔥",
+      "amount": "1條"
+    }
+  ],
+  "steps": [
+    "雞胸肉切粒，生抽、生粉、油醃10分鐘；咸魚切碎；飯搓散。",
+    "易潔鑊中火下少許油，炒香咸魚至出味（小心搶火）。",
+    "下雞粒炒至變色熟透，盛起。",
+    "大火下油炒飯至乾身，加入雞蛋快速炒散。",
+    "倒返咸魚雞粒，兜匀炒勻。",
+    "撒蔥花，試味（咸魚夠咸可唔加鹽），起鑊。"
+  ]
+}

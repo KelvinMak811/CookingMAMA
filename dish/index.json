@@ -1,0 +1,256 @@
+{
+  "version": 1,
+  "description": "SmartCook built-in dish database — one JSON file per recipe",
+  "dishes": [
+    {
+      "id": "recipe-1",
+      "name": "番茄炒蛋",
+      "cuisine": "chinese"
+    },
+    {
+      "id": "recipe-2",
+      "name": "豉油皇炒麵",
+      "cuisine": "chinese"
+    },
+    {
+      "id": "recipe-3",
+      "name": "清蒸鱸魚",
+      "cuisine": "chinese"
+    },
+    {
+      "id": "recipe-4",
+      "name": "麻婆豆腐",
+      "cuisine": "chinese"
+    },
+    {
+      "id": "recipe-5",
+      "name": "姜葱滑雞",
+      "cuisine": "chinese"
+    },
+    {
+      "id": "recipe-6",
+      "name": "蒸水蛋",
+      "cuisine": "chinese"
+    },
+    {
+      "id": "cn-7",
+      "name": "揚州炒飯",
+      "cuisine": "chinese"
+    },
+    {
+      "id": "cn-8",
+      "name": "蠔油菜心",
+      "cuisine": "chinese"
+    },
+    {
+      "id": "cn-9",
+      "name": "魚香茄子",
+      "cuisine": "chinese"
+    },
+    {
+      "id": "cn-10",
+      "name": "滑蛋牛肉飯",
+      "cuisine": "chinese"
+    },
+    {
+      "id": "cn-11",
+      "name": "港式咖喱牛腩",
+      "cuisine": "chinese"
+    },
+    {
+      "id": "cn-12",
+      "name": "咸鱼雞粒炒飯",
+      "cuisine": "chinese"
+    },
+    {
+      "id": "cn-13",
+      "name": "香煎豬頸肉",
+      "cuisine": "chinese"
+    },
+    {
+      "id": "cn-14",
+      "name": "豉椒豬頸肉",
+      "cuisine": "chinese"
+    },
+    {
+      "id": "cn-15",
+      "name": "薯仔牛柳粒",
+      "cuisine": "chinese"
+    },
+    {
+      "id": "cn-16",
+      "name": "三文魚炒飯",
+      "cuisine": "chinese"
+    },
+    {
+      "id": "cn-17",
+      "name": "蠔油炆水菜",
+      "cuisine": "chinese"
+    },
+    {
+      "id": "cn-18",
+      "name": "干炒牛河",
+      "cuisine": "chinese"
+    },
+    {
+      "id": "cn-19",
+      "name": "蜜糖蒜蓉豬頸肉",
+      "cuisine": "chinese"
+    },
+    {
+      "id": "cn-20",
+      "name": "黑椒豬頸肉意粉",
+      "cuisine": "chinese"
+    },
+    {
+      "id": "w-1",
+      "name": "美式炒蛋多士",
+      "cuisine": "western"
+    },
+    {
+      "id": "w-2",
+      "name": "蘑菇奶油意粉",
+      "cuisine": "western"
+    },
+    {
+      "id": "w-3",
+      "name": "香煎雞腿扒",
+      "cuisine": "western"
+    },
+    {
+      "id": "w-4",
+      "name": "蕃茄肉醬意粉",
+      "cuisine": "western"
+    },
+    {
+      "id": "w-5",
+      "name": "北非蛋 Shakshuka",
+      "cuisine": "western"
+    },
+    {
+      "id": "w-6",
+      "name": "芝士火腿蛋卷",
+      "cuisine": "western"
+    },
+    {
+      "id": "w-7",
+      "name": "蒜香牛油蝦",
+      "cuisine": "western"
+    },
+    {
+      "id": "w-8",
+      "name": "奶油蘑菇雞扒",
+      "cuisine": "western"
+    },
+    {
+      "id": "w-9",
+      "name": "經典牛柳粒",
+      "cuisine": "western"
+    },
+    {
+      "id": "w-10",
+      "name": "蔬菜雜燴一鑊煮",
+      "cuisine": "western"
+    },
+    {
+      "id": "j-1",
+      "name": "親子丼",
+      "cuisine": "japanese"
+    },
+    {
+      "id": "j-2",
+      "name": "牛肉饭",
+      "cuisine": "japanese"
+    },
+    {
+      "id": "j-3",
+      "name": "照烧鸡腿",
+      "cuisine": "japanese"
+    },
+    {
+      "id": "j-4",
+      "name": "日式咖喱饭",
+      "cuisine": "japanese"
+    },
+    {
+      "id": "j-5",
+      "name": "味噌汤",
+      "cuisine": "japanese"
+    },
+    {
+      "id": "j-6",
+      "name": "日式炒乌冬",
+      "cuisine": "japanese"
+    },
+    {
+      "id": "j-7",
+      "name": "姜烧猪肉",
+      "cuisine": "japanese"
+    },
+    {
+      "id": "j-8",
+      "name": "豆腐汉堡排",
+      "cuisine": "japanese"
+    },
+    {
+      "id": "j-9",
+      "name": "鲭鱼味噌煮",
+      "cuisine": "japanese"
+    },
+    {
+      "id": "j-10",
+      "name": "茶碗蒸",
+      "cuisine": "japanese"
+    },
+    {
+      "id": "it-1",
+      "name": "蒜香橄榄油意粉",
+      "cuisine": "italian"
+    },
+    {
+      "id": "it-2",
+      "name": "番茄罗勒意粉",
+      "cuisine": "italian"
+    },
+    {
+      "id": "it-3",
+      "name": "培根蛋意粉",
+      "cuisine": "italian"
+    },
+    {
+      "id": "it-4",
+      "name": "意式番茄炖鸡",
+      "cuisine": "italian"
+    },
+    {
+      "id": "it-5",
+      "name": "蒜香虾仁意粉",
+      "cuisine": "italian"
+    },
+    {
+      "id": "it-6",
+      "name": "肉丸番茄意粉",
+      "cuisine": "italian"
+    },
+    {
+      "id": "it-7",
+      "name": "意式杂菜烩",
+      "cuisine": "italian"
+    },
+    {
+      "id": "it-8",
+      "name": "奶油培根意粉",
+      "cuisine": "italian"
+    },
+    {
+      "id": "it-9",
+      "name": "香辣意式香肠炒意粉",
+      "cuisine": "italian"
+    },
+    {
+      "id": "it-10",
+      "name": "简易蘑菇烩饭",
+      "cuisine": "italian"
+    }
+  ]
+}

@@ -1,0 +1,45 @@
+{
+  "id": "recipe-5",
+  "name": "姜葱滑雞",
+  "cuisine": "chinese",
+  "baseServings": 2,
+  "description": "取代白切雞嘅快手版，易潔鑊快炒，肉質嫩滑多汁。",
+  "difficulty": 2,
+  "prepTime": 25,
+  "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d0/Ginger_chicken.jpg/960px-Ginger_chicken.jpg",
+  "ingredients": [
+    {
+      "id": "i5-1",
+      "name": "去骨雞腿肉",
+      "amount": "400g"
+    },
+    {
+      "id": "i5-2",
+      "name": "薑",
+      "amount": "5片"
+    },
+    {
+      "id": "i5-3",
+      "name": "蔥",
+      "amount": "3條"
+    },
+    {
+      "id": "i5-4",
+      "name": "生抽",
+      "amount": "2湯匙"
+    },
+    {
+      "id": "i5-5",
+      "name": "生粉",
+      "amount": "1湯匙"
+    }
+  ],
+  "steps": [
+    "雞腿肉切約3厘米塊，生抽、少許糖、生粉抓勻醃15分鐘。",
+    "薑切片；蔥切段，葱白同葱葉分開。",
+    "易潔鑊大火下油，爆香薑片同葱白至出香。",
+    "下雞件大火炒至表面變色，約4–5分鐘至熟透。",
+    "加少許水燜1分鐘令肉更滑（可省略）。",
+    "下葱葉快速兜炒幾下，汁收少少即可起鑊。"
+  ]
+}
