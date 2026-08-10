@@ -54,11 +54,7 @@ body {
 }
 
 @media (min-width: 768px) {
-  /* Match Next globals.css: wider desktop shell; mobile stays 48rem. */
-  .app-main {
-    max-width: 72rem;
-    padding-bottom: 2rem;
-  }
+  .app-main { padding-bottom: 2rem; }
 }
 
 .safe-area-bottom {
