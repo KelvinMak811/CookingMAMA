@@ -13,6 +13,7 @@ export const STORAGE_KEYS = {
   CUSTOM_RECIPES: "smartcook_custom_recipes",
   FITNESS: "smartcook_fitness",
   JAPANESE: "smartcook_japanese",
+  INVEST: "smartcook_invest",
 } as const;
 
 export type StorageKey = (typeof STORAGE_KEYS)[keyof typeof STORAGE_KEYS];
@@ -63,6 +64,7 @@ export function storageKeyToSyncKey(
   | "fridge"
   | "fitness"
   | "japanese"
+  | "invest"
   | "custom_recipes"
   | null {
   if (localKey === STORAGE_KEYS.SHOPPING) return "shopping";
@@ -71,6 +73,7 @@ export function storageKeyToSyncKey(
   if (localKey === STORAGE_KEYS.FRIDGE) return "fridge";
   if (localKey === STORAGE_KEYS.FITNESS) return "fitness";
   if (localKey === STORAGE_KEYS.JAPANESE) return "japanese";
+  if (localKey === STORAGE_KEYS.INVEST) return "invest";
   if (localKey === STORAGE_KEYS.CUSTOM_RECIPES) return "custom_recipes";
   return null;
 }

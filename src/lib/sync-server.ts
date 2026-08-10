@@ -10,6 +10,7 @@ export const SYNC_USER_KEYS = [
   "fridge",
   "fitness",
   "japanese",
+  "invest",
 ] as const;
 export type SyncUserKey = (typeof SYNC_USER_KEYS)[number];
 

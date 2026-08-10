@@ -835,4 +835,49 @@ body {
   flex-shrink: 0;
 }
 
+.invest-disclaimer {
+  border: 1px solid #fcd34d;
+  background: linear-gradient(135deg, #fffbeb, #fff7ed);
+  border-radius: 0.9rem;
+  padding: 0.85rem 1rem;
+}
+
+.invest-disclaimer--compact {
+  padding: 0.55rem 0.75rem;
+}
+
+.invest-disclaimer-title {
+  display: block;
+  color: #92400e;
+  font-size: 0.95rem;
+}
+
+.invest-disclaimer-body {
+  margin-top: 0.35rem;
+  color: #78716c;
+  font-size: 0.82rem;
+  line-height: 1.45;
+}
+
+.text-truncate-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+@media (max-width: 767.98px) {
+  .app-bottom-nav-label {
+    font-size: 0.58rem;
+  }
+
+  .app-bottom-nav-icon {
+    font-size: 1.1rem;
+  }
+
+  .app-bottom-nav-link {
+    padding: 0.3rem 0.1rem;
+  }
+}
+
 
