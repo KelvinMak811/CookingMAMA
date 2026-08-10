@@ -4,12 +4,15 @@ import { FormEvent, useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useAccountStore } from "@/stores/accountStore";
 import {
+  CATEGORIES,
+  categoryLabel,
   formatChangePct,
   formatPrice,
   loadMarketSnapshot,
   marketModeBadge,
   type MarketQuote,
   type MarketSnapshot,
+  type StockCategoryId,
 } from "@/lib/investMarket";
 import {
   computeHoldings,
@@ -21,6 +24,44 @@ import {
 } from "@/lib/investStorage";
 import { InvestDisclaimer } from "@/components/invest/InvestDisclaimer";
 
+const POLL_MS = 90_000;
+
+function groupNamesForPicker(names: MarketQuote[]) {
+  const byMarket: Record<"HK" | "US", MarketQuote[]> = { HK: [], US: [] };
+  for (const n of names) {
+    byMarket[n.market].push(n);
+  }
+  const order: StockCategoryId[] = [
+    "etf",
+    "bluechip",
+    "tech",
+    "finance",
+    "consumer",
+    "healthcare",
+    "energy",
+    "penny",
+  ];
+  function byCategory(list: MarketQuote[]) {
+    const map = new Map<StockCategoryId, MarketQuote[]>();
+    for (const n of list) {
+      const arr = map.get(n.category) ?? [];
+      arr.push(n);
+      map.set(n.category, arr);
+    }
+    return order
+      .filter((id) => map.has(id))
+      .map((id) => ({
+        category: id,
+        label: categoryLabel(id),
+        items: map.get(id)!,
+      }));
+  }
+  return {
+    HK: byCategory(byMarket.HK),
+    US: byCategory(byMarket.US),
+  };
+}
+
 export function InvestSimulateClient() {
   const currentUserId = useAccountStore((s) => s.currentUserId);
   const userKey = currentUserId || "guest";
@@ -28,6 +69,10 @@ export function InvestSimulateClient() {
   const [mode, setMode] = useState("loading");
   const [isDemo, setIsDemo] = useState(true);
   const [fetchedAt, setFetchedAt] = useState<string | null>(null);
+  const [liveCount, setLiveCount] = useState<number | undefined>();
+  const [attempted, setAttempted] = useState<number | undefined>();
+  const [hasApiKey, setHasApiKey] = useState<boolean | undefined>();
+  const [loadError, setLoadError] = useState<string | null>(null);
   const [portfolio, setPortfolio] = useState<PaperPortfolio | null>(null);
   const [quoteId, setQuoteId] = useState("");
   const [side, setSide] = useState<"buy" | "sell">("buy");
@@ -39,21 +84,30 @@ export function InvestSimulateClient() {
   const refreshLocal = useCallback(() => {
     const data = loadInvestData(userKey);
     setPortfolio(data.paperPortfolio);
+    return data.paperPortfolio;
   }, [userKey]);
 
   const loadQuotes = useCallback(async () => {
     setRefreshing(true);
     try {
-      const result = await loadMarketSnapshot();
+      const paper = loadInvestData(userKey).paperPortfolio;
+      const heldIds = computeHoldings(paper.trades).map((h) => h.quoteId);
+      const result = await loadMarketSnapshot({
+        prioritizeIds: heldIds,
+      });
       setSnapshot(result.snapshot);
       setMode(result.mode);
       setIsDemo(result.isDemo);
       setFetchedAt(result.fetchedAt ?? result.snapshot.asOf);
+      setLiveCount(result.liveCount);
+      setAttempted(result.attempted);
+      setHasApiKey(result.hasApiKey);
+      setLoadError(result.error ?? null);
       setQuoteId((current) => current || result.snapshot.names[0]?.id || "");
     } finally {
       setRefreshing(false);
     }
-  }, []);
+  }, [userKey]);
 
   useEffect(() => {
     let cancelled = false;
@@ -68,11 +122,25 @@ export function InvestSimulateClient() {
     };
   }, [userKey, loadQuotes, refreshLocal]);
 
+  // Auto-refresh quotes so holdings MTM tracks the market API
+  useEffect(() => {
+    if (!hydrated) return;
+    const id = window.setInterval(() => {
+      void loadQuotes();
+    }, POLL_MS);
+    return () => window.clearInterval(id);
+  }, [hydrated, loadQuotes]);
+
   const quoteMap = useMemo(() => {
     const map = new Map<string, MarketQuote>();
     snapshot?.names.forEach((n) => map.set(n.id, n));
     return map;
   }, [snapshot]);
+
+  const pickerGroups = useMemo(
+    () => (snapshot ? groupNamesForPicker(snapshot.names) : { HK: [], US: [] }),
+    [snapshot]
+  );
 
   const selected = quoteMap.get(quoteId);
 
@@ -82,8 +150,11 @@ export function InvestSimulateClient() {
     return markHoldingsToMarket(
       holdings,
       snapshot.names.map((n) => ({ id: n.id, last: n.last }))
-    );
-  }, [portfolio, snapshot]);
+    ).map((h) => {
+      const q = quoteMap.get(h.quoteId);
+      return { ...h, changePct: q?.changePct ?? null };
+    });
+  }, [portfolio, snapshot, quoteMap]);
 
   const totals = useMemo(() => {
     let hkdMv = 0;
@@ -128,6 +199,7 @@ export function InvestSimulateClient() {
   const badge = marketModeBadge(mode);
   const equityHkd = portfolio.cashHkd + totals.hkdMv;
   const equityUsd = portfolio.cashUsd + totals.usdMv;
+  const quoteStatusLabel = isDemo ? "示範資料" : badge.text;
 
   return (
     <div className="planner-side-stack">
@@ -141,19 +213,28 @@ export function InvestSimulateClient() {
               <span className="badge text-bg-warning">模擬／學習用</span>
               <span
                 className={`badge text-bg-${
-                  badge.tone === "success"
-                    ? "success"
-                    : badge.tone === "warning"
-                      ? "warning"
+                  isDemo
+                    ? "warning"
+                    : badge.tone === "success"
+                      ? "success"
                       : "secondary"
                 }`}
               >
-                {isDemo ? "示範資料" : badge.text}
+                {quoteStatusLabel}
               </span>
             </div>
             <p className="small text-secondary mb-0">
-              虛擬現金買賣港／美示範標的；持倉按最新報價標記市值。唔連接券商，唔係真實資產。
-              報價更新：{fetchedAt ? new Date(fetchedAt).toLocaleString("zh-HK") : "—"}
+              虛擬現金買賣港／美標的；買入後持倉按「實際市場」同一報價 API
+              標記市值同未實現盈虧。成本按成交均價保存，唔連接券商。
+              <br />
+              報價更新：
+              {fetchedAt ? new Date(fetchedAt).toLocaleString("zh-HK") : "—"}
+              {typeof liveCount === "number" && liveCount > 0
+                ? ` · 已更新 ${liveCount}${
+                    typeof attempted === "number" ? `/${attempted}` : ""
+                  } 個報價`
+                : ""}
+              {" · "}約每 {POLL_MS / 1000} 秒自動刷新
             </p>
           </div>
           <div className="d-flex flex-wrap gap-2">
@@ -173,6 +254,27 @@ export function InvestSimulateClient() {
             </Link>
           </div>
         </div>
+        {loadError && (
+          <div className="alert alert-secondary small mt-3 mb-0">{loadError}</div>
+        )}
+        {isDemo && (
+          <div className="alert alert-warning small mt-3 mb-0">
+            而家用示範／快照價做標記市值。設定伺服器環境變數{" "}
+            <code>FINNHUB_API_KEY</code>{" "}
+            之後，模擬持倉會跟市場頁同一條 Finnhub 報價更新；API
+            失敗會清楚回退示範價。
+            {hasApiKey === false
+              ? "（目前偵測到未設定 API key。）"
+              : hasApiKey === true
+                ? "（已偵測到 API key，但今次未成功更新報價。）"
+                : ""}
+          </div>
+        )}
+        {!isDemo && (
+          <div className="alert alert-success small mt-3 mb-0">
+            持倉現價／未實現盈虧正跟市場報價標記（部分即時）。教育用途，唔構成買賣建議。
+          </div>
+        )}
       </section>
 
       <div className="row g-3">
@@ -253,11 +355,20 @@ export function InvestSimulateClient() {
               value={quoteId}
               onChange={(e) => setQuoteId(e.target.value)}
             >
-              {snapshot.names.map((n) => (
-                <option key={n.id} value={n.id}>
-                  {n.market} {n.symbol} {n.nameZh}
-                </option>
-              ))}
+              {(["HK", "US"] as const).map((mkt) =>
+                pickerGroups[mkt].map((group) => (
+                  <optgroup
+                    key={`${mkt}-${group.category}`}
+                    label={`${mkt === "HK" ? "港股" : "美股"} · ${group.label}`}
+                  >
+                    {group.items.map((n) => (
+                      <option key={n.id} value={n.id}>
+                        {n.symbol} {n.nameZh}（{formatChangePct(n.changePct)}）
+                      </option>
+                    ))}
+                  </optgroup>
+                ))
+              )}
             </select>
           </div>
           <div className="col-4 col-md-2">
@@ -282,7 +393,7 @@ export function InvestSimulateClient() {
             />
           </div>
           <div className="col-4 col-md-2">
-            <label className="form-label small">成交價</label>
+            <label className="form-label small">成交價（跟市）</label>
             <div className="form-control form-control-sm bg-light">
               {selected ? formatPrice(selected.last, selected.currency) : "—"}
             </div>
@@ -295,7 +406,16 @@ export function InvestSimulateClient() {
         </form>
         {selected && (
           <p className="small text-secondary mt-2 mb-0">
-            {selected.nameZh} 變動 {formatChangePct(selected.changePct)} ·
+            {selected.nameZh} · 最新{" "}
+            {formatPrice(selected.last, selected.currency)} · 變動{" "}
+            <span
+              className={
+                selected.changePct >= 0 ? "text-success" : "text-danger"
+              }
+            >
+              {formatChangePct(selected.changePct)}
+            </span>{" "}
+            · {CATEGORIES.find((c) => c.id === selected.category)?.labelZh} ·
             標籤：模擬／學習用
           </p>
         )}
@@ -305,9 +425,11 @@ export function InvestSimulateClient() {
       </section>
 
       <section className="planner-section">
-        <h3 className="h6 fw-bold mb-2">持倉（按最新報價標記）</h3>
+        <h3 className="h6 fw-bold mb-2">持倉（按最新市場報價標記）</h3>
         {marked.length === 0 ? (
-          <p className="small text-secondary mb-0">未有持倉。買入後會喺度顯示盈虧。</p>
+          <p className="small text-secondary mb-0">
+            未有持倉。買入後會用最新報價顯示現價同未實現盈虧。
+          </p>
         ) : (
           <div className="table-responsive">
             <table className="table table-sm align-middle mb-0">
@@ -317,6 +439,7 @@ export function InvestSimulateClient() {
                   <th className="text-end">股數</th>
                   <th className="text-end">成本</th>
                   <th className="text-end">現價</th>
+                  <th className="text-end">日變動</th>
                   <th className="text-end">未實現</th>
                 </tr>
               </thead>
@@ -333,6 +456,15 @@ export function InvestSimulateClient() {
                     </td>
                     <td className="text-end small">
                       {h.last != null ? formatPrice(h.last, h.currency) : "—"}
+                    </td>
+                    <td
+                      className={`text-end small ${
+                        (h.changePct ?? 0) >= 0 ? "text-success" : "text-danger"
+                      }`}
+                    >
+                      {h.changePct == null
+                        ? "—"
+                        : formatChangePct(h.changePct)}
                     </td>
                     <td
                       className={`text-end small ${

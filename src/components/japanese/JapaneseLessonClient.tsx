@@ -24,27 +24,28 @@ function ReadingLine({
   reading: string;
   romaji?: string;
 }) {
-  const showReading = reading && reading !== ja;
   return (
     <div className="jp-reading-block">
       <div className="jp-ja" lang="ja">
         {ja}
       </div>
-      {showReading ? (
-        <div className="jp-yomi" lang="ja">
-          <span className="jp-yomi-label">讀法</span>
-          {reading}
-        </div>
-      ) : (
-        <div className="jp-yomi" lang="ja">
-          <span className="jp-yomi-label">讀法</span>
-          {reading || ja}
-        </div>
-      )}
+      <div className="jp-yomi" lang="ja">
+        <span className="jp-yomi-label">讀法</span>
+        {reading || ja}
+      </div>
       {romaji ? <div className="jp-romaji">{romaji}</div> : null}
     </div>
   );
 }
+
+const TOC_ITEMS = [
+  { id: "jp-sec-vocab", label: "詞彙" },
+  { id: "jp-sec-examples", label: "例句" },
+  { id: "jp-sec-tips", label: "解說" },
+  { id: "jp-sec-practice", label: "練習" },
+  { id: "jp-sec-culture", label: "文化" },
+  { id: "jp-sec-checklist", label: "Checklist" },
+] as const;
 
 export function JapaneseLessonClient({ lessonId }: { lessonId: string }) {
   const currentUserId = useAccountStore((s) => s.currentUserId);
@@ -84,6 +85,12 @@ export function JapaneseLessonClient({ lessonId }: { lessonId: string }) {
   }
 
   const { level, unit, lesson } = found;
+  const hasCulture = Boolean(content?.cultureTipsZh?.length);
+  const toc = TOC_ITEMS.filter((item) => {
+    if (item.id === "jp-sec-culture") return hasCulture;
+    if (!content && item.id !== "jp-sec-checklist") return false;
+    return true;
+  });
 
   return (
     <AppShell title={lesson.titleZh} showBack backHref="/japanese">
@@ -119,99 +126,137 @@ export function JapaneseLessonClient({ lessonId }: { lessonId: string }) {
         <p className="text-secondary mt-3 mb-0">{lesson.summaryZh}</p>
       </section>
 
-      {!content ? (
-        <section className="planner-output-card mb-3">
-          <p className="mb-0 text-secondary">呢課暫時未有學習內容。</p>
-        </section>
-      ) : (
-        <>
-          <section className="planner-output-card mb-3">
-            <h2 className="h5 fw-bold mb-1">詞彙 · 讀法</h2>
-            <p className="small text-secondary mb-3">
-              每個詞都有日文、讀法（かな），入門課會加羅馬字；意思用粵語／繁中。
-            </p>
-            <ul className="list-unstyled jp-vocab-list mb-0">
-              {content.vocab.map((item) => (
-                <li key={`${item.ja}-${item.reading}`} className="jp-vocab-item">
-                  <ReadingLine
-                    ja={item.ja}
-                    reading={item.reading}
-                    romaji={item.romaji}
-                  />
-                  <div className="jp-meaning">{item.meaningZh}</div>
-                </li>
-              ))}
-            </ul>
-          </section>
+      {content ? (
+        <nav className="jp-lesson-toc mb-3" aria-label="課堂章節">
+          <div className="jp-lesson-toc-label">本課目錄</div>
+          <div className="jp-lesson-toc-links">
+            {toc.map((item) => (
+              <a key={item.id} href={`#${item.id}`} className="jp-lesson-toc-link">
+                {item.label}
+              </a>
+            ))}
+          </div>
+        </nav>
+      ) : null}
 
-          <section className="planner-output-card mb-3">
-            <h2 className="h5 fw-bold mb-3">例句 · 讀法</h2>
-            <div className="d-flex flex-column gap-3">
-              {content.examples.map((ex) => (
-                <div key={ex.ja} className="jp-example-card">
-                  <ReadingLine ja={ex.ja} reading={ex.reading} />
-                  <div className="jp-meaning mt-2">{ex.meaningZh}</div>
+      <div className="jp-lesson-layout">
+        <div className="jp-lesson-main">
+          {!content ? (
+            <section className="planner-output-card mb-3">
+              <p className="mb-0 text-secondary">呢課暫時未有學習內容。</p>
+            </section>
+          ) : (
+            <>
+              <section id="jp-sec-vocab" className="planner-output-card mb-3">
+                <h2 className="h5 fw-bold mb-1">詞彙 · 讀法</h2>
+                <p className="small text-secondary mb-3">
+                  每個詞都有日文、讀法（かな）
+                  {level.id === "beginner" ? "、羅馬字" : ""}
+                  ；意思用粵語／繁中。本課共 {content.vocab.length} 項。
+                </p>
+                <ul className="list-unstyled jp-vocab-list mb-0">
+                  {content.vocab.map((item, idx) => (
+                    <li
+                      key={`${item.ja}-${item.reading}-${idx}`}
+                      className="jp-vocab-item"
+                    >
+                      <ReadingLine
+                        ja={item.ja}
+                        reading={item.reading}
+                        romaji={item.romaji}
+                      />
+                      <div className="jp-meaning">{item.meaningZh}</div>
+                    </li>
+                  ))}
+                </ul>
+              </section>
+
+              <section id="jp-sec-examples" className="planner-output-card mb-3">
+                <h2 className="h5 fw-bold mb-3">
+                  例句 · 讀法
+                  <span className="jp-section-count">{content.examples.length}</span>
+                </h2>
+                <div className="d-flex flex-column gap-3">
+                  {content.examples.map((ex, idx) => (
+                    <div key={`${ex.ja}-${idx}`} className="jp-example-card">
+                      <ReadingLine ja={ex.ja} reading={ex.reading} />
+                      <div className="jp-meaning mt-2">{ex.meaningZh}</div>
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </div>
-          </section>
+              </section>
 
-          <section className="planner-output-card mb-3">
-            <h2 className="h5 fw-bold mb-2">解說 · 文法筆記</h2>
-            <ul className="mb-0 ps-3">
-              {content.tipsZh.map((tip) => (
-                <li key={tip} className="mb-2">
-                  {tip}
-                </li>
+              <section id="jp-sec-tips" className="planner-output-card mb-3">
+                <h2 className="h5 fw-bold mb-2">解說 · 文法筆記</h2>
+                <ul className="jp-tip-list mb-0 ps-3">
+                  {content.tipsZh.map((tip, idx) => (
+                    <li key={`${idx}-${tip.slice(0, 24)}`} className="mb-2">
+                      {tip}
+                    </li>
+                  ))}
+                </ul>
+              </section>
+
+              <section id="jp-sec-practice" className="planner-output-card mb-3">
+                <h2 className="h5 fw-bold mb-2">練習 · 迷你操練</h2>
+                <ol className="jp-practice-list mb-0 ps-3">
+                  {content.practiceZh.map((p, idx) => (
+                    <li key={`${idx}-${p.slice(0, 24)}`} className="mb-2">
+                      {p}
+                    </li>
+                  ))}
+                </ol>
+              </section>
+
+              {hasCulture ? (
+                <section id="jp-sec-culture" className="planner-output-card mb-3">
+                  <h2 className="h5 fw-bold mb-2">文化 · 使用小貼士</h2>
+                  <ul className="jp-tip-list mb-0 ps-3">
+                    {content!.cultureTipsZh!.map((tip, idx) => (
+                      <li key={`${idx}-${tip.slice(0, 24)}`} className="mb-2">
+                        {tip}
+                      </li>
+                    ))}
+                  </ul>
+                </section>
+              ) : null}
+            </>
+          )}
+
+          <section id="jp-sec-checklist" className="planner-output-card mb-3">
+            <h2 className="h6 fw-bold mb-2">今日 checklist</h2>
+            <ul className="small mb-0 ps-3">
+              {lesson.checklist.map((item) => (
+                <li key={item}>{item}</li>
               ))}
             </ul>
           </section>
 
-          <section className="planner-output-card mb-3">
-            <h2 className="h5 fw-bold mb-2">練習</h2>
-            <ol className="mb-0 ps-3">
-              {content.practiceZh.map((p) => (
-                <li key={p} className="mb-2">
-                  {p}
-                </li>
-              ))}
-            </ol>
-          </section>
-        </>
-      )}
-
-      <section className="planner-output-card mb-3">
-        <h2 className="h6 fw-bold mb-2">今日 checklist</h2>
-        <ul className="small mb-0 ps-3">
-          {lesson.checklist.map((item) => (
-            <li key={item}>{item}</li>
-          ))}
-        </ul>
-      </section>
-
-      <nav className="d-flex flex-wrap gap-2 justify-content-between mb-4">
-        {adjacent.prev ? (
-          <Link
-            href={`/japanese/lesson/${adjacent.prev.id}`}
-            className="btn btn-outline-secondary"
-          >
-            ← {adjacent.prev.titleZh}
-          </Link>
-        ) : (
-          <span />
-        )}
-        <Link href="/japanese/plan" className="btn btn-outline-primary">
-          返回日程
-        </Link>
-        {adjacent.next ? (
-          <Link
-            href={`/japanese/lesson/${adjacent.next.id}`}
-            className="btn btn-primary"
-          >
-            {adjacent.next.titleZh} →
-          </Link>
-        ) : null}
-      </nav>
+          <nav className="d-flex flex-wrap gap-2 justify-content-between mb-4">
+            {adjacent.prev ? (
+              <Link
+                href={`/japanese/lesson/${adjacent.prev.id}`}
+                className="btn btn-outline-secondary"
+              >
+                ← {adjacent.prev.titleZh}
+              </Link>
+            ) : (
+              <span />
+            )}
+            <Link href="/japanese/plan" className="btn btn-outline-primary">
+              返回日程
+            </Link>
+            {adjacent.next ? (
+              <Link
+                href={`/japanese/lesson/${adjacent.next.id}`}
+                className="btn btn-primary"
+              >
+                {adjacent.next.titleZh} →
+              </Link>
+            ) : null}
+          </nav>
+        </div>
+      </div>
     </AppShell>
   );
 }

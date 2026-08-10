@@ -7,6 +7,7 @@
     "build": "next build",
     "build:pages": "npm run export-recipes && node scripts/build-github-pages-static.mjs",
     "export-recipes": "npx tsx scripts/export-recipes-json.ts",
+    "sync-invest-snapshot": "npx tsx scripts/sync-invest-snapshot.ts",
     "start": "next start",
     "lint": "eslint"
   },

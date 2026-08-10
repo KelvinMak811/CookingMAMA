@@ -53,6 +53,10 @@ export function InvestMarketsClient() {
 
   useEffect(() => {
     void refresh();
+    const id = window.setInterval(() => {
+      void refresh();
+    }, 90_000);
+    return () => window.clearInterval(id);
   }, [refresh]);
 
   const names = useMemo(() => {

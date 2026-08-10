@@ -860,6 +860,66 @@ body {
   text-decoration: line-through;
 }
 
+.jp-lesson-toc {
+  position: sticky;
+  top: 0.5rem;
+  z-index: 20;
+  padding: 0.65rem 0.85rem;
+  border-radius: 0.9rem;
+  border: 1px solid #fed7aa;
+  background: rgba(255, 251, 235, 0.94);
+  backdrop-filter: blur(8px);
+}
+
+.jp-lesson-toc-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #c2410c;
+  margin-bottom: 0.35rem;
+}
+
+.jp-lesson-toc-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.jp-lesson-toc-link {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.28rem 0.65rem;
+  border-radius: 999px;
+  border: 1px solid #fdba74;
+  background: #fff;
+  color: #9a3412;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.jp-lesson-toc-link:hover {
+  background: #ffedd5;
+  color: #7c2d12;
+}
+
+.jp-section-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 0.45rem;
+  min-width: 1.4rem;
+  height: 1.4rem;
+  padding: 0 0.35rem;
+  border-radius: 999px;
+  background: #ffedd5;
+  color: #c2410c;
+  font-size: 0.75rem;
+  font-weight: 700;
+  vertical-align: 0.15em;
+}
+
 .jp-vocab-list {
   display: flex;
   flex-direction: column;
@@ -920,6 +980,11 @@ body {
   color: #4b5563;
 }
 
+.jp-tip-list li,
+.jp-practice-list li {
+  line-height: 1.55;
+}
+
 .jp-complete-toggle {
   display: inline-flex;
   align-items: center;
@@ -934,6 +999,15 @@ body {
   cursor: pointer;
 }
 
+#jp-sec-vocab,
+#jp-sec-examples,
+#jp-sec-tips,
+#jp-sec-practice,
+#jp-sec-culture,
+#jp-sec-checklist {
+  scroll-margin-top: 4.5rem;
+}
+
 @media (max-width: 575.98px) {
   .jp-reading-block .jp-ja {
     font-size: 1.1rem;
@@ -942,6 +1016,16 @@ body {
   .jp-vocab-item,
   .jp-example-card {
     padding: 0.7rem 0.75rem;
+  }
+
+  .jp-lesson-toc {
+    top: 0.25rem;
+    padding: 0.55rem 0.7rem;
+  }
+
+  .jp-lesson-toc-link {
+    font-size: 0.75rem;
+    padding: 0.22rem 0.55rem;
   }
 }
 
@@ -976,6 +1060,11 @@ body {
   padding: 0.65rem 0.85rem;
   font-size: 0.9rem;
   color: #065f46;
+  line-height: 1.55;
+}
+
+.invest-lesson-prose {
+  line-height: 1.65;
 }
 
 .invest-lesson-example {
@@ -983,11 +1072,29 @@ body {
   padding-left: 0.85rem;
 }
 
+.invest-lesson-worked {
+  border: 1px solid #e7e5e4;
+  border-radius: 0.75rem;
+  padding: 0.85rem 1rem;
+  background: #f8fafc;
+}
+
 .invest-lesson-quiz {
   border: 1px solid #e7e5e4;
   border-radius: 0.75rem;
   padding: 0.75rem 0.85rem;
   background: #fafaf9;
+}
+
+@media (max-width: 575.98px) {
+  .invest-lesson-worked {
+    padding: 0.75rem 0.85rem;
+  }
+
+  .invest-lesson-quiz .btn {
+    white-space: normal;
+    height: auto;
+  }
 }
 
 .text-truncate-2 {

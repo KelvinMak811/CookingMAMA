@@ -42,10 +42,12 @@ export interface JapaneseExample {
 export interface LessonStudyContent {
   vocab: JapaneseVocabItem[];
   examples: JapaneseExample[];
-  /** 文法／用法短講解 */
+  /** 文法／用法講解（粵語） */
   tipsZh: string[];
-  /** 簡單練習提示 */
+  /** 練習提示／迷你操練 */
   practiceZh: string[];
+  /** 可選：文化／實用Tips */
+  cultureTipsZh?: string[];
 }
 
 export interface JapaneseLesson {

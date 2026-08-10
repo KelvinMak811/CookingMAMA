@@ -3,7 +3,14 @@
  * Live quotes optional; defaults to clearly labeled demo data.
  */
 
+import {
+  buildEducationalUniverseSnapshot,
+  DEFAULT_WATCHLIST_IDS,
+} from "@/lib/investUniverse";
+
 export type MarketId = "HK" | "US";
+
+export { DEFAULT_WATCHLIST_IDS };
 
 export type StockCategoryId =
   | "tech"
@@ -173,173 +180,14 @@ export const RISK_LABELS: Record<RiskLevel, string> = {
   very_high: "極高",
 };
 
-const EMBEDDED_SNAPSHOT: MarketSnapshot = {
-  version: 1,
-  label: "示範／學習用",
-  source: "CookingMAMA embedded educational sample",
-  asOf: "2026-08-10T16:00:00+08:00",
-  disclaimerZh: INVEST_DISCLAIMER_LONG,
-  indices: [
-    {
-      id: "hsi",
-      market: "HK",
-      symbol: "HSI",
-      nameZh: "恒生指數",
-      last: 17520.4,
-      changePct: 0.85,
-      trendNoteZh: "近一週區間震盪偏穩（示範）。",
-    },
-    {
-      id: "hstech",
-      market: "HK",
-      symbol: "HSTECH",
-      nameZh: "恒生科技指數",
-      last: 3820.1,
-      changePct: 1.42,
-      trendNoteZh: "科技波動較大（示範）。",
-    },
-    {
-      id: "spx",
-      market: "US",
-      symbol: "SPX",
-      nameZh: "標普 500",
-      last: 5480.2,
-      changePct: 0.38,
-      trendNoteZh: "廣基指數對照用（示範）。",
-    },
-    {
-      id: "ndx",
-      market: "US",
-      symbol: "NDX",
-      nameZh: "納斯達克 100",
-      last: 19210.5,
-      changePct: 0.91,
-      trendNoteZh: "科技權重高（示範）。",
-    },
-  ],
-  names: [
-    {
-      id: "0700.HK",
-      market: "HK",
-      symbol: "0700.HK",
-      nameZh: "騰訊控股",
-      category: "tech",
-      last: 382.4,
-      changePct: 1.1,
-      currency: "HKD",
-      riskLevel: "medium",
-      blurbZh: "港股大型科技代表（示範）。",
-    },
-    {
-      id: "9988.HK",
-      market: "HK",
-      symbol: "9988.HK",
-      nameZh: "阿里巴巴－Ｗ",
-      category: "tech",
-      last: 88.5,
-      changePct: 0.6,
-      currency: "HKD",
-      riskLevel: "medium",
-      blurbZh: "大型新經濟股（示範）。",
-    },
-    {
-      id: "0005.HK",
-      market: "HK",
-      symbol: "0005.HK",
-      nameZh: "匯豐控股",
-      category: "finance",
-      last: 68.2,
-      changePct: -0.3,
-      currency: "HKD",
-      riskLevel: "medium",
-      blurbZh: "金融藍籌示範。",
-    },
-    {
-      id: "2800.HK",
-      market: "HK",
-      symbol: "2800.HK",
-      nameZh: "盈富基金",
-      category: "etf",
-      last: 18.9,
-      changePct: 0.5,
-      currency: "HKD",
-      riskLevel: "low",
-      blurbZh: "恒指 ETF（示範）。",
-    },
-    {
-      id: "demo-penny.HK",
-      market: "HK",
-      symbol: "DEMO.PENNY",
-      nameZh: "示範仙股（虛構）",
-      category: "penny",
-      last: 0.082,
-      changePct: -4.2,
-      currency: "HKD",
-      riskLevel: "very_high",
-      blurbZh: "虛構仙股：只供認風險，唔係入手對象。",
-    },
-    {
-      id: "AAPL",
-      market: "US",
-      symbol: "AAPL",
-      nameZh: "蘋果",
-      category: "tech",
-      last: 214.3,
-      changePct: 0.7,
-      currency: "USD",
-      riskLevel: "medium",
-      blurbZh: "美股大型科技（示範）。",
-    },
-    {
-      id: "MSFT",
-      market: "US",
-      symbol: "MSFT",
-      nameZh: "微軟",
-      category: "tech",
-      last: 428.1,
-      changePct: 0.4,
-      currency: "USD",
-      riskLevel: "medium",
-      blurbZh: "大型軟件（示範）。",
-    },
-    {
-      id: "JNJ",
-      market: "US",
-      symbol: "JNJ",
-      nameZh: "強生",
-      category: "healthcare",
-      last: 158.6,
-      changePct: -0.2,
-      currency: "USD",
-      riskLevel: "low",
-      blurbZh: "醫藥防禦代表（示範）。",
-    },
-    {
-      id: "VOO",
-      market: "US",
-      symbol: "VOO",
-      nameZh: "Vanguard S&P 500 ETF",
-      category: "etf",
-      last: 512.4,
-      changePct: 0.35,
-      currency: "USD",
-      riskLevel: "low",
-      blurbZh: "廣基指數 ETF（示範）。",
-    },
-    {
-      id: "XOM",
-      market: "US",
-      symbol: "XOM",
-      nameZh: "埃克森美孚",
-      category: "energy",
-      last: 112.8,
-      changePct: 1.2,
-      currency: "USD",
-      riskLevel: "medium",
-      blurbZh: "能源週期股（示範）。",
-    },
-  ],
-};
+const EMBEDDED_SNAPSHOT: MarketSnapshot = (() => {
+  const snap = buildEducationalUniverseSnapshot();
+  return {
+    ...snap,
+    source: "CookingMAMA embedded educational sample",
+    disclaimerZh: INVEST_DISCLAIMER_LONG,
+  };
+})();
 
 function isSnapshot(raw: unknown): raw is MarketSnapshot {
   if (!raw || typeof raw !== "object") return false;
@@ -351,17 +199,34 @@ export function getEmbeddedSnapshot(): MarketSnapshot {
   return EMBEDDED_SNAPSHOT;
 }
 
+export interface LoadMarketOptions {
+  /** Prefer enriching these quote ids first (e.g. simulate holdings). */
+  prioritizeIds?: string[];
+}
+
 /** Prefer public JSON / API; fall back to embedded demo. */
-export async function loadMarketSnapshot(): Promise<{
+export async function loadMarketSnapshot(
+  options?: LoadMarketOptions
+): Promise<{
   snapshot: MarketSnapshot;
   mode: MarketLoadMode;
   isDemo: boolean;
   fetchedAt?: string;
   liveCount?: number;
+  attempted?: number;
+  hasApiKey?: boolean;
   error?: string;
 }> {
   try {
-    const apiRes = await fetch("/api/invest/markets", { cache: "no-store" });
+    const params = new URLSearchParams();
+    if (options?.prioritizeIds?.length) {
+      params.set("ids", options.prioritizeIds.join(","));
+    }
+    const qs = params.toString();
+    const apiRes = await fetch(
+      `/api/invest/markets${qs ? `?${qs}` : ""}`,
+      { cache: "no-store" }
+    );
     if (apiRes.ok) {
       const json = (await apiRes.json()) as {
         ok?: boolean;
@@ -369,6 +234,8 @@ export async function loadMarketSnapshot(): Promise<{
         isDemo?: boolean;
         fetchedAt?: string;
         liveCount?: number;
+        attempted?: number;
+        hasApiKey?: boolean;
         snapshot?: unknown;
       };
       if (json.ok && isSnapshot(json.snapshot)) {
@@ -379,6 +246,8 @@ export async function loadMarketSnapshot(): Promise<{
           isDemo: json.isDemo ?? mode !== "live_partial",
           fetchedAt: json.fetchedAt,
           liveCount: json.liveCount,
+          attempted: json.attempted,
+          hasApiKey: json.hasApiKey,
         };
       }
     }

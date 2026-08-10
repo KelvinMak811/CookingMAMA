@@ -154,10 +154,10 @@ export function InvestLessonClient({ lessonId }: { lessonId: string }) {
       </section>
 
       <section className="planner-section">
-        <h3 className="h6 fw-bold mb-2">概念</h3>
-        <ul className="mb-0 ps-3">
+        <h3 className="h6 fw-bold mb-2">概念詳解</h3>
+        <ul className="mb-0 ps-3 invest-lesson-prose">
           {content.conceptsZh.map((c) => (
-            <li key={c} className="mb-2">
+            <li key={c} className="mb-3">
               {c}
             </li>
           ))}
@@ -169,15 +169,41 @@ export function InvestLessonClient({ lessonId }: { lessonId: string }) {
         <div className="d-flex flex-column gap-3">
           {content.examples.map((ex) => (
             <div key={ex.titleZh} className="invest-lesson-example">
-              <div className="d-flex gap-2 align-items-center mb-1">
+              <div className="d-flex gap-2 align-items-center mb-1 flex-wrap">
                 <span className="badge text-bg-dark">{ex.market}</span>
                 <span className="fw-semibold small">{ex.titleZh}</span>
               </div>
-              <p className="small mb-0 text-secondary">{ex.bodyZh}</p>
+              <p className="small mb-0 text-secondary invest-lesson-prose">
+                {ex.bodyZh}
+              </p>
             </div>
           ))}
         </div>
       </section>
+
+      {content.workedExamples?.length > 0 && (
+        <section className="planner-section">
+          <h3 className="h6 fw-bold mb-2">逐步例題（學習用）</h3>
+          <div className="d-flex flex-column gap-3">
+            {content.workedExamples.map((we) => (
+              <div key={we.titleZh} className="invest-lesson-worked">
+                <div className="fw-semibold small mb-2">{we.titleZh}</div>
+                <ol className="mb-2 ps-3 small invest-lesson-prose">
+                  {we.stepsZh.map((step) => (
+                    <li key={step} className="mb-2">
+                      {step}
+                    </li>
+                  ))}
+                </ol>
+                <p className="small mb-0 text-secondary">
+                  <span className="fw-semibold">重點：</span>
+                  {we.takeawayZh}
+                </p>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
 
       <section className="planner-section">
         <h3 className="h6 fw-bold mb-2">風險提示</h3>
@@ -193,6 +219,19 @@ export function InvestLessonClient({ lessonId }: { lessonId: string }) {
         </p>
       </section>
 
+      {content.mistakesZh?.length > 0 && (
+        <section className="planner-section">
+          <h3 className="h6 fw-bold mb-2">新手常見錯誤</h3>
+          <ul className="mb-0 ps-3">
+            {content.mistakesZh.map((m) => (
+              <li key={m} className="mb-2">
+                {m}
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+
       <section className="planner-section">
         <h3 className="h6 fw-bold mb-2">Checklist</h3>
         <ul className="list-unstyled mb-0">
@@ -201,7 +240,7 @@ export function InvestLessonClient({ lessonId }: { lessonId: string }) {
               <label className="d-flex gap-2 align-items-start small mb-0">
                 <input
                   type="checkbox"
-                  className="form-check-input mt-1"
+                  className="form-check-input mt-1 flex-shrink-0"
                   checked={!!checkOff[item]}
                   onChange={(e) =>
                     setCheckOff((prev) => ({ ...prev, [item]: e.target.checked }))
@@ -215,7 +254,15 @@ export function InvestLessonClient({ lessonId }: { lessonId: string }) {
       </section>
 
       <section className="planner-section">
-        <h3 className="h6 fw-bold mb-2">小測驗</h3>
+        <h3 className="h6 fw-bold mb-2">
+          小測驗
+          {content.quiz.length > 0 ? (
+            <span className="fw-normal text-secondary">
+              {" "}
+              · {content.quiz.length} 題
+            </span>
+          ) : null}
+        </h3>
         <QuizBlock key={lessonId} quiz={content.quiz} />
       </section>
 

@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useAccountStore } from "@/stores/accountStore";
 import {
+  DEFAULT_WATCHLIST_IDS,
   formatChangePct,
   formatPrice,
   loadMarketSnapshot,
@@ -126,8 +127,31 @@ export function InvestWatchlistClient() {
             加入名單
           </button>
         </div>
+        <div className="mb-3">
+          <div className="small text-secondary mb-1">熱門預設（一鍵加入）</div>
+          <div className="d-flex flex-wrap gap-1">
+            {DEFAULT_WATCHLIST_IDS.map((id) => {
+              const q = quoteMap.get(id);
+              if (!q) return null;
+              const already = watchlist.some((w) => w.quoteId === id);
+              return (
+                <button
+                  key={id}
+                  type="button"
+                  className="btn btn-sm btn-outline-secondary"
+                  disabled={already}
+                  onClick={() => onAddWatch(id)}
+                >
+                  {q.symbol} {already ? "✓" : "+"}
+                </button>
+              );
+            })}
+          </div>
+        </div>
         {watchlist.length === 0 ? (
-          <p className="small text-secondary mb-0">未有觀察股份。</p>
+          <p className="small text-secondary mb-0">
+            未有觀察股份。可撳上面熱門預設，或由清單加入。
+          </p>
         ) : (
           <ul className="list-group list-group-flush">
             {watchlist.map((w) => {
