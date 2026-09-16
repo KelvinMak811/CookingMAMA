@@ -1,0 +1,45 @@
+{
+  "id": "j-5",
+  "name": "味噌汤",
+  "cuisine": "japanese",
+  "baseServings": 2,
+  "description": "简单日式味噌汤，易洁锅几分钟煮好。",
+  "difficulty": 1,
+  "prepTime": 10,
+  "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c9/Miso_soup_001.jpg/960px-Miso_soup_001.jpg",
+  "ingredients": [
+    {
+      "id": "j5-1",
+      "name": "味噌",
+      "amount": "2汤匙"
+    },
+    {
+      "id": "j5-2",
+      "name": "豆腐",
+      "amount": "半盒"
+    },
+    {
+      "id": "j5-3",
+      "name": "海带",
+      "amount": "5g"
+    },
+    {
+      "id": "j5-4",
+      "name": "葱花",
+      "amount": "适量"
+    },
+    {
+      "id": "j5-5",
+      "name": "水",
+      "amount": "500ml"
+    }
+  ],
+  "steps": [
+    "豆腐切約1.5厘米小方粒；海帶用濕布輕拭淨，唔使洗；蔥切細花。",
+    "易潔鑊倒入500ml水，中火煮滾。",
+    "下海帶煮約2分鐘出味，撈起海帶（可選保留）。",
+    "輕輕放入豆腐粒，煮約1分鐘至豆腐熱透，唔好大力攪拌以免碎。",
+    "關火，味噌用少許湯調開至順滑，倒回鑊內輕輕拌勻，唔好再煮沸（避免味噌香味流失）。",
+    "盛碗撒蔥花，趁熱飲。"
+  ]
+}

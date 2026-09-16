@@ -1,0 +1,45 @@
+{
+  "id": "w-3",
+  "name": "香煎雞腿扒",
+  "cuisine": "western",
+  "baseServings": 2,
+  "description": "皮脆肉嫩，易潔鑊煎就得，唔使焗爐。",
+  "difficulty": 2,
+  "prepTime": 30,
+  "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0e/Fried_chicken_thigh.jpg/960px-Fried_chicken_thigh.jpg",
+  "ingredients": [
+    {
+      "id": "w3-1",
+      "name": "連皮雞腿扒",
+      "amount": "2塊"
+    },
+    {
+      "id": "w3-2",
+      "name": "鹽",
+      "amount": "少許"
+    },
+    {
+      "id": "w3-3",
+      "name": "黑胡椒",
+      "amount": "少許"
+    },
+    {
+      "id": "w3-4",
+      "name": "橄欖油",
+      "amount": "2湯匙"
+    },
+    {
+      "id": "w3-5",
+      "name": "迷迭香",
+      "amount": "2枝"
+    }
+  ],
+  "steps": [
+    "雞腿扒用廚房紙印乾水分；皮面朝上用刀背輕輕拍鬆肉，兩面撒鹽同黑胡椒。",
+    "室溫醃約15分鐘，讓調味滲入；迷迭香洗淨拍一拍出香備用。",
+    "易潔鑊中火加橄欖油，油溫夠時皮面朝下放入，不要移動，煎約6至8分鐘至皮層金黃酥脆。",
+    "翻面後放入迷迭香，再煎約5至6分鐘；用筷子插入最厚部位，流出透明汁即熟透。",
+    "起鑊放砧板休息5分鐘，讓肉汁回流，避免切開時流失。",
+    "順紋切件上碟，可淋鑊內餘油同香草碎。"
+  ]
+}

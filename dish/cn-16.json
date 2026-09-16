@@ -1,0 +1,50 @@
+{
+  "id": "cn-16",
+  "name": "三文魚炒飯",
+  "cuisine": "chinese",
+  "baseServings": 2,
+  "description": "鮮甜三文魚配隔夜飯炒出嚟，唔使油炸，易潔鑊幾分鐘搞掂。",
+  "difficulty": 2,
+  "prepTime": 20,
+  "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/50/Fried_rice.jpg/960px-Fried_rice.jpg",
+  "ingredients": [
+    {
+      "id": "cn16-1",
+      "name": "隔夜白飯",
+      "amount": "2碗"
+    },
+    {
+      "id": "cn16-2",
+      "name": "三文魚",
+      "amount": "250g"
+    },
+    {
+      "id": "cn16-3",
+      "name": "雞蛋",
+      "amount": "2隻"
+    },
+    {
+      "id": "cn16-4",
+      "name": "蔥",
+      "amount": "2條"
+    },
+    {
+      "id": "cn16-5",
+      "name": "生抽",
+      "amount": "2湯匙"
+    },
+    {
+      "id": "cn16-6",
+      "name": "胡椒粉",
+      "amount": "少許"
+    }
+  ],
+  "steps": [
+    "三文魚去皮切粒，少許鹽同胡椒粉輕醃；蔥切粒。",
+    "雞蛋打散；隔夜飯用手指搓散，避免一舊舊。",
+    "易潔鑊中火下油，炒三文魚粒至表面變色七成熟，盛起。",
+    "加少許油炒蛋至半熟盛起。",
+    "大火下飯炒散，加入生抽同胡椒粉，炒至飯粒乾身跳動。",
+    "倒回三文魚同炒蛋，快速兜匀，撒蔥花起鑊。"
+  ]
+}

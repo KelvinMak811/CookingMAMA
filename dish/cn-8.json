@@ -1,0 +1,40 @@
+{
+  "id": "cn-8",
+  "name": "蠔油菜心",
+  "cuisine": "chinese",
+  "baseServings": 2,
+  "description": "經典粵菜，易潔鑊灼菜再淋蠔油，清爽又健康。",
+  "difficulty": 1,
+  "prepTime": 10,
+  "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/de/Stir_fried_vegetables.jpg/960px-Stir_fried_vegetables.jpg",
+  "ingredients": [
+    {
+      "id": "cn8-1",
+      "name": "菜心",
+      "amount": "400g"
+    },
+    {
+      "id": "cn8-2",
+      "name": "蠔油",
+      "amount": "2湯匙"
+    },
+    {
+      "id": "cn8-3",
+      "name": "蒜蓉",
+      "amount": "2瓣"
+    },
+    {
+      "id": "cn8-4",
+      "name": "糖",
+      "amount": "半茶匙"
+    }
+  ],
+  "steps": [
+    "菜心洗淨，粗梗可輕輕拍鬆；蒜切蓉。",
+    "易潔鑊燒滾大量水，加1茶匙鹽同少許油。",
+    "下菜心焯約2分鐘至翠綠軟身，撈起瀝乾擺碟。",
+    "蠔油、糖同2湯匙水調匀。",
+    "易潔鑊少許油爆香蒜蓉，倒入蠔油汁煮滾。",
+    "淋在菜心上即可。"
+  ]
+}
