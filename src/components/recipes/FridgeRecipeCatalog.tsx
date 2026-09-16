@@ -8,12 +8,19 @@ import { useCustomRecipes } from "@/hooks/useCustomRecipes";
 import { useFridgeStore } from "@/stores/fridgeStore";
 import { useRecipeSearchQuery } from "@/hooks/useRecipeSearchQuery";
 import { useRecipeIngredientFilters } from "@/hooks/useRecipeIngredientFilters";
+import { useRecipeDifficultyFilter } from "@/hooks/useRecipeDifficultyFilter";
 import { filterRecipesBySearch } from "@/lib/recipeSearch";
 import {
   filterRecipesByIngredients,
   type MeatFilterId,
   type VegFilterId,
 } from "@/lib/recipeIngredientFilters";
+import {
+  filterRecipesByDifficulty,
+  sortRecipesByDifficulty,
+  type DifficultyLevel,
+  type DifficultySort,
+} from "@/lib/recipeDifficultyFilters";
 import {
   getFridgeRecipeMatches,
   splitFridgeRecipeMatches,
@@ -25,20 +32,32 @@ function filterMatchesByBrowse(
   matches: FridgeRecipeMatch[],
   query: string,
   meats: MeatFilterId[],
-  vegs: VegFilterId[]
+  vegs: VegFilterId[],
+  levels: DifficultyLevel[],
+  sort: DifficultySort | null
 ): FridgeRecipeMatch[] {
   let list = matches.map((match) => match.recipe);
   list = filterRecipesByIngredients(list, meats, vegs);
+  list = filterRecipesByDifficulty(list, levels);
   list = filterRecipesBySearch(list, query);
-  const filteredIds = new Set(list.map((recipe) => recipe.id));
-  return matches.filter((match) => filteredIds.has(match.recipe.id));
+  list = sortRecipesByDifficulty(list, sort);
+  const order = new Map(list.map((recipe, index) => [recipe.id, index]));
+  return matches
+    .filter((match) => order.has(match.recipe.id))
+    .sort(
+      (a, b) => (order.get(a.recipe.id) ?? 0) - (order.get(b.recipe.id) ?? 0)
+    );
 }
 
 function FridgeRecipeCatalogInner() {
   const { recipes: customRecipes } = useCustomRecipes();
   const fridgeItems = useFridgeStore((s) => s.items);
   const { query } = useRecipeSearchQuery();
-  const { meats, vegs, hasFilters } = useRecipeIngredientFilters();
+  const { meats, vegs, hasFilters: hasIngredientFilters } =
+    useRecipeIngredientFilters();
+  const { levels, sort, hasFilters: hasDifficultyFilters } =
+    useRecipeDifficultyFilter();
+  const hasFilters = hasIngredientFilters || hasDifficultyFilters;
   const isSearching = query.trim().length > 0;
   const isNarrowed = isSearching || hasFilters;
 
@@ -56,10 +75,24 @@ function FridgeRecipeCatalogInner() {
     const split = splitFridgeRecipeMatches(matches);
     if (!isNarrowed) return split;
     return {
-      readyNow: filterMatchesByBrowse(split.readyNow, query, meats, vegs),
-      almostReady: filterMatchesByBrowse(split.almostReady, query, meats, vegs),
+      readyNow: filterMatchesByBrowse(
+        split.readyNow,
+        query,
+        meats,
+        vegs,
+        levels,
+        sort
+      ),
+      almostReady: filterMatchesByBrowse(
+        split.almostReady,
+        query,
+        meats,
+        vegs,
+        levels,
+        sort
+      ),
     };
-  }, [matches, query, meats, vegs, isNarrowed]);
+  }, [matches, query, meats, vegs, levels, sort, isNarrowed]);
 
   return (
     <div>
@@ -78,7 +111,7 @@ function FridgeRecipeCatalogInner() {
       </div>
       <p className="text-secondary small mb-4">
         {isNarrowed
-          ? `${isSearching ? `搜尋「${query.trim()}」` : "材料篩選"}${
+          ? `${isSearching ? `搜尋「${query.trim()}」` : "篩選"}${
               hasFilters && isSearching ? " + 篩選" : ""
             }— 材料齊 ${readyNow.length} 款，差少少 ${almostReady.length} 款`
           : "根據你雪櫃現有材料，推薦而家可以煮或者差少少就煮到嘅菜式。"}

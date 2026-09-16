@@ -9,8 +9,13 @@ import { CalendarUserButtons } from "@/components/history/CalendarUserButtons";
 import { useCustomRecipes } from "@/hooks/useCustomRecipes";
 import { useRecipeSearchQuery } from "@/hooks/useRecipeSearchQuery";
 import { useRecipeIngredientFilters } from "@/hooks/useRecipeIngredientFilters";
+import { useRecipeDifficultyFilter } from "@/hooks/useRecipeDifficultyFilter";
 import { filterRecipesBySearch } from "@/lib/recipeSearch";
 import { filterRecipesByIngredients } from "@/lib/recipeIngredientFilters";
+import {
+  filterRecipesByDifficulty,
+  sortRecipesByDifficulty,
+} from "@/lib/recipeDifficultyFilters";
 import { RecipeGrid } from "./RecipeGrid";
 
 interface RecipeCatalogProps {
@@ -28,7 +33,11 @@ const CUISINE_HINTS: Record<CuisineType | "all", string> = {
 function RecipeCatalogInner({ cuisine = "all" }: RecipeCatalogProps) {
   const { recipes: customRecipes } = useCustomRecipes();
   const { query } = useRecipeSearchQuery();
-  const { meats, vegs, hasFilters } = useRecipeIngredientFilters();
+  const { meats, vegs, hasFilters: hasIngredientFilters } =
+    useRecipeIngredientFilters();
+  const { levels, sort, hasFilters: hasDifficultyFilters } =
+    useRecipeDifficultyFilter();
+  const hasFilters = hasIngredientFilters || hasDifficultyFilters;
   const allRecipes = useMemo(
     () => [...customRecipes, ...recipes],
     [customRecipes]
@@ -44,10 +53,14 @@ function RecipeCatalogInner({ cuisine = "all" }: RecipeCatalogProps) {
     () => filterRecipesByIngredients(filtered, meats, vegs),
     [filtered, meats, vegs]
   );
-  const displayed = useMemo(
-    () => filterRecipesBySearch(ingredientFiltered, query),
-    [ingredientFiltered, query]
+  const difficultyFiltered = useMemo(
+    () => filterRecipesByDifficulty(ingredientFiltered, levels),
+    [ingredientFiltered, levels]
   );
+  const displayed = useMemo(() => {
+    const searched = filterRecipesBySearch(difficultyFiltered, query);
+    return sortRecipesByDifficulty(searched, sort);
+  }, [difficultyFiltered, query, sort]);
   const title = cuisine === "all" ? "全部菜式" : CUISINE_LABELS[cuisine];
   const isSearching = query.trim().length > 0;
   const isNarrowed = isSearching || hasFilters;
@@ -70,7 +83,7 @@ function RecipeCatalogInner({ cuisine = "all" }: RecipeCatalogProps) {
       <p className="text-secondary small mb-4">
         {isNarrowed ? (
           <>
-            {isSearching ? `搜尋「${query.trim()}」` : "材料篩選"}
+            {isSearching ? `搜尋「${query.trim()}」` : "篩選"}
             {hasFilters && isSearching ? " + 篩選" : ""}
             — 搵到 {displayed.length} 款
             {cuisine !== "all" ? `（${CUISINE_LABELS[cuisine]}）` : ""}

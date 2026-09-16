@@ -12,6 +12,8 @@
   --safe-area-right: env(safe-area-inset-right, 0px);
   --app-header-content: 2.75rem;
   --app-bottom-nav-content: 4rem;
+  /* Phone/narrow shell; widened from md up (see media query below). */
+  --app-shell-max-width: 48rem;
   --safe-area-top-effective: var(--safe-area-top);
   --safe-area-bottom-effective: var(--safe-area-bottom);
   --app-header-height: calc(var(--app-header-content) + var(--safe-area-top-effective));
@@ -24,6 +26,13 @@
     --safe-area-bottom-effective: max(var(--safe-area-bottom), 0.625rem);
     --app-header-height: calc(var(--app-header-content) + var(--safe-area-top-effective));
     --app-bottom-nav-height: calc(var(--app-bottom-nav-content) + var(--safe-area-bottom-effective));
+  }
+}
+
+/* Desktop: widen shell (~Bootstrap xl / 1140px) so layout is less phone-narrow. */
+@media (min-width: 768px) {
+  :root {
+    --app-shell-max-width: 72rem;
   }
 }
 
@@ -105,7 +114,7 @@ body {
 }
 
 .app-main {
-  max-width: 48rem;
+  max-width: var(--app-shell-max-width);
   padding-bottom: 0.5rem;
 }
 
@@ -132,7 +141,7 @@ body {
   align-items: stretch;
   justify-content: space-around;
   min-height: var(--app-bottom-nav-content);
-  max-width: 48rem;
+  max-width: var(--app-shell-max-width);
   margin: 0 auto;
 }
 
@@ -158,7 +167,7 @@ body {
 }
 
 .app-bottom-nav-label {
-  font-size: 0.7rem;
+  font-size: 0.65rem;
   line-height: 1.15;
   white-space: nowrap;
 }
@@ -353,10 +362,11 @@ body {
 }
 
 @media (min-width: 768px) {
+  /* Align FAB to the right edge of the centered shell (half of --app-shell-max-width). */
   .shopping-fab {
     right: max(
       calc(1rem + var(--safe-area-right)),
-      calc(50% - 24rem + 1rem + var(--safe-area-right))
+      calc(50% - (var(--app-shell-max-width) / 2) + 1rem + var(--safe-area-right))
     );
   }
 }
@@ -526,6 +536,10 @@ body {
   gap: 0.65rem;
 }
 
+.planner-summary-grid .planner-stat-card:last-child:nth-child(odd) {
+  grid-column: 1 / -1;
+}
+
 .planner-stat-card {
   background: #fff7ed;
   border-radius: 0.85rem;
@@ -649,6 +663,193 @@ body {
   border-color: #fed7aa;
 }
 
+.planner-video {
+  margin-top: 0.35rem;
+}
+
+.planner-video-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #ea580c;
+  text-align: left;
+  cursor: pointer;
+}
+
+.planner-video-toggle:hover,
+.planner-video-toggle:focus-visible {
+  color: #c2410c;
+  text-decoration: underline;
+  outline: none;
+}
+
+.planner-video-panel {
+  margin-top: 0.55rem;
+  padding: 0.65rem;
+  border-radius: 0.85rem;
+  border: 1px solid #fed7aa;
+  background: linear-gradient(180deg, #fff7ed 0%, #ffffff 85%);
+}
+
+.planner-video-frame {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  border-radius: 0.65rem;
+  background: #1c1917;
+}
+
+.planner-video-player {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  display: block;
+}
+
+.planner-video-fallback {
+  margin-bottom: 0.5rem;
+}
+
+.planner-video-source {
+  display: inline-block;
+  margin-top: 0.45rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: #a8a29e;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.planner-video-source:hover,
+.planner-video-source:focus-visible {
+  color: #78716c;
+}
+
+.bmi-chart-svg {
+  width: 100%;
+  height: auto;
+  display: block;
+  background: linear-gradient(180deg, #fff7ed 0%, #ffffff 70%);
+  border-radius: 0.85rem;
+  border: 1px solid #fed7aa;
+}
+
+.bmi-chart-line {
+  stroke: #ea580c;
+  stroke-width: 2.5;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+
+.bmi-chart-dot {
+  fill: #ea580c;
+}
+
+.bmi-chart-band {
+  stroke: #fdba74;
+  stroke-width: 1;
+  stroke-dasharray: 4 4;
+}
+
+.bmi-chart-band-label {
+  fill: #9a3412;
+  font-size: 8px;
+}
+
+.bmi-chart-axis {
+  fill: #78716c;
+  font-size: 9px;
+}
+
+.bmi-history-list li + li {
+  margin-top: 0.25rem;
+}
+
+.planner-movement-list .planner-video {
+  display: block;
+}
+
+.planner-movement-list .planner-video-toggle {
+  display: inline-flex;
+}
+
+.planner-next-banner {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.1rem;
+  border-radius: 1rem;
+  border: 1px solid #fdba74;
+  background: linear-gradient(135deg, #fff7ed, #ffffff);
+}
+
+.planner-profile-notes {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.planner-profile-note {
+  padding: 0.75rem 0.85rem;
+  border-radius: 0.85rem;
+  border: 1px solid #f3f4f6;
+  background: #fffaf5;
+}
+
+.planner-history-list {
+  padding-left: 1.1rem;
+}
+
+.planner-history-list li + li {
+  margin-top: 0.35rem;
+}
+
+/* SmartJP — Japanese learning */
+.jp-focus-badge {
+  display: inline-flex;
+  margin-top: 0.25rem;
+  padding: 0.1rem 0.45rem;
+  border-radius: 999px;
+  border: 1px solid #fed7aa;
+  background: #fff7ed;
+  color: #c2410c;
+  font-size: 0.72rem;
+  font-weight: 600;
+}
+
+.jp-sample {
+  padding: 0.65rem 0.75rem;
+  border-radius: 0.75rem;
+  border: 1px solid #fde68a;
+  background: #fffbeb;
+}
+
+.jp-lesson-card {
+  padding: 0.7rem 0.75rem;
+  border-radius: 0.85rem;
+  border: 1px solid #f3f4f6;
+  background: #fff;
+}
+
+.jp-lesson-done {
+  background: #fff7ed;
+  border-color: #fed7aa;
+}
+
+  background: #fff7ed;
+  border-color: #fed7aa;
+}
+
 .fitness-calendar-weekday {
   font-size: 0.72rem;
   font-weight: 700;
@@ -692,5 +893,302 @@ body {
   width: 100%;
   max-height: 220px;
   object-fit: cover;
+}
+
+.jp-week-card {
+  padding: 0.85rem;
+  border-radius: 0.9rem;
+  border: 1px solid #f3f4f6;
+  background: #fffaf5;
+}
+
+.jp-day-card {
+  height: 100%;
+  padding: 0.75rem;
+  border-radius: 0.8rem;
+  border: 1px solid #e5e7eb;
+  background: #fff;
+}
+
+.jp-day-rest {
+  background: #f9fafb;
+  color: #6b7280;
+}
+
+.jp-block-row .form-check-input {
+  flex-shrink: 0;
+}
+
+.jp-open-lesson {
+  color: #c2410c;
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+.jp-block-done {
+  color: #6b7280;
+}
+
+.jp-block-done .fw-semibold,
+.jp-block-done .small:not(.jp-open-lesson) {
+  text-decoration: line-through;
+}
+
+.jp-lesson-toc {
+  position: sticky;
+  top: 0.5rem;
+  z-index: 20;
+  padding: 0.65rem 0.85rem;
+  border-radius: 0.9rem;
+  border: 1px solid #fed7aa;
+  background: rgba(255, 251, 235, 0.94);
+  backdrop-filter: blur(8px);
+}
+
+.jp-lesson-toc-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #c2410c;
+  margin-bottom: 0.35rem;
+}
+
+.jp-lesson-toc-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.jp-lesson-toc-link {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.28rem 0.65rem;
+  border-radius: 999px;
+  border: 1px solid #fdba74;
+  background: #fff;
+  color: #9a3412;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.jp-lesson-toc-link:hover {
+  background: #ffedd5;
+  color: #7c2d12;
+}
+
+.jp-section-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 0.45rem;
+  min-width: 1.4rem;
+  height: 1.4rem;
+  padding: 0 0.35rem;
+  border-radius: 999px;
+  background: #ffedd5;
+  color: #c2410c;
+  font-size: 0.75rem;
+  font-weight: 700;
+  vertical-align: 0.15em;
+}
+
+.jp-vocab-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.jp-vocab-item {
+  padding: 0.75rem 0.85rem;
+  border-radius: 0.85rem;
+  border: 1px solid #fed7aa;
+  background: linear-gradient(180deg, #fffbeb 0%, #fff 100%);
+}
+
+.jp-example-card {
+  padding: 0.85rem 0.9rem;
+  border-radius: 0.85rem;
+  border: 1px solid #fde68a;
+  background: #fffbeb;
+}
+
+.jp-reading-block .jp-ja {
+  font-size: 1.2rem;
+  font-weight: 700;
+  line-height: 1.45;
+  color: #1f2937;
+}
+
+.jp-yomi {
+  margin-top: 0.25rem;
+  font-size: 0.95rem;
+  color: #9a3412;
+  line-height: 1.4;
+}
+
+.jp-yomi-label {
+  display: inline-block;
+  margin-right: 0.4rem;
+  padding: 0.05rem 0.4rem;
+  border-radius: 999px;
+  border: 1px solid #fdba74;
+  background: #ffedd5;
+  color: #c2410c;
+  font-size: 0.68rem;
+  font-weight: 700;
+  vertical-align: 0.1em;
+}
+
+.jp-romaji {
+  margin-top: 0.15rem;
+  font-size: 0.82rem;
+  color: #78716c;
+  letter-spacing: 0.02em;
+}
+
+.jp-meaning {
+  margin-top: 0.35rem;
+  font-size: 0.92rem;
+  color: #4b5563;
+}
+
+.jp-tip-list li,
+.jp-practice-list li {
+  line-height: 1.55;
+}
+
+.jp-complete-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.35rem 0.7rem;
+  border-radius: 999px;
+  border: 1px solid #fed7aa;
+  background: #fff7ed;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #9a3412;
+  cursor: pointer;
+}
+
+#jp-sec-vocab,
+#jp-sec-examples,
+#jp-sec-tips,
+#jp-sec-practice,
+#jp-sec-culture,
+#jp-sec-checklist {
+  scroll-margin-top: 4.5rem;
+}
+
+@media (max-width: 575.98px) {
+  .jp-reading-block .jp-ja {
+    font-size: 1.1rem;
+  }
+
+  .jp-vocab-item,
+  .jp-example-card {
+    padding: 0.7rem 0.75rem;
+  }
+
+  .jp-lesson-toc {
+    top: 0.25rem;
+    padding: 0.55rem 0.7rem;
+  }
+
+  .jp-lesson-toc-link {
+    font-size: 0.75rem;
+    padding: 0.22rem 0.55rem;
+  }
+}
+
+.invest-disclaimer {
+  border: 1px solid #fcd34d;
+  background: linear-gradient(135deg, #fffbeb, #fff7ed);
+  border-radius: 0.9rem;
+  padding: 0.85rem 1rem;
+}
+
+.invest-disclaimer--compact {
+  padding: 0.55rem 0.75rem;
+}
+
+.invest-disclaimer-title {
+  display: block;
+  color: #92400e;
+  font-size: 0.95rem;
+}
+
+.invest-disclaimer-body {
+  margin-top: 0.35rem;
+  color: #78716c;
+  font-size: 0.82rem;
+  line-height: 1.45;
+}
+
+.invest-lesson-tip {
+  background: linear-gradient(135deg, #ecfdf5, #f0fdf4);
+  border: 1px solid #a7f3d0;
+  border-radius: 0.75rem;
+  padding: 0.65rem 0.85rem;
+  font-size: 0.9rem;
+  color: #065f46;
+  line-height: 1.55;
+}
+
+.invest-lesson-prose {
+  line-height: 1.65;
+}
+
+.invest-lesson-example {
+  border-left: 3px solid #94a3b8;
+  padding-left: 0.85rem;
+}
+
+.invest-lesson-worked {
+  border: 1px solid #e7e5e4;
+  border-radius: 0.75rem;
+  padding: 0.85rem 1rem;
+  background: #f8fafc;
+}
+
+.invest-lesson-quiz {
+  border: 1px solid #e7e5e4;
+  border-radius: 0.75rem;
+  padding: 0.75rem 0.85rem;
+  background: #fafaf9;
+}
+
+@media (max-width: 575.98px) {
+  .invest-lesson-worked {
+    padding: 0.75rem 0.85rem;
+  }
+
+  .invest-lesson-quiz .btn {
+    white-space: normal;
+    height: auto;
+  }
+}
+
+.text-truncate-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+@media (max-width: 767.98px) {
+  .app-bottom-nav-label {
+    font-size: 0.58rem;
+  }
+
+  .app-bottom-nav-icon {
+    font-size: 1.1rem;
+  }
+
+  .app-bottom-nav-link {
+    padding: 0.3rem 0.1rem;
+  }
 }
 

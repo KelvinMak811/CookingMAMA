@@ -31,13 +31,19 @@ function collectAccountSyncPayload(accountId: AccountId) {
     | typeof STORAGE_KEYS.SHOPPING
     | typeof STORAGE_KEYS.COOKING_LOG
     | typeof STORAGE_KEYS.MEAL_PLAN
-    | typeof STORAGE_KEYS.FRIDGE,
+    | typeof STORAGE_KEYS.FRIDGE
+    | typeof STORAGE_KEYS.FITNESS
+    | typeof STORAGE_KEYS.JAPANESE
+    | typeof STORAGE_KEYS.INVEST,
     string
   ][] = [
     [STORAGE_KEYS.SHOPPING, userStorageKey(STORAGE_KEYS.SHOPPING, accountId)],
     [STORAGE_KEYS.COOKING_LOG, userStorageKey(STORAGE_KEYS.COOKING_LOG, accountId)],
     [STORAGE_KEYS.MEAL_PLAN, userStorageKey(STORAGE_KEYS.MEAL_PLAN, accountId)],
     [STORAGE_KEYS.FRIDGE, userStorageKey(STORAGE_KEYS.FRIDGE, accountId)],
+    [STORAGE_KEYS.FITNESS, userStorageKey(STORAGE_KEYS.FITNESS, accountId)],
+    [STORAGE_KEYS.JAPANESE, userStorageKey(STORAGE_KEYS.JAPANESE, accountId)],
+    [STORAGE_KEYS.INVEST, userStorageKey(STORAGE_KEYS.INVEST, accountId)],
   ];
 
   for (const [syncName, localKey] of pairs) {
@@ -76,6 +82,9 @@ function applyServerSync(sync: {
     cooking_log: userStorageKey(STORAGE_KEYS.COOKING_LOG, accountId),
     meal_plan: userStorageKey(STORAGE_KEYS.MEAL_PLAN, accountId),
     fridge: userStorageKey(STORAGE_KEYS.FRIDGE, accountId),
+    fitness: userStorageKey(STORAGE_KEYS.FITNESS, accountId),
+    japanese: userStorageKey(STORAGE_KEYS.JAPANESE, accountId),
+    invest: userStorageKey(STORAGE_KEYS.INVEST, accountId),
   } as const;
 
   for (const [key, localKey] of Object.entries(map)) {
@@ -206,6 +215,9 @@ export function exportUserBackup(): void {
       cooking_log: getLocalPayload(userStorageKey(STORAGE_KEYS.COOKING_LOG, accountId)),
       meal_plan: getLocalPayload(userStorageKey(STORAGE_KEYS.MEAL_PLAN, accountId)),
       fridge: getLocalPayload(userStorageKey(STORAGE_KEYS.FRIDGE, accountId)),
+      fitness: getLocalPayload(userStorageKey(STORAGE_KEYS.FITNESS, accountId)),
+      japanese: getLocalPayload(userStorageKey(STORAGE_KEYS.JAPANESE, accountId)),
+      invest: getLocalPayload(userStorageKey(STORAGE_KEYS.INVEST, accountId)),
     };
   }
 
@@ -259,6 +271,27 @@ export async function importUserBackup(file: File): Promise<void> {
       applyPayloadToLocal(
         userStorageKey(STORAGE_KEYS.FRIDGE, accountId),
         data.fridge,
+        exportedAt
+      );
+    }
+    if (data.fitness) {
+      applyPayloadToLocal(
+        userStorageKey(STORAGE_KEYS.FITNESS, accountId),
+        data.fitness,
+        exportedAt
+      );
+    }
+    if (data.japanese) {
+      applyPayloadToLocal(
+        userStorageKey(STORAGE_KEYS.JAPANESE, accountId),
+        data.japanese,
+        exportedAt
+      );
+    }
+    if (data.invest) {
+      applyPayloadToLocal(
+        userStorageKey(STORAGE_KEYS.INVEST, accountId),
+        data.invest,
         exportedAt
       );
     }
